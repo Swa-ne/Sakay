@@ -74,3 +74,4 @@ __pycache__/
 *.pyc
 
 pubspec.lock
+package-lock.json
