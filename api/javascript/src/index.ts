@@ -38,6 +38,7 @@ app.use(
 app.use(cookieParser());
 
 app.use(express.json());
+app.use("/authentication", entryRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
