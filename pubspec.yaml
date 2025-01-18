@@ -76,6 +76,11 @@ flutter:
     - assets/pwd_id.png
     - assets/medical_certificate.png
     - assets/proof_of_address.png
+    - assets/default_map.png
+    - assets/satellite_map.png
+    - assets/terrain_map.png
+    - assets/profile_icon.png
+    - assets/swane.png
 
 
 
