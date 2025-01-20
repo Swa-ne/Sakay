@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import { checkEmailAvailability, checkEmailVerified, checkUsernameAvailability, signupUsertoDatabase } from '../../services/authentication/signup.services';
+import { checkEmailAvailability, checkEmailVerified, checkPhoneNumberAvailability, signupUsertoDatabase } from '../../services/authentication/signup.services';
 import { UserSchemaInterface } from '../../models/authentication/user.model';
-import { checkEveryInputForSignup, validateBioLength } from '../../utils/input.validators';
+import { checkEveryInputForSignup, checkPhoneNumberValidity } from '../../utils/input.validators';
 import { generateAccessAndRefereshTokens, sendEmailCode, verifyEmailCode } from '../../services/index.services';
 import { UserType } from '../../middlewares/token.authentication';
 
 interface CustomRequestBody extends UserSchemaInterface {
-    confirmation_password: string,
-    valid_email: boolean
+    confirmation_password: string
 }
 
 export const checkEmailVerifiedController = async (req: Request & { user?: UserType }, res: Response) => {
@@ -31,15 +30,17 @@ export const checkEmailVerifiedController = async (req: Request & { user?: UserT
     }
 }
 
-export const checkUsernameAvailabilityController = async (req: Request, res: Response) => {
+export const checkEmailAvailabilityController = async (req: Request, res: Response) => {
     try {
-        let username: string = req.body.username;
-        if (!username) {
-            res.status(404).json({ error: "Username not found" });
+        let email_address: string = req.body.email_address;
+        if (!email_address) {
+            res.status(404).json({ error: "Email address not found" });
             return;
         }
-        if (!(await checkUsernameAvailability(username))) {
-            res.status(409).json({ error: 'This username is being used.' });
+        email_address = email_address.toLowerCase();
+        if (!(await checkEmailAvailability(email_address))) {
+            res.status(409).json({ error: 'This email address is being used.' });
+            return;
         }
         res.status(200).json({ message: "Success" });
     } catch (e) {
@@ -47,16 +48,19 @@ export const checkUsernameAvailabilityController = async (req: Request, res: Res
     }
 }
 
-export const checkEmailAvailabilityController = async (req: Request, res: Response) => {
+export const checkPhoneNumberValidityController = async (req: Request, res: Response) => {
     try {
-        let personal_email: string = req.body.personal_email;
-        if (!personal_email) {
-            res.status(404).json({ error: "Email address not found" });
+        let phone_number: string = req.body.phone_number;
+        if (!phone_number) {
+            res.status(404).json({ error: "Phone number not found" });
             return;
         }
-        personal_email = personal_email.toLowerCase();
-        if (!(await checkEmailAvailability(personal_email))) {
-            res.status(409).json({ error: 'This email address is being used.' });
+        if (!checkPhoneNumberValidity(phone_number)) {
+            res.status(400).json({ error: 'Please enter a valid phone number' });
+            return;
+        }
+        if (!(await checkPhoneNumberAvailability(phone_number))) {
+            res.status(409).json({ error: 'This phone number is being used.' });
             return;
         }
         res.status(200).json({ message: "Success" });
@@ -67,31 +71,30 @@ export const checkEmailAvailabilityController = async (req: Request, res: Respon
 
 export const signupUserController = async (req: Request, res: Response) => {
     try {
-        const { first_name, middle_name, last_name, username, bio, password_hash, confirmation_password, birthday, valid_email }: CustomRequestBody = req.body;
-        let personal_email: string = req.body.personal_email;
-        if (!personal_email) {
-            res.status(404).json({ error: "Email address not found" });
+        const { first_name, last_name, phone_number, password_hash, confirmation_password, birthday, user_type }: CustomRequestBody = req.body;
+        let email_address: string = req.body.email_address;
+        if (!email_address && !phone_number) {
+            res.status(404).json({ error: "Email address or phone number not found" });
             return
         }
-        personal_email = personal_email.toLowerCase()
+        email_address = email_address.toLowerCase()
         const requiredFields = {
             first_name,
             last_name,
-            username,
-            personal_email,
             password_hash,
             confirmation_password,
             birthday,
+            user_type,
         };
 
         const updatedKey: { [key: string]: string } = {
             first_name: "First Name",
             last_name: "Last Name",
             username: "Username",
-            personal_email: "Email Address",
             password_hash: "Password",
             confirmation_password: "Confirmation Password",
             birthday: "Birthday",
+            user_type: "User Type",
         }
         for (const [key, value] of Object.entries(requiredFields)) {
             if (!value) {
@@ -100,14 +103,9 @@ export const signupUserController = async (req: Request, res: Response) => {
             }
         }
 
-        if (!validateBioLength(bio)) {
-            res.status(400).json({ error: 'Bio exceeds the maximum allowed length of 80 words. Please shorten your bio.' });
-            return;
-        }
-
-        const checkerForInput = await checkEveryInputForSignup(username, personal_email, password_hash, confirmation_password);
+        const checkerForInput = await checkEveryInputForSignup(phone_number, email_address, password_hash, confirmation_password);
         if (checkerForInput.message === 'Success') {
-            const data = await signupUsertoDatabase(first_name, middle_name, last_name, username, bio, personal_email, birthday, password_hash, valid_email);
+            const data = await signupUsertoDatabase(first_name, last_name, email_address, phone_number, password_hash, birthday, user_type);
             if (data.httpCode !== 200) {
                 res.status(500).json({ error: data.error });
                 return;
