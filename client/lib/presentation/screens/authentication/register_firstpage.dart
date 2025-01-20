@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/login_page.dart';
-import 'package:sakay_app/screens/authentication/register_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 
 class SignUpPage1 extends StatefulWidget {
   const SignUpPage1({super.key});
@@ -12,9 +12,11 @@ class SignUpPage1 extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage1> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false; // To control password visibility
-  bool _isConfirmPasswordVisible = false; // To control confirm password visibility
+  bool _isConfirmPasswordVisible =
+      false; // To control confirm password visibility
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +64,15 @@ class _SignUpPageState extends State<SignUpPage1> {
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF3A6C8D)),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: const Color(0xFF3A6C8D),
                     ),
                     onPressed: () {
                       setState(() {
-                        _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                        _isPasswordVisible =
+                            !_isPasswordVisible; // Toggle visibility
                       });
                     },
                   ),
@@ -85,12 +90,15 @@ class _SignUpPageState extends State<SignUpPage1> {
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF3A6C8D)),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: const Color(0xFF3A6C8D),
                     ),
                     onPressed: () {
                       setState(() {
-                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible; // Toggle visibility
+                        _isConfirmPasswordVisible =
+                            !_isConfirmPasswordVisible; // Toggle visibility
                       });
                     },
                   ),
@@ -105,7 +113,8 @@ class _SignUpPageState extends State<SignUpPage1> {
                   // Add logic for Next button here
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -138,14 +147,15 @@ class _SignUpPageState extends State<SignUpPage1> {
                       // Navigate to Login page using push
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
                       );
                     },
                     child: const Text(
                       "Login",
                       style: TextStyle(
                         fontSize: 14.0,
-                        color: Color(0xFF3A6C8D), 
+                        color: Color(0xFF3A6C8D),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -166,7 +176,8 @@ class _SignUpPageState extends State<SignUpPage1> {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 30.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 30.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       side: const BorderSide(color: Colors.grey),

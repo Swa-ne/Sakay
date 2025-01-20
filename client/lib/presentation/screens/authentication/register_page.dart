@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/usertype.dart';
+import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -31,7 +31,9 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20.0), // Adjusted to match the space after the app bar
+              const SizedBox(
+                  height:
+                      20.0), // Adjusted to match the space after the app bar
               const Text(
                 "Sign up",
                 style: TextStyle(
@@ -148,9 +150,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 onPressed: _isTermsAccepted
                     ? () {
                         Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const UserTypePage(firstName: '',)),
-                  );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserTypePage(
+                                    firstName: '',
+                                  )),
+                        );
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

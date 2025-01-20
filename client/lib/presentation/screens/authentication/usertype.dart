@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/pwdrequirements_page.dart';
-import 'package:sakay_app/screens/commuter/home_page.dart';
-import 'captcha_page.dart'; 
+import 'package:sakay_app/presentation/screens/authentication/pwdrequirements_page.dart';
+import 'package:sakay_app/presentation/screens/commuter/home_page.dart';
+import 'captcha_page.dart';
 
 class UserTypePage extends StatefulWidget {
   final String firstName;
@@ -29,7 +29,8 @@ class _UserTypePageState extends State<UserTypePage> {
             } else if (_userType == 'PWD') {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const PWDRequirementsPage()),
+                MaterialPageRoute(
+                    builder: (context) => const PWDRequirementsPage()),
               );
             }
           },
@@ -54,7 +55,8 @@ class _UserTypePageState extends State<UserTypePage> {
             const SizedBox(height: 20.0),
             Text(
               "Hey, ${widget.firstName}",
-              style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15.0),
             const Text(
@@ -74,7 +76,8 @@ class _UserTypePageState extends State<UserTypePage> {
               onPressed: _userType != null ? _navigateToCaptcha : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF3A6C8D),
-                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 155.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 155.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50.0),
                 ),

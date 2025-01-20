@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/intro/guide_screen.dart';
+import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 20.0),
             // Styled CircularProgressIndicator with custom color
             const CircularProgressIndicator(
-              color: Color(0xFF3A6C8D), 
+              color: Color(0xFF3A6C8D),
             ),
           ],
         ),

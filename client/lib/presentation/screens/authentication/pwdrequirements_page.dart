@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/pwd_upload.dart';
+import 'package:sakay_app/presentation/screens/authentication/pwd_upload.dart';
 
 class PWDRequirementsPage extends StatelessWidget {
   const PWDRequirementsPage({super.key});
@@ -54,7 +54,8 @@ class PWDRequirementsPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const PWDUploadPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const PWDUploadPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -90,7 +91,8 @@ class PWDRequirementsPage extends StatelessWidget {
             flex: 2,
             child: Text(
               text,
-              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+              style:
+                  const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
             ),
           ),
           const SizedBox(width: 10.0),
@@ -107,4 +109,3 @@ class PWDRequirementsPage extends StatelessWidget {
     );
   }
 }
-
