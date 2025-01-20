@@ -18,11 +18,11 @@ class _ProfilePageState extends State<ProfilePage> {
           'Profile',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF3A6C8D),
+        backgroundColor: const Color(0xFF00A2FF),
         automaticallyImplyLeading: true,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView( 
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -34,45 +34,89 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(30.0),
-                color: const Color(0xFF3A6C8D), 
+                color: const Color(0xFF00A2FF),
                 child: Container(
-                  padding: const EdgeInsets.all(10.0), 
+                  padding: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(38, 0, 0, 0), 
-                    borderRadius: BorderRadius.circular(10.0), 
-                  ),
-                  child: const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 50.0,
-                        backgroundImage: AssetImage('assets/swane.png'),
+                    color: const Color(0xFF00A2FF),
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        offset: const Offset(0, 8),
+                        blurRadius: 5.0,
+                        spreadRadius: 2,
                       ),
-                      SizedBox(width: 15.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      const Row(
                         children: [
-                          Text(
-                            'Swane Bautista', 
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          CircleAvatar(
+                            radius: 50.0,
+                            backgroundImage: AssetImage('assets/swane.png'),
                           ),
-                          Text(
-                            'Commuter',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              color: Colors.white70,
-                            ),
+                          SizedBox(width: 15.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Swane Bautista',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Commuter',
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
+                      ),
+                      Positioned(
+                        left: 73, 
+                        bottom: 0, 
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Change Profile Picture')),
+                            );
+                          },
+                          child: Container(
+                            height: 25.0,
+                            width: 25.0,
+                            decoration: BoxDecoration(
+                              color: Colors.black, 
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 4.0,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 14.0,
+                              color: Colors.white, 
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
+
 
             const SizedBox(height: 20.0),
 
@@ -114,20 +158,23 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 10.0),
 
-            _buildSettingsOption(Icons.account_circle, 'Account'),
+            // Settings Options
+            _buildSettingsOption(Icons.account_circle, 'Account', 'Manage and update your personal account information'),
             _buildDivider(),
-            _buildSettingsOption(Icons.notifications, 'Notifications'),
+            _buildSettingsOption(Icons.notifications, 'Notifications', 'Customize how you stay informed with real-time updates'),
             _buildDivider(),
-            _buildSettingsOption(Icons.location_on, 'Saved Locations'),
+            _buildSettingsOption(Icons.location_on, 'Saved Locations', 'Easily access your most frequented destinations'),
             _buildDivider(),
-            _buildSettingsOption(Icons.language, 'Language Preference'),
+            _buildSettingsOption(Icons.language, 'Language Preference','Select the language that best fits your needs'),
             _buildDivider(),
-            _buildSettingsOption(Icons.format_paint, 'Theme Customization'),
+            _buildSettingsOption(Icons.format_paint, 'Theme Customization', 'Adjust the app’s appearance to suit your style'),
             _buildDivider(),
-            _buildSettingsOption(Icons.info, 'About'),
+            _buildSettingsOption(Icons.info, 'About', 'Discover more about Sakay and its features'),
+            _buildDivider(),
+            _buildSettingsOption(Icons.contact_mail, 'Contact Us', 'Message us with your concerns'),
             _buildDivider(),
 
-            const SizedBox(height: 20.0),  
+            const SizedBox(height: 20.0),
 
             _buildLogoutOption(),
 
@@ -179,23 +226,36 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSettingsOption(IconData icon, String title) {
+  Widget _buildSettingsOption(IconData icon, String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.black),
-          const SizedBox(width: 20.0),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14.0),
+          Icon(icon, color: Colors.black, size: 30.0,),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.black),
         ],
       ),
     );
   }
+
+
 
   Widget _buildLogoutOption() {
     return Padding(
@@ -213,7 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(width: 20.0),
             Text(
               'Logout',
-              style: TextStyle(fontSize: 16.0),
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
             ),
             Spacer(),
             Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.black),
