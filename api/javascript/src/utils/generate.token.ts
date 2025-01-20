@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { getUserRefreshToken } from '../services/index.services';
-import { User } from '../models/authentication/user.model';
+import { User, UserSchemaInterface } from '../models/authentication/user.model';
 import { CustomResponse } from './input.validators';
 
 export const generateAccessTokenWithRefreshToken = async (decoded_token: jwt.JwtPayload): Promise<CustomResponse> => {
@@ -14,9 +14,9 @@ export const generateAccessTokenWithRefreshToken = async (decoded_token: jwt.Jwt
         message: jwt.sign(
             {
                 user_id: user._id,
-                email: user.personal_email,
-                username: user.username,
-                full_name: user.full_name
+                email: user.email_address,
+                phone_number: user.phone_number,
+                full_name: `${user.first_name} ${user.last_name}`
             },
             process.env.ACCESS_TOKEN_SECRET as string,
             {
@@ -26,25 +26,19 @@ export const generateAccessTokenWithRefreshToken = async (decoded_token: jwt.Jwt
     }
 };
 
-export const generateAccessToken = async (user_id: string): Promise<CustomResponse> => {
-    const user = await User.findById(user_id)
-
-    if (!user) return { error: "User Not Found", httpCode: 404 }
-
-    return {
-        message: jwt.sign(
-            {
-                user_id,
-                email: user.personal_email,
-                username: user.username,
-                full_name: user.full_name
-            },
-            process.env.ACCESS_TOKEN_SECRET as string,
-            {
-                expiresIn: "30m"
-            }
-        ), httpCode: 200
-    }
+export const generateAccessToken = async (user: UserSchemaInterface): Promise<string> => {
+    return jwt.sign(
+        {
+            user_id: user._id,
+            email: user.email_address,
+            phone_number: user.phone_number,
+            full_name: `${user.first_name} ${user.last_name}`
+        },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        {
+            expiresIn: "30m"
+        }
+    )
 };
 
 export const generateRefreshToken = async (user_id: string): Promise<string> => {
