@@ -6,8 +6,9 @@ import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
 import entryRoutes from "./routes/authentication.routes";
+import { server } from './socket';
 
-const app = express();
+export const app = express();
 
 
 dotenv.config()
@@ -44,6 +45,6 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
