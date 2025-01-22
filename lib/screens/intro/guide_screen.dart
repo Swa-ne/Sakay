@@ -126,7 +126,7 @@ class _GuideScreenState extends State<GuideScreen> {
                 effect: const ExpandingDotsEffect( 
                   dotWidth: 12.0,
                   dotHeight: 12.0,
-                  activeDotColor: Color(0xFF3A6C8D), 
+                  activeDotColor: Color(0xFF00A2FF), 
                   dotColor: Colors.grey, 
                   spacing: 20.0, 
                   expansionFactor: 4.0, 
@@ -139,7 +139,7 @@ class _GuideScreenState extends State<GuideScreen> {
             ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3A6C8D), 
+                backgroundColor: const Color(0xFF00A2FF), 
                 padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 130.0), 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50.0), 

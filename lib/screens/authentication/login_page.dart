@@ -50,10 +50,13 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: 'Email',
                       prefixIcon: Icon(
                         Icons.email,
-                        color: Color(0xFF3A6C8D),
+                        color: Color(0xFF00A2FF),
                       ),
-                      iconColor: Color(0xFF3A6C8D),
+                      iconColor: Color(0xFF00A2FF),
                       border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20.0),
@@ -66,13 +69,16 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: 'Password',
                       prefixIcon: Icon(
                         Icons.lock,
-                        color: Color(0xFF3A6C8D),
+                        color: Color(0xFF00A2FF),
                       ),
                       suffixIcon: Icon(
                         Icons.visibility,
-                        color: Color(0xFF3A6C8D),
+                        color: Color(0xFF00A2FF),
                       ),
                       border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10.0),
@@ -84,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Checkbox(
                             value: _isRememberMeChecked,
+                            activeColor: const Color(0xFF00A2FF),
                             onChanged: (bool? value) {
                               setState(() {
                                 _isRememberMeChecked = value ?? false;
@@ -93,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                           const Text('Remember Me'),
                         ],
                       ),
-                      // Forgot Password Link
+
                       TextButton(
                         onPressed: () {},
                         child: const Text(
@@ -105,11 +112,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 10.0),
 
-                  // Login Button
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3A6C8D),
+                      backgroundColor: const Color(0xFF00A2FF),
                       padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 150.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50.0),
@@ -134,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                             MaterialPageRoute(builder: (context) => const SignUpPage1()),
                           );
                         },
-                        child: const Text('Register'),
+                        child: const Text('Register', style: TextStyle(color: Color(0xFF00A2FF)),),
                       ),
                     ],
                   ),

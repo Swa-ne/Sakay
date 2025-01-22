@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sakay_app/screens/authentication/login_page.dart';
 import 'package:sakay_app/screens/authentication/register_page.dart';
@@ -13,8 +14,8 @@ class _SignUpPageState extends State<SignUpPage1> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  bool _isPasswordVisible = false; // To control password visibility
-  bool _isConfirmPasswordVisible = false; // To control confirm password visibility
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,74 +43,78 @@ class _SignUpPageState extends State<SignUpPage1> {
               ),
               const SizedBox(height: 30.0),
 
-              // Email TextField
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email, color: Color(0xFF3A6C8D)),
+                  prefixIcon: Icon(Icons.email, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
 
-              // Password TextField with visibility toggle
               TextField(
                 controller: _passwordController,
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF3A6C8D)),
+                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: const Color(0xFF3A6C8D),
+                      color: const Color(0xFF00A2FF),
                     ),
                     onPressed: () {
                       setState(() {
-                        _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                        _isPasswordVisible = !_isPasswordVisible; 
                       });
                     },
                   ),
                   border: const OutlineInputBorder(),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
 
-              // Confirm Password TextField with visibility toggle
               TextField(
                 controller: _confirmPasswordController,
                 obscureText: !_isConfirmPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
-                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF3A6C8D)),
+                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: const Color(0xFF3A6C8D),
+                      color: const Color(0xFF00A2FF),
                     ),
                     onPressed: () {
                       setState(() {
-                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible; // Toggle visibility
+                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                       });
                     },
                   ),
                   border: const OutlineInputBorder(),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                  ),
                 ),
               ),
               const SizedBox(height: 30.0),
 
-              // Next Button
               ElevatedButton(
                 onPressed: () {
-                  // Add logic for Next button here
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const RegisterPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3A6C8D),
+                  backgroundColor: const Color(0xFF00A2FF),
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50.0),
@@ -125,7 +130,6 @@ class _SignUpPageState extends State<SignUpPage1> {
 
               const SizedBox(height: 30.0),
 
-              // Add "Already have an account? Login" text
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -135,7 +139,6 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigate to Login page using push
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -145,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                       "Login",
                       style: TextStyle(
                         fontSize: 14.0,
-                        color: Color(0xFF3A6C8D), 
+                        color: Color(0xFF00A2FF),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -155,11 +158,9 @@ class _SignUpPageState extends State<SignUpPage1> {
 
               const SizedBox(height: 30.0),
 
-              // Centered "Sign Up with Google" Button
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Add logic for Google Sign Up here
                   },
                   icon: Image.asset('assets/google_icon.png', height: 24.0),
                   label: const Text('Sign up with Google'),
@@ -174,6 +175,35 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 120.0),
+
+              Center(
+                child: Text.rich(
+                  TextSpan(
+                    text: "By signing up you agree to our ",
+                    style: const TextStyle(fontSize: 14.0, color: Colors.black),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "Terms of Use",
+                        style: const TextStyle(color: Color(0xFF00A2FF)),
+                        recognizer: TapGestureRecognizer()..onTap = () {
+                        },
+                      ),
+                      const TextSpan(
+                        text: " and ",
+                      ),
+                      TextSpan(
+                        text: "Privacy Policy",
+                        style: const TextStyle(color: Color(0xFF00A2FF)),
+                        recognizer: TapGestureRecognizer()..onTap = () {
+                        },
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
         ),
@@ -181,3 +211,4 @@ class _SignUpPageState extends State<SignUpPage1> {
     );
   }
 }
+

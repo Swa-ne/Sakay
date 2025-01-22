@@ -21,7 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Goes back to the previous screen
+            Navigator.pop(context);
           },
         ),
       ),
@@ -31,9 +31,8 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20.0), // Adjusted to match the space after the app bar
               const Text(
-                "Sign up",
+                "New User Registration ",
                 style: TextStyle(
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,
@@ -52,8 +51,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _firstNameController,
                 decoration: const InputDecoration(
                   labelText: 'First Name',
-                  prefixIcon: Icon(Icons.person, color: Color(0xFF3A6C8D)),
+                  prefixIcon: Icon(Icons.person, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -62,8 +64,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _lastNameController,
                 decoration: const InputDecoration(
                   labelText: 'Last Name',
-                  prefixIcon: Icon(Icons.person, color: Color(0xFF3A6C8D)),
+                  prefixIcon: Icon(Icons.person, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -116,11 +121,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 20.0),
-
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Checkbox(
                     value: _isTermsAccepted,
+                    activeColor: const Color(0xFF00A2FF),
                     onChanged: (bool? value) {
                       setState(() {
                         _isTermsAccepted = value ?? false;
@@ -129,35 +135,48 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isTermsAccepted = !_isTermsAccepted;
-                        });
-                      },
-                      child: const Text(
-                        "I agree to the Privacy Notice and Terms and Conditions",
-                        style: TextStyle(fontSize: 14.0),
+                      onTap: null,
+                      child: const Text.rich(
+                        TextSpan(
+                          text: "By Proceeding, I agree that Sakay can collect, use and disclose the information provided by me in accordance with the ",
+                          children: [
+                            TextSpan(
+                              text: "Privacy Notice",
+                              style: TextStyle(fontSize: 14.0, color: Color(0xFF00A2FF)),
+                            ),
+                            TextSpan(
+                              text: " and I fully comply with ",
+                            ),
+                            TextSpan(
+                              text: "Terms & Conditions",
+                              style: TextStyle(fontSize: 14.0, color: Color(0xFF00A2FF)),
+                            ),
+                            TextSpan(
+                              text: " which I have read and understand.",
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 250.0),
 
               ElevatedButton(
                 onPressed: _isTermsAccepted
                     ? () {
                         Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const UserTypePage(firstName: '',)),
-                  );
+                          context,
+                          MaterialPageRoute(builder: (context) => const UserTypePage(firstName: '',)),
+                        );
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3A6C8D),
+                  backgroundColor: const Color(0xFF00A2FF),
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
                 child: const Center(
