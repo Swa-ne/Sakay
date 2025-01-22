@@ -1,5 +1,5 @@
 import { User, UserSchemaInterface } from "../../models/authentication/user.model";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { CustomResponse } from "../../utils/input.validators";
 
 export const loginUsertoDatabase = async (user_identifier: string, password: string) => {
