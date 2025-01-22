@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { createClient } from 'redis';
 import cors from 'cors';
 import bodyParser from "body-parser";
 import cookieParser from 'cookie-parser';
@@ -12,9 +13,10 @@ export const app = express();
 
 
 dotenv.config()
-const port = 3000;
+const port = Number(process.env.API_PORT);
 
 const MONGODB_CONNECTION: any = process.env.MONGODB_CONNECTION;
+
 mongoose
     .connect(MONGODB_CONNECTION)
     .then(() => {
@@ -23,6 +25,22 @@ mongoose
     .catch((error) => {
         console.log('Internal Server Error');
     });
+
+const redis = createClient({
+    username: process.env.REDIS_USERNAME,
+    password: process.env.REDIS_PASSWORD,
+    socket: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT)
+    }
+});
+redis.on('ready', () => {
+    console.log('Connected to Redis Client');
+});
+
+redis.on('error', (err) => {
+    console.error('Redis Client Error:', err);
+});
 
 app.set('trust proxy', 1);
 app.use(
