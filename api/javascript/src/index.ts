@@ -26,7 +26,7 @@ mongoose
         console.log('Internal Server Error');
     });
 
-const redis = createClient({
+export const redis = createClient({
     username: process.env.REDIS_USERNAME,
     password: process.env.REDIS_PASSWORD,
     socket: {
