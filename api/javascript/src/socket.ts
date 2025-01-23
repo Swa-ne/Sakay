@@ -3,7 +3,7 @@ import http from "http";
 import { app } from ".";
 import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
-import { addUserToRedisController } from "./controllers/tracking/index.controller";
+import { addUserToRedisController, removeUserToRedisController } from "./controllers/tracking/index.controller";
 
 declare module "socket.io" {
     interface Socket {
@@ -29,6 +29,7 @@ io.on("connection", async (socket) => {
     addUserToRedisController(socket.id, socket.user);
 
     socket.on("disconnect", async () => {
+        removeUserToRedisController(socket.id, socket.user)
         console.log(`disconnected ${socket.id}`)
     });
 });
