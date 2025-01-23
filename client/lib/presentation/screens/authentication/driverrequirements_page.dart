@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/authentication/pwd_upload.dart';
+import 'package:sakay_app/presentation/screens/authentication/driver_upload.dart';
 
-class PWDRequirementsPage extends StatelessWidget {
-  const PWDRequirementsPage({super.key});
+class DriverRequirementsPage extends StatelessWidget {
+  const DriverRequirementsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,43 +23,40 @@ class PWDRequirementsPage extends StatelessWidget {
                 'To fulfill all the requirements needed for the security of the company and commuters.',
                 style: TextStyle(fontSize: 16.0),
               ),
-              const SizedBox(height: 20.0),
-
+              const SizedBox(height: 10.0),
               _buildRequirementItem(
-                'Government-Issued PWD ID',
-                [
-                  'Serves as official identification for Persons with Disabilities (PWD).',
-                  'Must be authorized and validated by the government.',
-                ],
+                'Driver’s License',
                 'assets/requirement_pic.png',
+                const [
+                  'Proof of driving eligibility and competence for public roadways',
+                  'Verifying the driver’s legal age, authorization, and skill to operate vehicles',
+                ],
               ),
               _buildRequirementItem(
-                'Medical Certificate or Report',
-                [
-                  'Provides proof of a certified medical condition.',
-                  'Should be signed by a licensed healthcare professional.',
-                ],
+                'Vehicle Registration Documents',
                 'assets/requirement_pic.png',
+                const [
+                  'Ownership or authorization to operate a vehicle for transport vehicles',
+                  'Ensuring the vehicle meets regulatory standards for public use',
+                ],
               ),
               _buildRequirementItem(
-                'Disability Certification from Relevant Agencies',
-                [
-                  'Confirms disability status through authorized agencies.',
-                  'Required for validation of eligibility and benefits.',
-                ],
+                'NBI or Police Clearance',
                 'assets/requirement_pic.png',
+                const [
+                  'OEnsuring a Safe and Trustworthy Driving Record for Passenger Confidence',
+                  'Validating a Clear Criminal Background for Public Transportation Safety',
+                ],
               ),
-
-              const SizedBox(height: 60.0),
-
-              // Continue Button
+              const SizedBox(height: 30.0),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const PWDUploadPage()),
+                        builder: (context) => const DriverUploadPage(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -85,11 +82,10 @@ class PWDRequirementsPage extends StatelessWidget {
     );
   }
 
-  // Widget for Requirement Items with Updated Subtitles
-  Widget _buildRequirementItem(
-      String title, List<String> bullets, String imagePath) {
+  Widget _buildRequirementItem(String title, String imagePath,
+      [List<String>? bullets]) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -103,39 +99,48 @@ class PWDRequirementsPage extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(height: 5.0),
-                ...bullets.map(
-                  (bullet) => Padding(
-                    padding: const EdgeInsets.only(left: 10.0, bottom: 5.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '• ', // Bullet point
-                          style: TextStyle(fontSize: 14.0, color: Colors.black),
-                        ),
-                        Expanded(
-                          child: Text(
-                            bullet,
-                            style: const TextStyle(
-                                fontSize: 14.0, color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
+                if (bullets != null) ...[
+                  const SizedBox(height: 10.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: bullets
+                        .expand((bullet) => [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    '• ',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      bullet,
+                                      style: const TextStyle(
+                                          fontSize: 14.0,
+                                          color: Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8.0),
+                            ])
+                        .toList(),
                   ),
-                ),
+                ],
               ],
             ),
           ),
           const SizedBox(width: 10.0),
+          // Image
           Expanded(
             flex: 1,
             child: Align(
               alignment: Alignment.topCenter,
               child: Image.asset(
                 imagePath,
-                height: 120.0,
+                height: 150.0,
                 fit: BoxFit.contain,
               ),
             ),
