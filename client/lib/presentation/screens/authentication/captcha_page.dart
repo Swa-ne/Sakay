@@ -85,6 +85,9 @@ class _CaptchaPageState extends State<CaptchaPage> {
               decoration: InputDecoration(
                 labelText: "Enter your answer",
                 border: const OutlineInputBorder(),
+                focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                ),
                 errorText: _errorMessage,
               ),
               keyboardType: TextInputType.number,
@@ -94,7 +97,7 @@ class _CaptchaPageState extends State<CaptchaPage> {
               onPressed: _validateCaptcha,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
-                backgroundColor: const Color(0xFF3A6C8D),
+                backgroundColor: const Color(0xFF00A2FF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
