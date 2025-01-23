@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/driverrequirements_page.dart';
-import 'package:sakay_app/screens/authentication/phone_verification.dart';
-import 'package:sakay_app/screens/authentication/pwdrequirements_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/pwdrequirements_page.dart';
+import 'captcha_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/driverrequirements_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/phone_verification.dart';
 import 'captcha_page.dart';
 
 class UserTypePage extends StatefulWidget {
@@ -25,17 +26,14 @@ class _UserTypePageState extends State<UserTypePage> {
             if (_userType == 'Commuter') {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => PhoneVerificationPage()),
+                MaterialPageRoute(
+                    builder: (context) => PhoneVerificationPage()),
               );
             } else if (_userType == 'PWD') {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const PWDRequirementsPage()),
-              );
-            } else if (_userType == 'Driver') {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const DriverRequirementsPage()),
+                MaterialPageRoute(
+                    builder: (context) => const PWDRequirementsPage()),
               );
             }
           },
@@ -61,7 +59,8 @@ class _UserTypePageState extends State<UserTypePage> {
               const SizedBox(height: 20.0),
               Text(
                 "Hey, ${widget.firstName}",
-                style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 15.0),
               const Text(
@@ -83,7 +82,8 @@ class _UserTypePageState extends State<UserTypePage> {
                 onPressed: _userType != null ? _navigateToCaptcha : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00A2FF),
-                  padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 155.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 155.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),

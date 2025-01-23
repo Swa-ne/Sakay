@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/driver_upload.dart';
+import 'package:sakay_app/presentation/screens/authentication/driver_upload.dart';
 
 class DriverRequirementsPage extends StatelessWidget {
   const DriverRequirementsPage({super.key});
@@ -7,8 +7,7 @@ class DriverRequirementsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -20,13 +19,11 @@ class DriverRequirementsPage extends StatelessWidget {
                 style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10.0),
-
               const Text(
                 'To fulfill all the requirements needed for the security of the company and commuters.',
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 10.0),
-
               _buildRequirementItem(
                 'Driver’s License',
                 'assets/requirement_pic.png',
@@ -35,7 +32,6 @@ class DriverRequirementsPage extends StatelessWidget {
                   'Verifying the driver’s legal age, authorization, and skill to operate vehicles',
                 ],
               ),
-
               _buildRequirementItem(
                 'Vehicle Registration Documents',
                 'assets/requirement_pic.png',
@@ -44,7 +40,6 @@ class DriverRequirementsPage extends StatelessWidget {
                   'Ensuring the vehicle meets regulatory standards for public use',
                 ],
               ),
-
               _buildRequirementItem(
                 'NBI or Police Clearance',
                 'assets/requirement_pic.png',
@@ -53,9 +48,7 @@ class DriverRequirementsPage extends StatelessWidget {
                   'Validating a Clear Criminal Background for Public Transportation Safety',
                 ],
               ),
-
               const SizedBox(height: 30.0),
-
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -89,7 +82,8 @@ class DriverRequirementsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRequirementItem(String title, String imagePath, [List<String>? bullets]) {
+  Widget _buildRequirementItem(String title, String imagePath,
+      [List<String>? bullets]) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Row(
@@ -102,7 +96,8 @@ class DriverRequirementsPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
                 if (bullets != null) ...[
                   const SizedBox(height: 10.0),
@@ -115,12 +110,16 @@ class DriverRequirementsPage extends StatelessWidget {
                                 children: [
                                   const Text(
                                     '• ',
-                                    style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                   Expanded(
                                     child: Text(
                                       bullet,
-                                      style: const TextStyle(fontSize: 14.0, color: Colors.black87),
+                                      style: const TextStyle(
+                                          fontSize: 14.0,
+                                          color: Colors.black87),
                                     ),
                                   ),
                                 ],

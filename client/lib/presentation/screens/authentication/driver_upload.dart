@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:sakay_app/screens/authentication/submission_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/submission_page.dart';
 
 class DriverUploadPage extends StatefulWidget {
   const DriverUploadPage({super.key});
@@ -57,13 +57,11 @@ class _DriverUploadPageState extends State<DriverUploadPage> {
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 50.0),
-
               const Text(
                 'Driver\'s License',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16.0),
-
               Row(
                 children: [
                   Expanded(
@@ -76,33 +74,35 @@ class _DriverUploadPageState extends State<DriverUploadPage> {
                 ],
               ),
               const SizedBox(height: 16.0),
-
               _buildUploadSection('Vehicle Registration Documents'),
               const SizedBox(height: 16.0),
-
               _buildUploadSection('NBI or Police Clearance'),
               const SizedBox(height: 20.0),
-
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    bool allUploaded = uploadedFiles.values.every((file) => file.isNotEmpty);
+                    bool allUploaded =
+                        uploadedFiles.values.every((file) => file.isNotEmpty);
 
                     if (allUploaded) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SubmissionSuccessfulPage(),
+                          builder: (context) =>
+                              const SubmissionSuccessfulPage(),
                         ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please upload all required documents before submitting.')),
+                        const SnackBar(
+                            content: Text(
+                                'Please upload all required documents before submitting.')),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 150.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15.0, horizontal: 150.0),
                     backgroundColor: const Color(0xFF00A2FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -131,13 +131,13 @@ class _DriverUploadPageState extends State<DriverUploadPage> {
             requirement,
             style: TextStyle(
               fontSize: fontSize,
-              fontWeight: (requirement == 'Front Side' || requirement == 'Back Side')
-                  ? FontWeight.normal
-                  : FontWeight.bold,
+              fontWeight:
+                  (requirement == 'Front Side' || requirement == 'Back Side')
+                      ? FontWeight.normal
+                      : FontWeight.bold,
             ),
           ),
           const SizedBox(height: 10.0),
-
           GestureDetector(
             onTap: () {
               _uploadFile(requirement);
@@ -159,8 +159,11 @@ class _DriverUploadPageState extends State<DriverUploadPage> {
                 ),
                 const SizedBox(height: 5.0),
                 Text(
-                  (uploadedFiles[requirement] ?? '').isEmpty ? 'Click to upload' : 'Re-upload',
-                  style: const TextStyle(fontSize: 14.0, color: Color(0xFF3A6C8D)),
+                  (uploadedFiles[requirement] ?? '').isEmpty
+                      ? 'Click to upload'
+                      : 'Re-upload',
+                  style:
+                      const TextStyle(fontSize: 14.0, color: Color(0xFF3A6C8D)),
                 ),
               ],
             ),

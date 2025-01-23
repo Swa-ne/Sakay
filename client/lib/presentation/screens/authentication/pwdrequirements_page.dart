@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/pwd_upload.dart';
+import 'package:sakay_app/presentation/screens/authentication/pwd_upload.dart';
 
 class PWDRequirementsPage extends StatelessWidget {
   const PWDRequirementsPage({super.key});
@@ -58,7 +58,8 @@ class PWDRequirementsPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const PWDUploadPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const PWDUploadPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -85,11 +86,12 @@ class PWDRequirementsPage extends StatelessWidget {
   }
 
   // Widget for Requirement Items with Updated Subtitles
-  Widget _buildRequirementItem(String title, List<String> bullets, String imagePath) {
+  Widget _buildRequirementItem(
+      String title, List<String> bullets, String imagePath) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 3,
@@ -98,7 +100,8 @@ class PWDRequirementsPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 5.0),
                 ...bullets.map(
@@ -114,7 +117,8 @@ class PWDRequirementsPage extends StatelessWidget {
                         Expanded(
                           child: Text(
                             bullet,
-                            style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 14.0, color: Colors.grey),
                           ),
                         ),
                       ],

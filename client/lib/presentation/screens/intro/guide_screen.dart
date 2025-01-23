@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/login_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class GuideScreen extends StatefulWidget {
@@ -65,7 +65,8 @@ class _GuideScreenState extends State<GuideScreen> {
                     // Navigate to the login screen
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
                     );
                   },
                   () {
@@ -83,7 +84,8 @@ class _GuideScreenState extends State<GuideScreen> {
     );
   }
 
-  Widget _buildSlide(String imagePath, String header, String description, String buttonText, VoidCallback onPressed, VoidCallback? onBackPressed) {
+  Widget _buildSlide(String imagePath, String header, String description,
+      String buttonText, VoidCallback onPressed, VoidCallback? onBackPressed) {
     return Stack(
       children: [
         // Image at the top
@@ -103,10 +105,12 @@ class _GuideScreenState extends State<GuideScreen> {
               child: Text(
                 header,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 20.0), // Space between header and description
+            const SizedBox(
+                height: 20.0), // Space between header and description
             // Description text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -117,20 +121,20 @@ class _GuideScreenState extends State<GuideScreen> {
               ),
             ),
             const SizedBox(height: 60.0),
-          
+
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: SmoothPageIndicator(
                 controller: _pageController,
-                count: 3, 
-                effect: const ExpandingDotsEffect( 
+                count: 3,
+                effect: const ExpandingDotsEffect(
                   dotWidth: 12.0,
                   dotHeight: 12.0,
-                  activeDotColor: Color(0xFF00A2FF), 
-                  dotColor: Colors.grey, 
-                  spacing: 20.0, 
-                  expansionFactor: 4.0, 
-                  paintStyle: PaintingStyle.fill, 
+                  activeDotColor: Color(0xFF00A2FF),
+                  dotColor: Colors.grey,
+                  spacing: 20.0,
+                  expansionFactor: 4.0,
+                  paintStyle: PaintingStyle.fill,
                 ),
               ),
             ),
@@ -139,17 +143,19 @@ class _GuideScreenState extends State<GuideScreen> {
             ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00A2FF), 
-                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 130.0), 
+                backgroundColor: const Color(0xFF00A2FF),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 130.0),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0), 
+                  borderRadius: BorderRadius.circular(50.0),
                 ),
               ),
-              child: Text(buttonText, style: const TextStyle(fontSize: 15.0, color: Colors.white)),
+              child: Text(buttonText,
+                  style: const TextStyle(fontSize: 15.0, color: Colors.white)),
             ),
           ],
         ),
-      
+
         if (onBackPressed != null)
           Positioned(
             left: 10.0,
@@ -164,5 +170,3 @@ class _GuideScreenState extends State<GuideScreen> {
     );
   }
 }
-
-

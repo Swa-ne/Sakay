@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/register_firstpage.dart';
+import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 220.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 220.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -55,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
                       iconColor: Color(0xFF00A2FF),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                       ),
                     ),
                   ),
@@ -77,7 +79,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                       ),
                     ),
                   ),
@@ -100,7 +103,6 @@ class _LoginPageState extends State<LoginPage> {
                           const Text('Remember Me'),
                         ],
                       ),
-
                       TextButton(
                         onPressed: () {},
                         child: const Text(
@@ -116,7 +118,8 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00A2FF),
-                      padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 150.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 150.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50.0),
                       ),
@@ -137,10 +140,14 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignUpPage1()),
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage1()),
                           );
                         },
-                        child: const Text('Register', style: TextStyle(color: Color(0xFF00A2FF)),),
+                        child: const Text(
+                          'Register',
+                          style: TextStyle(color: Color(0xFF00A2FF)),
+                        ),
                       ),
                     ],
                   ),
@@ -154,7 +161,8 @@ class _LoginPageState extends State<LoginPage> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 30.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 30.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         side: const BorderSide(color: Colors.grey),

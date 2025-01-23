@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/usertype.dart';
+import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -46,7 +46,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 30.0),
-
               TextField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(
@@ -54,12 +53,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   prefixIcon: Icon(Icons.person, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                    borderSide:
+                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 20.0),
-
               TextField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(
@@ -67,12 +66,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   prefixIcon: Icon(Icons.person, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                    borderSide:
+                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 20.0),
-
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -138,18 +137,21 @@ class _RegisterPageState extends State<RegisterPage> {
                       onTap: null,
                       child: const Text.rich(
                         TextSpan(
-                          text: "By Proceeding, I agree that Sakay can collect, use and disclose the information provided by me in accordance with the ",
+                          text:
+                              "By Proceeding, I agree that Sakay can collect, use and disclose the information provided by me in accordance with the ",
                           children: [
                             TextSpan(
                               text: "Privacy Notice",
-                              style: TextStyle(fontSize: 14.0, color: Color(0xFF00A2FF)),
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Color(0xFF00A2FF)),
                             ),
                             TextSpan(
                               text: " and I fully comply with ",
                             ),
                             TextSpan(
                               text: "Terms & Conditions",
-                              style: TextStyle(fontSize: 14.0, color: Color(0xFF00A2FF)),
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Color(0xFF00A2FF)),
                             ),
                             TextSpan(
                               text: " which I have read and understand.",
@@ -162,13 +164,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
               const SizedBox(height: 250.0),
-
               ElevatedButton(
                 onPressed: _isTermsAccepted
                     ? () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const UserTypePage(firstName: '',)),
+                          MaterialPageRoute(
+                              builder: (context) => const UserTypePage(
+                                    firstName: '',
+                                  )),
                         );
                       }
                     : null,

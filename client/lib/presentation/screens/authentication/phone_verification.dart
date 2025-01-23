@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/phone_verification_code.dart';
+import 'package:sakay_app/presentation/screens/authentication/phone_verification_code.dart';
 
 class PhoneVerificationPage extends StatelessWidget {
   final TextEditingController _phoneNumberController = TextEditingController();
@@ -25,7 +25,6 @@ class PhoneVerificationPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10.0),
-
               const Text(
                 "Phone Verification",
                 style: TextStyle(
@@ -35,7 +34,6 @@ class PhoneVerificationPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10.0),
-
               const Text(
                 "We need to register your phone number before getting started",
                 style: TextStyle(
@@ -45,13 +43,13 @@ class PhoneVerificationPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 35.0),
-
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 4.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 4.0),
                 child: Row(
                   children: [
                     Row(
@@ -63,12 +61,12 @@ class PhoneVerificationPage extends StatelessWidget {
                         const SizedBox(width: 8.0),
                         const Text(
                           "+63",
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     const SizedBox(width: 12.0),
-
                     Expanded(
                       child: TextField(
                         controller: _phoneNumberController,
@@ -84,7 +82,6 @@ class PhoneVerificationPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15.0),
-
               ElevatedButton(
                 onPressed: () {
                   if (_phoneNumberController.text.isNotEmpty) {
@@ -104,7 +101,8 @@ class PhoneVerificationPage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00A2FF),
-                  padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 145.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 145.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),

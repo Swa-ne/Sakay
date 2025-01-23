@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/authentication/login_page.dart';
-import 'package:sakay_app/screens/authentication/register_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 
 class SignUpPage1 extends StatefulWidget {
   const SignUpPage1({super.key});
@@ -13,7 +13,8 @@ class SignUpPage1 extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage1> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
@@ -42,7 +43,6 @@ class _SignUpPageState extends State<SignUpPage1> {
                 ),
               ),
               const SizedBox(height: 30.0),
-
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
@@ -50,12 +50,12 @@ class _SignUpPageState extends State<SignUpPage1> {
                   prefixIcon: Icon(Icons.email, color: Color(0xFF00A2FF)),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                    borderSide:
+                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 20.0),
-
               TextField(
                 controller: _passwordController,
                 obscureText: !_isPasswordVisible,
@@ -64,23 +64,25 @@ class _SignUpPageState extends State<SignUpPage1> {
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: const Color(0xFF00A2FF),
                     ),
                     onPressed: () {
                       setState(() {
-                        _isPasswordVisible = !_isPasswordVisible; 
+                        _isPasswordVisible = !_isPasswordVisible;
                       });
                     },
                   ),
                   border: const OutlineInputBorder(),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                    borderSide:
+                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 20.0),
-
               TextField(
                 controller: _confirmPasswordController,
                 obscureText: !_isConfirmPasswordVisible,
@@ -89,7 +91,9 @@ class _SignUpPageState extends State<SignUpPage1> {
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: const Color(0xFF00A2FF),
                     ),
                     onPressed: () {
@@ -100,17 +104,18 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                   border: const OutlineInputBorder(),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                    borderSide:
+                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 30.0),
-
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -127,9 +132,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30.0),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -141,7 +144,8 @@ class _SignUpPageState extends State<SignUpPage1> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
                       );
                     },
                     child: const Text(
@@ -155,19 +159,17 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30.0),
-
               Center(
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                  },
+                  onPressed: () {},
                   icon: Image.asset('assets/google_icon.png', height: 24.0),
                   label: const Text('Sign up with Google'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 30.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 30.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       side: const BorderSide(color: Colors.grey),
@@ -175,9 +177,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 120.0),
-
               Center(
                 child: Text.rich(
                   TextSpan(
@@ -187,8 +187,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                       TextSpan(
                         text: "Terms of Use",
                         style: const TextStyle(color: Color(0xFF00A2FF)),
-                        recognizer: TapGestureRecognizer()..onTap = () {
-                        },
+                        recognizer: TapGestureRecognizer()..onTap = () {},
                       ),
                       const TextSpan(
                         text: " and ",
@@ -196,8 +195,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                       TextSpan(
                         text: "Privacy Policy",
                         style: const TextStyle(color: Color(0xFF00A2FF)),
-                        recognizer: TapGestureRecognizer()..onTap = () {
-                        },
+                        recognizer: TapGestureRecognizer()..onTap = () {},
                       ),
                     ],
                   ),
@@ -211,4 +209,3 @@ class _SignUpPageState extends State<SignUpPage1> {
     );
   }
 }
-
