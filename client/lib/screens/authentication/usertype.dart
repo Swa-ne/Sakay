@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/screens/commuters/current_location.dart';
 
 class UserTypePage extends StatefulWidget {
   final String firstName;
@@ -15,21 +16,18 @@ class _UserTypePageState extends State<UserTypePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Circular Image
             const CircleAvatar(
               radius: 50.0,
-              backgroundImage: AssetImage('assets/profile.jpg'), // Change to your image asset
+              backgroundImage: AssetImage(
+                  'assets/profile.jpg'), // Change to your image asset
             ),
             const SizedBox(height: 20.0),
-
-            // "Hey, First Name"
             Text(
               "Hey, ${widget.firstName}",
               style: const TextStyle(
@@ -38,15 +36,11 @@ class _UserTypePageState extends State<UserTypePage> {
               ),
             ),
             const SizedBox(height: 15.0),
-
-            // Question Text
             const Text(
               "What type of user are you?",
               style: TextStyle(fontSize: 15.0),
             ),
             const SizedBox(height: 50.0),
-
-            // Radio Button Choices separated by Borders
             Column(
               children: [
                 Container(
@@ -95,16 +89,21 @@ class _UserTypePageState extends State<UserTypePage> {
               ],
             ),
             const SizedBox(height: 50.0),
-
-            // Confirm Button
             ElevatedButton(
               onPressed: _userType != null
                   ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CurrentLocationPage(),
+                        ),
+                      );
                     }
                   : null, // Disable if no selection
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF3A6C8D),
-                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 155.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 155.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50.0),
                 ),
