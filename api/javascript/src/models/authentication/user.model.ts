@@ -3,17 +3,15 @@ import { Schema, Document, ObjectId, model } from 'mongoose';
 export interface UserSchemaInterface extends Document {
     _id: ObjectId,
     first_name: string,
-    middle_name?: string,
     last_name: string,
-    username: string,
-    full_name: string,
-    bio?: string,
     profile_picture_url: string,
-    personal_email: string,
+    email_address: string,
+    phone_number: string,
     birthday: Date,
     password_hash: string,
-    valid_email: boolean,
-    is_admin: boolean,
+    valid_email_address: boolean,
+    valid_phone_number: boolean,
+    user_type: string,
     refresh_token_version: number,
     createdAt?: Date,
     updatedAt?: Date,
@@ -24,31 +22,21 @@ const UserSchema: Schema = new Schema({
         type: String,
         required: [true, 'Please enter your first name.'],
     },
-    middle_name: {
-        type: String,
-    },
     last_name: {
         type: String,
         required: [true, 'Please enter your last name.'],
-    },
-    username: {
-        type: String,
-        required: [true, 'Please enter your username.'],
-    },
-    full_name: {
-        type: String,
-        required: [true, 'Please enter your full name.'],
-    },
-    bio: {
-        type: String,
     },
     profile_picture_url: {
         type: String,
         default: "https://i.pinimg.com/originals/58/51/2e/58512eb4e598b5ea4e2414e3c115bef9.jpg"
     },
-    personal_email: {
+    email_address: {
         type: String,
-        required: [true, 'Please enter your personal Email.'],
+        required: [true, 'Please enter your email address.'],
+        unique: true,
+    },
+    phone_number: {
+        type: String,
         unique: true,
     },
     birthday: {
@@ -59,13 +47,18 @@ const UserSchema: Schema = new Schema({
         type: String,
         required: [true, 'Please enter your password.'],
     },
-    valid_email: {
+    valid_email_address: {
         type: Boolean,
         default: false
     },
-    is_admin: {
+    valid_phone_number: {
         type: Boolean,
         default: false
+    },
+    user_type: {
+        type: String,
+        default: "COMMUTER",
+        required: [true, 'Please enter your password.'],
     },
     refresh_token_version: {
         type: Number,

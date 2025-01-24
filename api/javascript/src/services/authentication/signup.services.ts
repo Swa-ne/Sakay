@@ -5,14 +5,12 @@ import { generateAccessAndRefereshTokens, sendEmailCode } from "../index.service
 
 export const signupUsertoDatabase = async (
     first_name: string,
-    middle_name: string | undefined,
     last_name: string,
-    username: string,
-    bio: string | undefined,
-    personal_email: string,
-    birthday: Date,
+    email_address: string,
+    phone_number: string,
     password: string,
-    valid_email: boolean,
+    birthday: Date,
+    user_type: string,
 ): Promise<CustomResponse> => {
     let userCredentialResult;
 
@@ -21,23 +19,15 @@ export const signupUsertoDatabase = async (
         const password_hash = await bcrypt.hash(password, saltRounds);
         userCredentialResult = await new User({
             first_name,
-            middle_name,
             last_name,
-            username,
-            bio,
-            full_name: `${first_name} ${middle_name ? ` ${middle_name}` : ''} ${last_name}`.trim(),
-            personal_email,
-            birthday,
+            email_address,
+            phone_number,
             password_hash,
-            valid_email
+            birthday,
+            user_type,
         }).save();
-        // await new ActiveUsers({
-        //     userId: userCredentialResult._id,
-        //     active: "0",
-        //     fullName: userCredentialResult.full_name
-        // }).save();
 
-        await sendEmailCode(`${userCredentialResult._id}`, personal_email, first_name)
+        await sendEmailCode(`${userCredentialResult._id}`, email_address, first_name)
 
         const result: any = await generateAccessAndRefereshTokens(userCredentialResult._id.toString());
         if (result.httpCode === 200) {
@@ -58,18 +48,17 @@ export const signupUsertoDatabase = async (
     }
 };
 
-export const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+export const checkEmailAvailability = async (email_address: string): Promise<boolean> => {
     try {
-        const result = (await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } })) === null;
+        const result: boolean = (await User.findOne({ email_address: { $regex: new RegExp(`^${email_address}$`, 'i') } })) === null;
         return result;
     } catch (error) {
         return false;
     }
 };
-
-export const checkEmailAvailability = async (emailAddress: string): Promise<boolean> => {
+export const checkPhoneNumberAvailability = async (phone_number: string): Promise<boolean> => {
     try {
-        const result: boolean = (await User.findOne({ personal_email: { $regex: new RegExp(`^${emailAddress}$`, 'i') } })) === null;
+        const result: boolean = (await User.findOne({ phone_number: { $regex: new RegExp(`^${phone_number}$`, 'i') } })) === null;
         return result;
     } catch (error) {
         return false;
@@ -83,7 +72,7 @@ export const checkEmailVerified = async (user_id: string): Promise<boolean> => {
             return false;
         }
 
-        return result.valid_email;
+        return result.valid_email_address;
     } catch (error) {
         return false;
     }
@@ -91,7 +80,7 @@ export const checkEmailVerified = async (user_id: string): Promise<boolean> => {
 
 export const getDataByEmailAddress = async (emailAddress: string): Promise<UserSchemaInterface | null> => {
     try {
-        const result: UserSchemaInterface | null = await User.findOne({ personal_email: { $regex: new RegExp(`^${emailAddress}$`, 'i') } });
+        const result: UserSchemaInterface | null = await User.findOne({ email_address: { $regex: new RegExp(`^${emailAddress}$`, 'i') } });
         return result;
     } catch (error) {
         return null;

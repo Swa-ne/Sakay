@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/intro/splashscreen.dart';
+import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,25 +18,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sakay"),
-      ),
-      body: const Center(
-        child: Text(
-          "Welcome to the Home Screen!",
-          style: TextStyle(fontSize: 20.0),
-        ),
-      ),
     );
   }
 }

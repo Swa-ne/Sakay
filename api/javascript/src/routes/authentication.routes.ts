@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 
-import { checkEmailAvailabilityController, checkEmailVerifiedController, checkUsernameAvailabilityController, resendEmailCodeController, signupUserController, verifyEmailCodeController } from "../controllers/authentication/signup.controller";
+import { checkEmailAvailabilityController, checkEmailVerifiedController, checkPhoneNumberValidityController, resendEmailCodeController, signupUserController, verifyEmailCodeController } from "../controllers/authentication/signup.controller";
 import { authenticateToken } from "../middlewares/token.authentication";
 import { changePasswordController, editProfileController, forgotPasswordController, loginUserController, postResetPasswordController } from "../controllers/authentication/login.controller";
 import { logoutUserController } from "../controllers/authentication/logout.controller";
@@ -12,7 +12,7 @@ import { forgetPasswordLimiter, loginLimiter, sendCodeLimiter } from "../middlew
 const router = Router();
 
 router.post("/check-email", checkEmailAvailabilityController);
-router.post("/check-username", checkUsernameAvailabilityController);
+router.post("/check-phone-number", checkPhoneNumberValidityController);
 
 router.post("/signup", signupUserController);
 router.put("/resend-verification", sendCodeLimiter, authenticateToken, resendEmailCodeController);
@@ -21,6 +21,7 @@ router.post("/check-email-verification", authenticateToken, checkEmailVerifiedCo
 
 router.post("/login", loginLimiter, loginUserController);
 router.delete("/logout", authenticateToken, logoutUserController);
+// TODO: add logout all devices
 
 router.post("/access-token", refreshAccessTokenController);
 

@@ -4,22 +4,26 @@ import { CustomResponse } from "../../utils/input.validators";
 
 export const loginUsertoDatabase = async (user_identifier: string, password: string) => {
     try {
-        let result = await User.findOne({ personal_email: { $regex: new RegExp(`^${user_identifier}$`, 'i') } });
+        let result = await User.findOne({
+            $or: [{ phone_number: { $regex: new RegExp(`^${user_identifier}$`, 'i') } }, { email_address: { $regex: new RegExp(`^${user_identifier}$`, 'i') } }],
+        });
         if (result) {
             if (await bcrypt.compare(password, result.password_hash)) {
                 return { 'message': 'Success', "httpCode": 200 };
             }
-            return { 'error': 'Sorry, looks like that\'s the wrong email or password.', "httpCode": 401 };
+            return { 'error': 'Sorry, looks like that\'s the wrong credentials.', "httpCode": 401 };
         }
-        return { 'error': 'It looks like you haven\'t signed up yet. Please create an account to log in.', "httpCode": 404 };
+        return { 'error': 'Sorry, looks like that\'s the wrong credentials.', "httpCode": 404 };
     } catch {
         return { 'error': 'Internal Server Error.', "httpCode": 500 };
     }
 };
 
-export const getDataByEmailAddress = async (email_address: string): Promise<UserSchemaInterface | null> => {
+export const getDataByUserIdentifier = async (user_identifier: string): Promise<UserSchemaInterface | null> => {
     try {
-        const result: UserSchemaInterface | null = await User.findOne({ personal_email: { $regex: new RegExp(`^${email_address}$`, 'i') } });
+        const result: UserSchemaInterface | null = await User.findOne({
+            $or: [{ phone_number: { $regex: new RegExp(`^${user_identifier}$`, 'i') } }, { email_address: { $regex: new RegExp(`^${user_identifier}$`, 'i') } }],
+        });
         return result;
     } catch (error) {
         return null;
@@ -58,15 +62,11 @@ export const isOldPasswordSimilar = async (user_id: string, old_password: string
         return { error: "Internal Server Error", httpCode: 500 }
     }
 }
-
 export const editProfile = async (
     user_id: string,
     first_name: string,
-    middle_name: string | undefined,
     last_name: string,
-    username: string,
-    bio: string | undefined,
-    // personal_number: string | undefined,
+    phone_number: string,
     birthday: Date,
     profile_picture_url: string | undefined
 ): Promise<CustomResponse> => {
@@ -76,11 +76,8 @@ export const editProfile = async (
             {
                 $set: {
                     first_name,
-                    middle_name,
                     last_name,
-                    username,
-                    bio,
-                    // personal_number,
+                    phone_number,
                     birthday,
                     profile_picture_url
                 }

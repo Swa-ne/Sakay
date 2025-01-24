@@ -1,23 +1,24 @@
 import { Request, Response } from 'express';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
-import { checkEveryInputForLogin, checkUsernameValidity } from '../../utils/input.validators';
-import { changePassword, editProfile, getDataByEmailAddress, isOldPasswordSimilar, loginUsertoDatabase } from '../../services/authentication/login.services';
-import { generateAccessAndRefereshTokens, getCurrentUserByEmail, getCurrentUserById, sendEmailForgetPassword } from '../../services/index.services';
+import { checkEveryInputForLogin, checkInputType, checkPhoneNumberValidity } from '../../utils/input.validators';
+import { changePassword, editProfile, getDataByUserIdentifier, isOldPasswordSimilar, loginUsertoDatabase } from '../../services/authentication/login.services';
+import { generateAccessAndRefereshTokens, getCurrentUserById, getCurrentUserByUserIdentifier, sendEmailForgetPassword } from '../../services/index.services';
 import { UserType } from '../../middlewares/token.authentication';
-import { checkUsernameAvailability } from '../../services/authentication/signup.services';
+import { checkPhoneNumberAvailability } from '../../services/authentication/signup.services';
 
 
 export const loginUserController = async (req: Request, res: Response) => {
     try {
-        const { email_address, password } = req.body;
-        const checker_for_input = await checkEveryInputForLogin(email_address, password);
+        const { user_identifier, password } = req.body;
+        const user_identifier_type = await checkInputType(user_identifier);
+        const checker_for_input = await checkEveryInputForLogin(user_identifier, password, user_identifier_type);
 
         if (checker_for_input.httpCode === 200) {
-            const data = await loginUsertoDatabase(email_address, password);
+            const data = await loginUsertoDatabase(user_identifier, password);
 
             if (data.httpCode === 200) {
-                const user_data = await getDataByEmailAddress(email_address);
+                const user_data = await getDataByUserIdentifier(user_identifier);
 
                 if (!user_data) {
                     res.status(404).json({ error: "User not found" });
@@ -41,7 +42,7 @@ export const loginUserController = async (req: Request, res: Response) => {
                             sameSite: 'none',
                         }
                     )
-                    .json({ message: "Success", access_token: result.message?.access_token, user_id: user_data._id, is_admin: user_data.is_admin });
+                    .json({ message: "Success", access_token: result.message?.access_token, user_id: user_data._id, user_type: user_data.user_type });
                 return;
             }
             res.status(data.httpCode).json({ error: data.error });
@@ -72,6 +73,8 @@ export const changePasswordController = async (req: Request & { user?: UserType 
         const is_old_password_similar = await isOldPasswordSimilar(user.user_id, old_password);
         if (is_old_password_similar.httpCode === 200) {
             await changePassword(user.user_id, new_password)
+            res.status(is_old_password_similar.httpCode).json({ message: is_old_password_similar.message })
+            return;
         }
         res.status(is_old_password_similar.httpCode).json({ error: is_old_password_similar.error })
     } catch (error) {
@@ -87,27 +90,18 @@ export const editProfileController = async (req: Request & { user?: UserType }, 
             return;
         }
 
-        const { first_name, middle_name, last_name, username, bio, birthday, profile_picture_url } = req.body;
+        const { first_name, last_name, phone_number, birthday, profile_picture_url } = req.body;
 
         const requiredFields = {
             first_name,
             last_name,
-            username,
-            // personal_number,
-            birthday,
-            profile_picture_url
+            birthday
         };
 
         const updatedKey: { [key: string]: string } = {
             first_name: "First Name",
             last_name: "Last Name",
-            username: "Username",
-            personal_email: "Email Address",
-            password_hash: "Password",
-            confirmation_password: "Confirmation Password",
-            // personal_number: "Phone Number",
             birthday: "Birthday",
-            profile_picture_url
         }
         for (const [key, value] of Object.entries(requiredFields)) {
             if (value == null) {
@@ -116,16 +110,16 @@ export const editProfileController = async (req: Request & { user?: UserType }, 
             }
         }
 
-        if (!checkUsernameValidity(username)) {
-            res.status(400).json({ error: 'Please enter a valid username' });
+        if (!checkPhoneNumberValidity(phone_number)) {
+            res.status(400).json({ error: 'Please enter a valid phone number' });
             return;
         }
-        if (!(await checkUsernameAvailability(username))) {
-            res.status(409).json({ error: 'This usernmae is being used.' });
+        if (!(await checkPhoneNumberAvailability(phone_number))) {
+            res.status(409).json({ error: 'This phone number is being used.' });
             return;
         }
 
-        const data = await editProfile(user.user_id, first_name, middle_name, last_name, username, bio, birthday, profile_picture_url);
+        const data = await editProfile(user.user_id, first_name, last_name, phone_number, birthday, profile_picture_url);
         if (data.httpCode !== 200) {
             res.status(500).json({ error: data.error });
             return;
@@ -138,17 +132,19 @@ export const editProfileController = async (req: Request & { user?: UserType }, 
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
     try {
-        const { personal_email } = req.body;
-        const user = await getCurrentUserByEmail(personal_email);
+        const { email_address, phone_number } = req.body;
+        let user;
+        const user_identifier = (email_address !== null) ? email_address : phone_number;
+        user = await getCurrentUserByUserIdentifier(user_identifier);
         if (!user) {
             res.status(404).json({ error: "User not found" })
             return;
         }
 
-        const token = jwt.sign({ email: user.personal_email, user_id: user._id }, process.env.ACCESS_TOKEN_SECRET as string, {
+        const token = jwt.sign({ email: user.email_address, user_id: user._id }, process.env.ACCESS_TOKEN_SECRET as string, {
             expiresIn: "120m",
         });
-        await sendEmailForgetPassword(user._id.toString(), personal_email, user.full_name)
+        await sendEmailForgetPassword(user._id.toString(), email_address, `${user.first_name} ${user.last_name}`)
         res.status(200).json({ message: "Success", token });
     } catch (error) {
         res.status(500).json({ 'error': 'Internal Server Error' });

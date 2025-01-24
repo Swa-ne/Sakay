@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { UserType } from "../../middlewares/token.authentication"
-import { getCurrentUserByEmail } from "../../services/index.services";
+import { getCurrentUserById, getCurrentUserByUserIdentifier } from "../../services/index.services";
 
 export const getCurrentUserController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
@@ -11,7 +11,7 @@ export const getCurrentUserController = async (req: Request & { user?: UserType 
             return;
         }
 
-        const result = await getCurrentUserByEmail(user.email)
+        const result = await getCurrentUserById(user.user_id)
         res.status(200).json({ message: result })
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" })

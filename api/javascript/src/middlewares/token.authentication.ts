@@ -5,7 +5,7 @@ import { generateAccessTokenWithRefreshToken } from '../utils/generate.token';
 export interface UserType {
     user_id: string;
     email: string;
-    username: string;
+    phone_number: string;
     full_name: string;
 }
 interface AuthenticatedRequest extends Request {
@@ -46,11 +46,11 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
                 res.setHeader('Authorization', `Bearer ${refresh_access_token.message}`);
                 const user = verify(refresh_access_token.message as string, process.env.ACCESS_TOKEN_SECRET as string) as UserType;
 
-                if (user && user.user_id && user.email && user.username && user.full_name) {
+                if (user && user.user_id && user.email && user.phone_number && user.full_name) {
                     req.user = {
                         user_id: user.user_id,
                         email: user.email,
-                        username: user.username,
+                        phone_number: user.phone_number,
                         full_name: user.full_name
                     };
                     next();
