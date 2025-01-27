@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/common/widgets/map.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +21,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           // Search Bar
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
             child: Row(
               children: [
                 Expanded(
@@ -62,10 +63,10 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(16.0),
                 border: Border.all(color: Colors.grey),
               ),
-              child: const Center(
-                child: Text(
-                  'Mock Map Area',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0), // Same as parent
+                child: Center(
+                  child: MyMapWidget(),
                 ),
               ),
             ),

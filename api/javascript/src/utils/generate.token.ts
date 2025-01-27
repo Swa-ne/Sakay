@@ -10,20 +10,7 @@ export const generateAccessTokenWithRefreshToken = async (decoded_token: jwt.Jwt
 
     if (decoded_token.refresh_token_version !== (user.refresh_token_version)) return { error: "Refresh token is invalid", httpCode: 401 };
 
-    return {
-        message: jwt.sign(
-            {
-                user_id: user._id,
-                email: user.email_address,
-                phone_number: user.phone_number,
-                full_name: `${user.first_name} ${user.last_name}`
-            },
-            process.env.ACCESS_TOKEN_SECRET as string,
-            {
-                expiresIn: "30m"
-            }
-        ), httpCode: 200
-    }
+    return { message: await generateAccessToken(user), httpCode: 200 }
 };
 
 export const generateAccessToken = async (user: UserSchemaInterface): Promise<string> => {
@@ -32,6 +19,7 @@ export const generateAccessToken = async (user: UserSchemaInterface): Promise<st
             user_id: user._id,
             email: user.email_address,
             phone_number: user.phone_number,
+            user_type: user.user_type,
             full_name: `${user.first_name} ${user.last_name}`
         },
         process.env.ACCESS_TOKEN_SECRET as string,

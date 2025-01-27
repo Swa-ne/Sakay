@@ -7,6 +7,7 @@ export interface UserType {
     email: string;
     phone_number: string;
     full_name: string;
+    user_type: string;
 }
 interface AuthenticatedRequest extends Request {
     user?: UserType;
@@ -46,11 +47,12 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
                 res.setHeader('Authorization', `Bearer ${refresh_access_token.message}`);
                 const user = verify(refresh_access_token.message as string, process.env.ACCESS_TOKEN_SECRET as string) as UserType;
 
-                if (user && user.user_id && user.email && user.phone_number && user.full_name) {
+                if (user && user.user_id && user.email && user.phone_number && user.user_type && user.full_name) {
                     req.user = {
                         user_id: user.user_id,
                         email: user.email,
                         phone_number: user.phone_number,
+                        user_type: user.user_type,
                         full_name: user.full_name
                     };
                     next();

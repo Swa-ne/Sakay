@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
+import 'package:sakay_app/presentation/screens/commuter/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -115,7 +116,13 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 10.0),
 
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00A2FF),
                       padding: const EdgeInsets.symmetric(

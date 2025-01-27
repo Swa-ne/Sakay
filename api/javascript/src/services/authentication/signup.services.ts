@@ -1,4 +1,4 @@
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { User, UserSchemaInterface } from "../../models/authentication/user.model";
 import { CustomResponse } from "../../utils/input.validators";
 import { generateAccessAndRefereshTokens, sendEmailCode } from "../index.services";
