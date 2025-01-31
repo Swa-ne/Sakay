@@ -1,3 +1,6 @@
+import 'dart:collection';
+
+import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sakay_app/data/models/location.dart';
@@ -6,9 +9,16 @@ import 'package:location/location.dart' as loc;
 
 mixin Tracker {
   static MapboxMap? mapboxMap;
+  CircleAnnotationManager? circleAnnotationManager;
+  CircleAnnotation? circleAnnotation;
+  final Map<String, CircleAnnotation> busses = HashMap();
 
-  void setMap(MapboxMap map) {
+// Function to add or update a user's marker
+
+  void setMap(MapboxMap map) async {
     mapboxMap = map;
+    circleAnnotationManager =
+        await mapboxMap?.annotations.createCircleAnnotationManager();
   }
 
   Future<Location> getLocationandSpeed() async {
@@ -67,5 +77,36 @@ mixin Tracker {
   hideMyLocation() {
     mapboxMap?.location
         .updateSettings(LocationComponentSettings(enabled: false));
+  }
+
+  Future<void> createOneAnnotation(String bus, num lng, num lat) async {
+    final annotation = await circleAnnotationManager?.create(
+      CircleAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(
+            lng,
+            lat,
+          ),
+        ),
+        circleColor: Colors.yellow.hashCode,
+        circleRadius: 12.0,
+      ),
+    );
+    busses.addAll({bus: annotation!});
+  }
+
+  Future<void> updateOneAnnotations(String bus, num lng, num lat) async {
+    if (circleAnnotationManager == null || busses.isEmpty) return;
+
+    busses[bus]?.geometry = Point(coordinates: Position(lng, lat));
+
+    circleAnnotationManager!.update(busses[bus]!);
+  }
+
+  void removeOneAnnotations(String bus) {
+    if (circleAnnotationManager == null || busses.isEmpty) return;
+
+    final lastAnnotation = busses.remove(bus);
+    circleAnnotationManager!.delete(lastAnnotation!);
   }
 }
