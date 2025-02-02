@@ -16,23 +16,23 @@ class TrackerBloc extends Bloc<TrackerEvent, TrackerState> {
         emit(const ConnectionError("Connection Error"));
       }
     });
-    on<StartTrackMeEvent>(
+    on<StartTrackMyVehicleEvent>(
       (event, emit) async {
         try {
-          emit(TrackMeInitializing());
-          _socketRepo.trackMe();
-          emit(TrackMeStarted());
+          emit(TrackMyVehicleInitializing());
+          _socketRepo.trackMyVehicle();
+          emit(TrackMyVehicleStarted());
         } catch (e) {
           emit(const ConnectionError("Connection Error"));
         }
       },
     );
-    on<StopTrackMeEvent>(
+    on<StopTrackMyVehicleEvent>(
       (event, emit) async {
         try {
-          emit(TrackMeInitializing());
-          _socketRepo.stopTrackMe();
-          emit(TrackMeStopped());
+          emit(TrackMyVehicleInitializing());
+          _socketRepo.stopTrackMyVehicle();
+          emit(TrackMyVehicleStopped());
         } catch (e) {
           emit(const ConnectionError("Connection Error"));
         }

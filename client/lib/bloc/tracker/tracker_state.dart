@@ -11,11 +11,11 @@ class ConnectingSocket extends TrackerState {}
 
 class ConnectedSocket extends TrackerState {}
 
-class TrackMeInitializing extends TrackerState {}
+class TrackMyVehicleInitializing extends TrackerState {}
 
-class TrackMeStarted extends TrackerState {}
+class TrackMyVehicleStarted extends TrackerState {}
 
-class TrackMeStopped extends TrackerState {}
+class TrackMyVehicleStopped extends TrackerState {}
 
 class ConnectionError extends TrackerState {
   final String error;

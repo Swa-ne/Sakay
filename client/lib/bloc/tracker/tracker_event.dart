@@ -7,8 +7,8 @@ abstract class TrackerEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class StartTrackMeEvent extends TrackerEvent {}
+class StartTrackMyVehicleEvent extends TrackerEvent {}
 
-class StopTrackMeEvent extends TrackerEvent {}
+class StopTrackMyVehicleEvent extends TrackerEvent {}
 
 class ConnectEvent extends TrackerEvent {}
