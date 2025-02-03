@@ -4,7 +4,7 @@ class Location extends Equatable {
   final double latitude;
   final double longitude;
   final double speed;
-  final DateTime timestamp;
+  final String timestamp;
 
   const Location({
     required this.latitude,
@@ -15,9 +15,15 @@ class Location extends Equatable {
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      speed: json['speed'],
+      latitude: (json['latitude'] is int)
+          ? (json['latitude'] as int).toDouble()
+          : json['latitude'] as double,
+      longitude: (json['longitude'] is int)
+          ? (json['longitude'] as int).toDouble()
+          : json['longitude'] as double,
+      speed: (json['speed'] is int)
+          ? (json['speed'] as int).toDouble()
+          : json['speed'] as double,
       timestamp: json['timestamp'],
     );
   }
@@ -26,7 +32,7 @@ class Location extends Equatable {
       'latitude': latitude,
       'longitude': longitude,
       'speed': speed,
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': timestamp,
     };
   }
 
