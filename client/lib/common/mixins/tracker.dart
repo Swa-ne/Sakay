@@ -9,16 +9,16 @@ import 'package:location/location.dart' as loc;
 
 mixin Tracker {
   static MapboxMap? mapboxMap;
-  CircleAnnotationManager? circleAnnotationManager;
-  CircleAnnotation? circleAnnotation;
-  final Map<String, CircleAnnotation> busses = HashMap();
+  static PointAnnotationManager? pointAnnotationManager;
+  static PointAnnotation? pointAnnotation;
+  static Map<String, PointAnnotation> busses = HashMap();
 
 // Function to add or update a user's marker
 
   void setMap(MapboxMap map) async {
     mapboxMap = map;
-    circleAnnotationManager =
-        await mapboxMap?.annotations.createCircleAnnotationManager();
+    pointAnnotationManager =
+        await mapboxMap?.annotations.createPointAnnotationManager();
   }
 
   Future<Location> getLocationandSpeed() async {
@@ -34,7 +34,7 @@ mixin Tracker {
       latitude: loc.latitude,
       longitude: loc.longitude,
       speed: loc.speed,
-      timestamp: loc.timestamp,
+      timestamp: loc.timestamp.toString(),
     );
   }
 
@@ -80,33 +80,38 @@ mixin Tracker {
   }
 
   Future<void> createOneAnnotation(String bus, num lng, num lat) async {
-    final annotation = await circleAnnotationManager?.create(
-      CircleAnnotationOptions(
+    print("imgm running bch $pointAnnotationManager");
+    if (pointAnnotationManager == null) {
+      return;
+    }
+    final annotation = await pointAnnotationManager?.create(
+      PointAnnotationOptions(
         geometry: Point(
           coordinates: Position(
             lng,
             lat,
           ),
         ),
-        circleColor: Colors.yellow.hashCode,
-        circleRadius: 12.0,
+        iconColor: Colors.amber.hashCode,
+        // iconImage: "car_icon",
+        iconSize: 1.0,
       ),
     );
     busses.addAll({bus: annotation!});
   }
 
   Future<void> updateOneAnnotations(String bus, num lng, num lat) async {
-    if (circleAnnotationManager == null || busses.isEmpty) return;
+    if (pointAnnotationManager == null || busses.isEmpty) return;
 
     busses[bus]?.geometry = Point(coordinates: Position(lng, lat));
 
-    circleAnnotationManager!.update(busses[bus]!);
+    pointAnnotationManager!.update(busses[bus]!);
   }
 
-  void removeOneAnnotations(String bus) {
-    if (circleAnnotationManager == null || busses.isEmpty) return;
+  Future<void> removeOneAnnotations(String bus) async {
+    if (pointAnnotationManager == null || busses.isEmpty) return;
 
-    final lastAnnotation = busses.remove(bus);
-    circleAnnotationManager!.delete(lastAnnotation!);
+    final removePointAnnotation = busses.remove(bus);
+    pointAnnotationManager!.delete(removePointAnnotation!);
   }
 }
