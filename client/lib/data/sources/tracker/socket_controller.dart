@@ -10,8 +10,8 @@ final _apiUrl = "${dotenv.env['API_URL']}";
 
 abstract class SocketController {
   void connect();
-  void trackMe();
-  void stopTrackMe();
+  void trackMyVehicle();
+  void stopTrackMyVehicle();
   void disconnect();
 }
 
@@ -48,6 +48,28 @@ class SocketControllerImpl extends SocketController with Tracker {
       print('Connected to socket');
     });
 
+    socket.on('update-map', (data) async {
+      // TODO: update the map
+      Location busLoc = Location.fromJson(data['location']);
+      if (!Tracker.busses.containsKey(data['user'])) {
+        await createOneAnnotation(
+          data['user'],
+          busLoc.longitude,
+          busLoc.latitude,
+        );
+      } else {
+        await updateOneAnnotations(
+          data['user'],
+          busLoc.longitude,
+          busLoc.latitude,
+        );
+      }
+    });
+
+    socket.on('track-my-vehicle-stop', (data) async {
+      await removeOneAnnotations(data['user']);
+    });
+
     socket.onDisconnect((_) {
       print('Disconnected from socket');
     });
@@ -58,18 +80,19 @@ class SocketControllerImpl extends SocketController with Tracker {
   }
 
   @override
-  void trackMe() {
+  void trackMyVehicle() {
     showMyLocation();
     _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       Location loc = await getLocationandSpeed();
-      print("nfiasdfas $loc");
-      socket.emit('track-me', loc.toJson());
+
+      socket.emit('track-my-vehicle', loc.toJson());
     });
   }
 
   @override
-  void stopTrackMe() {
+  void stopTrackMyVehicle() {
     hideMyLocation();
+    socket.emit('pause-track-my-vehicle');
     _locationTimer?.cancel();
     _locationTimer = null;
   }
