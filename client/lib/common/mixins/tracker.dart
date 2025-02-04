@@ -1,6 +1,8 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sakay_app/data/models/location.dart';
@@ -13,12 +15,15 @@ mixin Tracker {
   static PointAnnotation? pointAnnotation;
   static Map<String, PointAnnotation> busses = HashMap();
 
-// Function to add or update a user's marker
+  static ByteData? carBytes;
+  static Uint8List? carImageData;
 
   void setMap(MapboxMap map) async {
     mapboxMap = map;
     pointAnnotationManager =
         await mapboxMap?.annotations.createPointAnnotationManager();
+    carBytes = await rootBundle.load('assets/bus.png');
+    carImageData = carBytes?.buffer.asUint8List();
   }
 
   Future<Location> getLocationandSpeed() async {
@@ -79,8 +84,7 @@ mixin Tracker {
         .updateSettings(LocationComponentSettings(enabled: false));
   }
 
-  Future<void> createOneAnnotation(String bus, num lng, num lat) async {
-    print("imgm running bch $pointAnnotationManager");
+  Future<void> createOneBus(String bus, num lng, num lat) async {
     if (pointAnnotationManager == null) {
       return;
     }
@@ -92,15 +96,14 @@ mixin Tracker {
             lat,
           ),
         ),
-        iconColor: Colors.amber.hashCode,
-        // iconImage: "car_icon",
-        iconSize: 1.0,
+        image: carImageData,
+        iconSize: 0.1,
       ),
     );
     busses.addAll({bus: annotation!});
   }
 
-  Future<void> updateOneAnnotations(String bus, num lng, num lat) async {
+  Future<void> updateOneBus(String bus, num lng, num lat) async {
     if (pointAnnotationManager == null || busses.isEmpty) return;
 
     busses[bus]?.geometry = Point(coordinates: Position(lng, lat));
@@ -108,7 +111,7 @@ mixin Tracker {
     pointAnnotationManager!.update(busses[bus]!);
   }
 
-  Future<void> removeOneAnnotations(String bus) async {
+  Future<void> removeOneBus(String bus) async {
     if (pointAnnotationManager == null || busses.isEmpty) return;
 
     final removePointAnnotation = busses.remove(bus);
