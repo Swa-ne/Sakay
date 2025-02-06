@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import '../commuter/profile_page.dart';
+import 'notifications.dart'; // Import the NotificationsScreen
+import 'inbox.dart'; // Import the InboxScreen
 
 void main() {
   runApp(const MyApp());
@@ -39,6 +41,23 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
         context,
         MaterialPageRoute(
             builder: (context) => const ProfilePage()), // Open ProfilePage
+      );
+    }
+    // Navigate to NotificationsScreen if index is 2 (Notifications tab)
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                NotificationsScreen()), // Open NotificationsScreen
+      );
+    }
+    // Navigate to InboxScreen if index is 1 (Inbox tab)
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => InboxScreen()), // Open InboxScreen
       );
     }
   }
@@ -133,10 +152,13 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
         ],
       ),
 
-      // Bottom Navigation Bar
+      // Bottom Navigation Bar with black background
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped, // Calls _onItemTapped when a tab is clicked
+        backgroundColor: Colors.black, // Set background to black
+        selectedItemColor: Colors.white, // Set selected item color to white
+        unselectedItemColor: Colors.grey, // Set unselected item color to grey
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
