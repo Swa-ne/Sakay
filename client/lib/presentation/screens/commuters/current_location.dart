@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import '../commuter/profile_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,6 +32,15 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Navigate to ProfilePage if index is 3 (Profile tab)
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const ProfilePage()), // Open ProfilePage
+      );
+    }
   }
 
   @override
@@ -126,7 +136,7 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
       // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: _onItemTapped, // Calls _onItemTapped when a tab is clicked
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
@@ -142,7 +152,7 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Profile', // The Profile tab
           ),
         ],
       ),
