@@ -55,28 +55,32 @@ class _PWDUploadPageState extends State<PWDUploadPage> {
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 20.0),
-
-              ...uploadedFiles.keys.map((requirement) => _buildUploadSection(requirement)).toList(),
-
+              ...uploadedFiles.keys
+                  .map((requirement) => _buildUploadSection(requirement)),
               const SizedBox(height: 20.0),
-
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    bool allUploaded = uploadedFiles.values.every((file) => file.isNotEmpty);
+                    bool allUploaded =
+                        uploadedFiles.values.every((file) => file.isNotEmpty);
 
                     if (allUploaded) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('All requirements uploaded successfully!')),
+                        const SnackBar(
+                            content: Text(
+                                'All requirements uploaded successfully!')),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please upload all requirements before submitting.')),
+                        const SnackBar(
+                            content: Text(
+                                'Please upload all requirements before submitting.')),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 150.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15.0, horizontal: 150.0),
                     backgroundColor: const Color(0xFF00A2FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -106,10 +110,9 @@ class _PWDUploadPageState extends State<PWDUploadPage> {
             style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10.0),
-
           GestureDetector(
             onTap: () {
-              _uploadFile(requirement); 
+              _uploadFile(requirement);
             },
             child: Column(
               children: [
@@ -128,8 +131,11 @@ class _PWDUploadPageState extends State<PWDUploadPage> {
                 ),
                 const SizedBox(height: 5.0),
                 Text(
-                  uploadedFiles[requirement]!.isEmpty ? 'Click to upload' : 'Re-upload',
-                  style: const TextStyle(fontSize: 14.0, color: Color(0xFF3A6C8D)),
+                  uploadedFiles[requirement]!.isEmpty
+                      ? 'Click to upload'
+                      : 'Re-upload',
+                  style:
+                      const TextStyle(fontSize: 14.0, color: Color(0xFF3A6C8D)),
                 ),
               ],
             ),

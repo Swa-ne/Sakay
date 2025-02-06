@@ -5,11 +5,11 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: CurrentLocationPage(),
     );
@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
 }
 
 class CurrentLocationPage extends StatefulWidget {
+  const CurrentLocationPage({super.key});
+
   @override
   _CurrentLocationPageState createState() => _CurrentLocationPageState();
 }

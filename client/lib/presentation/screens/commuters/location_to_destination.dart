@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LocationToDestination(),
     );
@@ -15,6 +16,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LocationToDestination extends StatefulWidget {
+  const LocationToDestination({super.key});
+
   @override
   _LocationToDestinationState createState() => _LocationToDestinationState();
 }
@@ -24,67 +27,38 @@ class _LocationToDestinationState extends State<LocationToDestination> {
 
   // Initial location of the map camera.
   final LatLng _initialPosition =
-      LatLng(16.0445, 120.3333); // Example coordinates for Dagupan
+      const LatLng(16.0445, 120.3333); // Example coordinates for Dagupan
   final LatLng _destination =
-      LatLng(16.0439, 120.3406); // Example coordinates for Harbour McDo
+      const LatLng(16.0439, 120.3406); // Example coordinates for Harbour McDo
 
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
-  List<LatLng> _polylineCoordinates = [];
-  late PolylinePoints _polylinePoints;
-
-  final String _googleApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
 
   @override
   void initState() {
     super.initState();
-    _polylinePoints = PolylinePoints();
 
     _setMarkers();
-    _setPolyline();
   }
 
   void _setMarkers() {
     _markers.add(Marker(
-      markerId: MarkerId('currentLocation'),
+      markerId: const MarkerId('currentLocation'),
       position: _initialPosition,
-      infoWindow: InfoWindow(title: 'Current Location'),
+      infoWindow: const InfoWindow(title: 'Current Location'),
     ));
     _markers.add(Marker(
-      markerId: MarkerId('destination'),
+      markerId: const MarkerId('destination'),
       position: _destination,
-      infoWindow: InfoWindow(title: 'Destination'),
+      infoWindow: const InfoWindow(title: 'Destination'),
     ));
-  }
-
-  void _setPolyline() async {
-    PolylineResult result = await _polylinePoints.getRouteBetweenCoordinates(
-      _googleApiKey,
-      PointLatLng(_initialPosition.latitude, _initialPosition.longitude),
-      PointLatLng(_destination.latitude, _destination.longitude),
-    );
-
-    if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
-        _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-
-      setState(() {
-        _polylines.add(Polyline(
-          polylineId: PolylineId('route'),
-          points: _polylineCoordinates,
-          color: Colors.blue,
-          width: 5,
-        ));
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Location to Destination'),
+        title: const Text('Location to Destination'),
         backgroundColor: Colors.blue,
       ),
       body: Stack(
@@ -105,11 +79,11 @@ class _LocationToDestinationState extends State<LocationToDestination> {
             left: 20,
             right: 20,
             child: Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 6,
@@ -120,7 +94,7 @@ class _LocationToDestinationState extends State<LocationToDestination> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Current Location:',
@@ -128,8 +102,8 @@ class _LocationToDestinationState extends State<LocationToDestination> {
                       Text('5045 P Burgos'),
                     ],
                   ),
-                  SizedBox(height: 8),
-                  Row(
+                  const SizedBox(height: 8),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Destination:',
@@ -137,7 +111,7 @@ class _LocationToDestinationState extends State<LocationToDestination> {
                       Text('Harbour McDo'),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       // Handle confirmation
@@ -145,7 +119,7 @@ class _LocationToDestinationState extends State<LocationToDestination> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                     ),
-                    child: Text('Confirm'),
+                    child: const Text('Confirm'),
                   ),
                 ],
               ),

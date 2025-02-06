@@ -1,15 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:sakay_app/main.dart';
-
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +18,7 @@ class MyApp extends StatelessWidget {
 }
 
 class AdminNotification extends StatelessWidget {
+  const AdminNotification({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +73,7 @@ class AdminNotification extends StatelessWidget {
                                 ),
                                 Text(
                                   'See Details...',
-                                  style: TextStyle(
-                                    color: Color(0xFF888888)
-                                  ),
+                                  style: TextStyle(color: Color(0xFF888888)),
                                 )
                               ],
                             ),

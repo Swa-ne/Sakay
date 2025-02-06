@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/commuter/home_page.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -122,7 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const HomePage()), // HomePage() to Map()
+                            builder: (context) =>
+                                const HomePage()), // HomePage() to Map()
                       );
                     },
                     style: ElevatedButton.styleFrom(

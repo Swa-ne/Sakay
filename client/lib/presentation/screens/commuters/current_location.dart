@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/common/widgets/map.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: CurrentLocationPage(),
     );
@@ -17,26 +18,28 @@ class MyApp extends StatelessWidget {
 }
 
 class CurrentLocationPage extends StatefulWidget {
+  const CurrentLocationPage({super.key});
+
   @override
   _CurrentLocationPageState createState() => _CurrentLocationPageState();
 }
 
 class _CurrentLocationPageState extends State<CurrentLocationPage> {
+  int _selectedIndex = 0; // Keeps track of the selected tab
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Map Placeholder
-          Container(
-            color: Colors.blue[100],
-            child: const Center(
-              child: Text(
-                "Map Placeholder",
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              ),
-            ),
-          ),
+          // Background Map from MyMapWidget
+          const MyMapWidget(), // Use MyMapWidget here
 
           // Top Search Bar
           Positioned(
@@ -116,6 +119,30 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+
+      // Bottom Navigation Bar
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Maps',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inbox),
+            label: 'Inbox',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),

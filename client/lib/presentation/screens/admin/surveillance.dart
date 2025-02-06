@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const Surveillance(),
       routes: {
-        '/map': (context) => Map(), // Navigate to the Map screen
+        '/map': (context) => const Map(), // Navigate to the Map screen
       },
     );
   }
@@ -62,23 +62,26 @@ class _SurveillanceState extends State<Surveillance> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    DrawerItem(icon: Icons.map, text: "Surveillance"),
+                    const DrawerItem(icon: Icons.map, text: "Surveillance"),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, '/map'); // Navigate and replace the current screen
+                        Navigator.pushReplacementNamed(context,
+                            '/map'); // Navigate and replace the current screen
                       },
-                      child: DrawerItem(icon: Icons.location_on, text: "Map"),
+                      child: const DrawerItem(
+                          icon: Icons.location_on, text: "Map"),
                     ),
-                    DrawerItem(icon: Icons.bar_chart, text: "Report"),
-                    DrawerItem(icon: Icons.notifications, text: "Notification"),
-                    DrawerItem(icon: Icons.inbox, text: "Inbox"),
-                    DrawerItem(icon: Icons.settings, text: "Settings"),
+                    const DrawerItem(icon: Icons.bar_chart, text: "Report"),
+                    const DrawerItem(
+                        icon: Icons.notifications, text: "Notification"),
+                    const DrawerItem(icon: Icons.inbox, text: "Inbox"),
+                    const DrawerItem(icon: Icons.settings, text: "Settings"),
                   ],
                 ),
               ),
               const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              const Padding(
+                padding: EdgeInsets.all(16.0),
                 child: DrawerItem(icon: Icons.logout, text: "Log out"),
               ),
               const SizedBox(height: 20),
@@ -112,10 +115,10 @@ class _SurveillanceState extends State<Surveillance> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+          const Padding(
+            padding: EdgeInsets.only(top: 16.0, left: 16.0),
             child: Row(children: [
-              const Text("Units",
+              Text("Units",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -125,7 +128,7 @@ class _SurveillanceState extends State<Surveillance> {
           ),
           Expanded(
             child: ListView(
-              children: [
+              children: const [
                 UnitCard(
                   unitName: "UNIT-17A",
                   address:
@@ -200,7 +203,6 @@ class UnitCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: Colors.grey[300]!,
-
                         width: 1.0,
                       ),
                     ),
