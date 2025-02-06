@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
-import 'package:sakay_app/presentation/screens/commuter/home_page.dart';
+import 'package:sakay_app/presentation/screens/commuters/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
-import '../commuter/profile_page.dart';
+import '../commuters/profile.dart';
 import 'notifications.dart'; // Import the NotificationsScreen
 import 'inbox.dart'; // Import the InboxScreen
 
