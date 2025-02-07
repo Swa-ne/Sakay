@@ -14,8 +14,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   int _selectedIndex = 2; // Set default to Notifications tab
 
   void _onItemTapped(int index) {
-    if (index == _selectedIndex) return;
+    if (index == _selectedIndex)
+      return; // Avoid re-navigation to the same screen
 
+    // Update the selected index
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navigate based on the selected index
     if (index == 0) {
       Navigator.pushReplacement(
         context,
@@ -38,12 +45,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // Remove leading icon (back button)
+        leading: null,
         title: const Text('Notifications'),
       ),
       body: ListView.builder(
