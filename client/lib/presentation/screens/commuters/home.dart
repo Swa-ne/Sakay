@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16.0), // Same as parent
-                child: Center(
+                child: const Center(
                   child: MyMapWidget(),
                 ),
               ),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/presentation/screens/authentication/pwdrequirements_page.dart';
 import 'captcha_page.dart';
-import 'package:sakay_app/presentation/screens/authentication/driverrequirements_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/phone_verification.dart';
-import 'captcha_page.dart';
 
 class UserTypePage extends StatefulWidget {
   final String firstName;

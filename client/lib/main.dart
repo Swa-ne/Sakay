@@ -5,21 +5,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
-import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  String ACCESS_TOKEN = "${dotenv.env['ACCESS_TOKEN']}";
-  MapboxOptions.setAccessToken(ACCESS_TOKEN);
+  String accessToken = "${dotenv.env['ACCESS_TOKEN']}";
+  MapboxOptions.setAccessToken(accessToken);
 
   runApp(const MyApp());
 }
@@ -43,7 +35,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: AdminChatPage(),
+          home: const AdminChatPage(),
         ),
       ),
     );

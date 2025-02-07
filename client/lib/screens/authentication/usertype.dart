@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/screens/commuters/current_location.dart';
+import 'package:sakay_app/presentation/screens/commuters/current_location.dart';
 
 class UserTypePage extends StatefulWidget {
   final String firstName;
@@ -95,7 +95,7 @@ class _UserTypePageState extends State<UserTypePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CurrentLocationPage(),
+                          builder: (context) => const CurrentLocationPage(),
                         ),
                       );
                     }
