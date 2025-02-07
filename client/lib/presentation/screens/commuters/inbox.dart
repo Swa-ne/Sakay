@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,6 +18,8 @@ class MyApp extends StatelessWidget {
 }
 
 class InboxScreen extends StatefulWidget {
+  const InboxScreen({super.key});
+
   @override
   _InboxScreenState createState() => _InboxScreenState();
 }
@@ -49,16 +53,16 @@ class _InboxScreenState extends State<InboxScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // Navigate back
           },
         ),
-        title: Text('Inbox'),
+        title: const Text('Inbox'),
       ),
       body: Column(
         children: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(16.0),
             child: TextField(
               decoration: InputDecoration(
@@ -96,13 +100,13 @@ class InboxItem {
 class InboxItemWidget extends StatelessWidget {
   final InboxItem item;
 
-  const InboxItemWidget(this.item);
+  const InboxItemWidget(this.item, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundColor: Colors.blue,
           child: Icon(Icons.person, color: Colors.white),
         ),

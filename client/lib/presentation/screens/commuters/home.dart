@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import '../commuters/profile.dart';
+import 'notifications.dart'; // Import the NotificationsScreen
+import 'inbox.dart'; // Import the InboxScreen
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +13,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
+  int _selectedIndex = 0; // Keeps track of the selected tab
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navigate based on index
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NotificationsScreen()),
+      );
+    } else if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => InboxScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +47,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
             child: Row(
@@ -40,7 +67,6 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 8.0),
                 ElevatedButton(
                   onPressed: () {
-                    // Perform search action
                     final query = _searchController.text;
                     if (query.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,8 +79,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-
-          // Mock Map
           Expanded(
             child: Container(
               margin: const EdgeInsets.all(16.0),
@@ -64,12 +88,37 @@ class _HomePageState extends State<HomePage> {
                 border: Border.all(color: Colors.grey),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0), // Same as parent
+                borderRadius: BorderRadius.circular(16.0),
                 child: const Center(
                   child: MyMapWidget(),
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Maps',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inbox),
+            label: 'Inbox',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),

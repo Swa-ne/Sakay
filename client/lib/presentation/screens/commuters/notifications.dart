@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 class NotificationsScreen extends StatelessWidget {
+  const NotificationsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
       ),
       body: ListView.builder(
         itemCount: 6,
@@ -33,21 +35,20 @@ class NotificationItem extends StatelessWidget {
   final String description;
 
   const NotificationItem(
-      {Key? key, required this.title, required this.description})
-      : super(key: key);
+      {super.key, required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundColor: Colors.blue,
           child: Icon(Icons.person, color: Colors.white),
         ),
         title: Text(title),
         subtitle: Text(description),
         trailing: IconButton(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           onPressed: () {},
         ),
       ),
