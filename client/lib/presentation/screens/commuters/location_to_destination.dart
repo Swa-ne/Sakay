@@ -43,45 +43,19 @@ class _LocationToDestinationPageState extends State<LocationToDestinationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          const MyMapWidget(), // Background Map
+   
+  onPressed: () {
+    Navigator.pop(context); // Closes the dialog when button is clicked
+  },
+  icon: const Icon(Icons.arrow_back),
 
-          Positioned(
-            top: 50,
-            left: 16,
-            right: 16,
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.arrow_back),
-                ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Enter your destination",
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.person),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+IconButton(
+  onPressed: () {
+    Navigator.pop(context); // Closes the dialog when button is clicked
+  },
+  icon: const Icon(Icons.person),
+),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

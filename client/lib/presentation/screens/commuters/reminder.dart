@@ -65,33 +65,34 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
   }
 
   // Show a pop-up reminder if the destination is too far
-  void _showDistanceReminder() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Warning"),
-          content: const Text(
-              "The destination is too far away. Would you like to continue?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text("Continue"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Proceed with destination selection or other actions
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+void _showDistanceReminder() {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent clicking outside to close
+    builder: (BuildContext dialogContext) { // Use separate context
+      return AlertDialog(
+        title: const Text("Warning"),
+        content: const Text(
+            "The destination is too far away. Would you like to continue?"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // Close the dialog
+            },
+          ),
+          TextButton(
+            child: const Text("Continue"),
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // Close the dialog
+              // Proceed with destination selection or other actions
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void _onItemTapped(int index) {
     setState(() {

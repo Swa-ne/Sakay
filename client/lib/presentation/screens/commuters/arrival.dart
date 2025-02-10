@@ -34,16 +34,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _showDestinationReachedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: Column(
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        contentPadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Blue header with an icon
@@ -68,8 +69,7 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     Text(
                       "Destination Reached",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 8),
@@ -92,21 +92,21 @@ class _MapScreenState extends State<MapScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(); // Closes the dialog when clicked
                   },
                   child: const Text("Got it"),
                 ),
               ),
             ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {

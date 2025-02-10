@@ -21,7 +21,38 @@ class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _MapScreenState createState() => _MapScreenState(
+    void _showDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevents closing by tapping outside
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: const Text("Destination Reached"),
+        content: const Text("Please alight the vehicle."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Closes the dialog
+            },
+            child: const Text("Close"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Closes the dialog
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  );
 }
 
 class _MapScreenState extends State<MapScreen> {
