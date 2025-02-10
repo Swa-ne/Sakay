@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'inbox.dart';
-import 'current_location.dart';
+import 'package:sakay_app/presentation/screens/commuters/current_location.dart';
+import 'inboxpwd.dart';
+import 'current_locationpwd.dart';
 import '../commuters/profile.dart';
 
-class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({super.key});
+class NotificationsScreenPwd extends StatefulWidget {
+  const NotificationsScreenPwd({super.key});
 
   @override
   _NotificationsScreenState createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreenPwd> {
   int _selectedIndex = 2; // Set default to Notifications tab
 
   void _onItemTapped(int index) {
@@ -32,7 +33,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const InboxScreen()),
+        MaterialPageRoute(builder: (context) => const InboxScreenPwd()),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
@@ -118,6 +119,6 @@ class NotificationItem extends StatelessWidget {
 
 void main() {
   runApp(const MaterialApp(
-    home: NotificationsScreen(),
+    home: NotificationsScreenPwd(),
   ));
 }

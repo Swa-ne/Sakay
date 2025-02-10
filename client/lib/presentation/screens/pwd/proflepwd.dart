@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'inbox.dart'; // Import the InboxScreen
-import 'notifications.dart'; // Import the NotificationsScreen
-import 'home.dart'; // Import the HomePage
+import 'package:sakay_app/presentation/screens/commuters-pwd/home.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/inbox.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/notifications.dart';
+import 'inboxpwd.dart'; // Import the InboxScreen
+import 'notificationspwd.dart'; // Import the NotificationsScreen
+import 'homepwd.dart'; // Import the HomePage
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

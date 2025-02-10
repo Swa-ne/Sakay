@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/inbox.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/notifications.dart';
 import '../commuters/profile.dart';
-import 'notifications.dart'; // Import the NotificationsScreen
-import 'inbox.dart'; // Import the InboxScreen
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePagePwd extends StatefulWidget {
+  const HomePagePwd({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePagePwd> {
   final TextEditingController _searchController = TextEditingController();
   int _selectedIndex = 0; // Keeps track of the selected tab
 

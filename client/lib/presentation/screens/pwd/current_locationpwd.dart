@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/inbox.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/notifications.dart';
 import '../commuters/profile.dart';
-import 'notifications.dart'; // Import the NotificationsScreen
-import 'inbox.dart'; // Import the InboxScreen
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LocationToDestinationPage extends StatefulWidget {
+  const LocationToDestinationPage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _LocationToDestinationPageState createState() =>
+      _LocationToDestinationPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final TextEditingController _searchController = TextEditingController();
+class _LocationToDestinationPageState extends State<LocationToDestinationPage> {
   int _selectedIndex = 0; // Keeps track of the selected tab
 
   void _onItemTapped(int index) {
@@ -20,18 +20,20 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
 
-    // Navigate based on index
+    // Navigate to the respective pages when tapped
     if (index == 3) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const ProfilePage()),
       );
-    } else if (index == 2) {
+    }
+    if (index == 2) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const NotificationsScreen()),
       );
-    } else if (index == 1) {
+    }
+    if (index == 1) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const InboxScreen()),
@@ -42,57 +44,40 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+          const MyMapWidget(), // Background Map
+
+          Positioned(
+            top: 50,
+            left: 16,
+            right: 16,
             child: Row(
               children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.arrow_back),
+                ),
                 Expanded(
                   child: TextField(
-                    controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search for a location...',
+                      hintText: "Enter your destination",
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 16),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
                       ),
-                      prefixIcon: const Icon(Icons.search),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    final query = _searchController.text;
-                    if (query.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Searching for "$query"...')),
-                      );
-                    }
-                  },
-                  child: const Text('Search'),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.person),
                 ),
               ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: const Center(
-                  child: MyMapWidget(),
-                ),
-              ),
             ),
           ),
         ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/home.dart';
+import 'package:sakay_app/presentation/screens/commuters-pwd/notifications.dart';
 import '../commuters/profile.dart';
-import 'notifications.dart';
-import 'home.dart';
+import 'notificationspwd.dart';
+import 'homepwd.dart';
 
 void main() => runApp(const MyApp());
 
@@ -15,19 +17,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const InboxScreen(),
+      home: const InboxScreenPwd(),
     );
   }
 }
 
-class InboxScreen extends StatefulWidget {
-  const InboxScreen({super.key});
+class InboxScreenPwd extends StatefulWidget {
+  const InboxScreenPwd({super.key});
 
   @override
   _InboxScreenState createState() => _InboxScreenState();
 }
 
-class _InboxScreenState extends State<InboxScreen> {
+class _InboxScreenState extends State<InboxScreenPwd> {
   final List<InboxItem> inboxItems = [
     InboxItem(
       sender: 'Emmanuel Darude',
