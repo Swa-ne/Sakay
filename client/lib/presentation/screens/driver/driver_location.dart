@@ -27,14 +27,12 @@ class _MapState extends State<DriverLocation> {
             ),
           ),
 
-          // Back Button and Search Bar
           Positioned(
             top: 50,
             left: 20,
             right: 20,
             child: Row(
               children: [
-                // Back Button
                 Container(
                   width: 40,
                   height: 40,
@@ -57,8 +55,6 @@ class _MapState extends State<DriverLocation> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
-                // Search Bar
                 Expanded(
                   child: Container(
                     height: 40,
