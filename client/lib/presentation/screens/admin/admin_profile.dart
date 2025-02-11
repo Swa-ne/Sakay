@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 
 class AdminProfile extends StatefulWidget {
   const AdminProfile({super.key});
@@ -8,23 +13,189 @@ class AdminProfile extends StatefulWidget {
 }
 
 class AadminProfileState extends State<AdminProfile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _selectedMapPreference = 'default';
+  String _selectedItem = "Profile";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+      key: _scaffoldKey, // Assign the scaffold key to the scaffold
+      drawer: Drawer(
+        child: Container(
+          color: const Color(0xFF00A3FF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 40, color: Colors.black),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Sakay Administrative",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Map";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminMap()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.map,
+                        text: "Map",
+                        isSelected: _selectedItem == "Map",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Surveillance";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminSurveillance()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.camera,
+                        text: "Surveillance",
+                        isSelected: _selectedItem == "Surveillance",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Report";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminReports()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.bar_chart,
+                        text: "Report",
+                        isSelected: _selectedItem == "Report",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Notifications";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminNotification()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.notifications,
+                        text: "Notifications",
+                        isSelected: _selectedItem == "Notifications",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Inbox";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminInbox()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.inbox,
+                        text: "Inbox",
+                        isSelected: _selectedItem == "Inbox",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Profile";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminProfile()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.person,
+                        text: "Profile",
+                        isSelected: _selectedItem == "Profile",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: DrawerItem(
+                  icon: Icons.logout,
+                  text: "Logout",
+                  isSelected: _selectedItem == "Logout",
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
-        title: const Text(
-          'Profile',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Color(0xFF00A2FF),
+          elevation: 0,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                  onPressed: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Profile',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        backgroundColor: Color(0xFF00A2FF),
-        foregroundColor: Colors.white,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -37,7 +208,11 @@ class AadminProfileState extends State<AdminProfile> {
               ),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(30.0),
+                padding: const EdgeInsets.only(
+                    top: 10.0,
+                    left: 30.0,
+                    right: 30.0,
+                    bottom: 30.0), // Reduced top padding
                 color: const Color(0xFF00A2FF),
                 child: Container(
                   padding: const EdgeInsets.all(10.0),
@@ -123,7 +298,6 @@ class AadminProfileState extends State<AdminProfile> {
             ),
 
             const SizedBox(height: 10.0),
-
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -132,10 +306,10 @@ class AadminProfileState extends State<AdminProfile> {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 3.0),
               child: Text(
                 'Select a preferred view of the map',
-                style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                style: TextStyle(fontSize: 10.0, color: Colors.grey),
               ),
             ),
             const SizedBox(height: 30.0),
@@ -144,15 +318,13 @@ class AadminProfileState extends State<AdminProfile> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildMapOption('default', 'assets/default_map.png'),
-                  _buildMapOption('terrain', 'assets/terrain_map.png'),
-                  _buildMapOption('satellite', 'assets/satellite_map.png'),
+                  _buildMapOption('Default', 'assets/default_map.png'),
+                  _buildMapOption('Terrain', 'assets/terrain_map.png'),
+                  _buildMapOption('Satellite', 'assets/satellite_map.png'),
                 ],
               ),
             ),
-
             const SizedBox(height: 30.0),
-
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -161,25 +333,20 @@ class AadminProfileState extends State<AdminProfile> {
               ),
             ),
             const SizedBox(height: 10.0),
-
-            // Settings Options
             _buildSettingsOption(Icons.account_circle, 'Account',
                 'Manage and update your personal account information'),
-            _buildDivider(),
+            const SizedBox(height: 10), // Added small space
             _buildSettingsOption(Icons.notifications, 'Notifications',
                 'Customize how you stay informed with real-time updates'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.edit, 'Manage Accounts',
-                'Manage a users account'),
-            _buildDivider(),
+            const SizedBox(height: 10), // Added small space
+            _buildSettingsOption(
+                Icons.edit, 'Manage Accounts', 'Manage a users account'),
+            const SizedBox(height: 10), // Added small space
             _buildSettingsOption(Icons.car_rental_sharp, 'Registered Units',
                 'View registered units'),
-            _buildDivider(),
-
+            const SizedBox(height: 10), // Added small space
             const SizedBox(height: 20.0),
-
             _buildLogoutOption(),
-
             const SizedBox(height: 10.0)
           ],
         ),
@@ -202,25 +369,23 @@ class AadminProfileState extends State<AdminProfile> {
             decoration: BoxDecoration(
               border: Border.all(
                 color: _selectedMapPreference == preference
-                    ? const Color(0xFF3A6C8D)
+                    ? Colors.blue
                     : Colors.grey,
-                width: 3.0,
+                width: 2,
               ),
               borderRadius: BorderRadius.circular(10.0),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
-              ),
             ),
+            child: Image.asset(imagePath, fit: BoxFit.cover),
           ),
           const SizedBox(height: 5.0),
           Text(
-            preference[0].toUpperCase() + preference.substring(1),
+            preference,
             style: TextStyle(
+              fontSize: 13.0,
+              fontWeight: FontWeight.bold,
               color: _selectedMapPreference == preference
-                  ? const Color(0xFF3A6C8D)
+                  ? Colors.blue
                   : Colors.grey,
-              fontSize: 14.0,
             ),
           ),
         ],
@@ -230,68 +395,149 @@ class AadminProfileState extends State<AdminProfile> {
 
   Widget _buildSettingsOption(IconData icon, String title, String subtitle) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: Colors.black,
-            size: 30.0,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: InkWell(
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title tapped')),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                offset: const Offset(0, 4),
+                blurRadius: 4.0,
+              ),
+            ],
           ),
-          const SizedBox(width: 12.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                      fontSize: 14.0, fontWeight: FontWeight.w500),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(fontSize: 12.0, color: Colors.grey),
-                ),
-              ],
-            ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.black),
+              const SizedBox(width: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.black),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildLogoutOption() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-      child: GestureDetector(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: InkWell(
         onTap: () {
-          // Handle logout logic
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged out successfully')),
+            const SnackBar(content: Text('Logging out...')),
           );
         },
-        child: const Row(
-          children: [
-            Icon(Icons.logout, color: Colors.black),
-            SizedBox(width: 20.0),
-            Text(
-              'Logout',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
-            ),
-            Spacer(),
-            Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.black),
-          ],
+        child: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                offset: const Offset(0, 4),
+                blurRadius: 4.0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: const [
+              Icon(Icons.logout, color: Colors.white),
+              SizedBox(width: 20.0),
+              Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
-      child: Divider(color: Colors.grey),
+class DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final bool isSelected;
+
+  const DrawerItem({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.white
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Container(
+          height: isSelected ? 40 : 50,
+          width: isSelected ? 350 : 250,
+          padding: isSelected
+              ? const EdgeInsets.only(left: 10)
+              : const EdgeInsets.only(left: 10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isSelected
+                    ? Colors.black
+                    : Colors.white,
+              ),
+              const SizedBox(width: 30),
+              Text(
+                text,
+                style: TextStyle(
+                  color: isSelected
+                      ? Colors.black
+                      : Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

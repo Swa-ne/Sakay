@@ -10,6 +10,7 @@ import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: DriverManageVehicle(),
+          home: AdminSurveillance(),
         ),
       ),
     );
