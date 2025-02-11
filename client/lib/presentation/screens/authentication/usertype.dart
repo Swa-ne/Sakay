@@ -44,11 +44,11 @@ class _UserTypePageState extends State<UserTypePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(
+      body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               const CircleAvatar(
                 radius: 50.0,
@@ -65,23 +65,19 @@ class _UserTypePageState extends State<UserTypePage> {
                 "What type of user are you?",
                 style: TextStyle(fontSize: 15.0),
               ),
-              const SizedBox(height: 50.0),
-              Column(
-                children: [
-                  _buildUserTypeOption('Commuter'),
-                  const SizedBox(height: 10.0),
-                  _buildUserTypeOption('PWD'),
-                  const SizedBox(height: 10.0),
-                  _buildUserTypeOption('Driver'),
-                ],
-              ),
-              const SizedBox(height: 180.0),
+              const SizedBox(height: 30.0),
+              _buildUserTypeOption('Commuter'),
+              const SizedBox(height: 10.0),
+              _buildUserTypeOption('PWD'),
+              const SizedBox(height: 10.0),
+              _buildUserTypeOption('Driver'),
+              const Spacer(),
               ElevatedButton(
                 onPressed: _userType != null ? _navigateToCaptcha : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00A2FF),
                   padding: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 155.0),
+                      vertical: 15.0, horizontal: 145.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),

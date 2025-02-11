@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import '../commuters/profile.dart';
+import 'notifications.dart';
+import 'inbox.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,67 +13,99 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+
+      final pages = [
+        const HomePage(),
+        const InboxScreen(),
+        const NotificationsScreen(),
+        const ProfilePage(),
+      ];
+
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => pages[index],
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child;
+          },
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search for a location...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      prefixIcon: const Icon(Icons.search),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Perform search action
-                    final query = _searchController.text;
-                    if (query.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Searching for "$query"...')),
-                      );
-                    }
-                  },
-                  child: const Text('Search'),
-                ),
-              ],
-            ),
+          const Positioned.fill(
+            child: MyMapWidget(),
           ),
 
-          // Mock Map
-          Expanded(
+          Positioned(
+            top: 50,
+            left: 16,
+            right: 16,
             child: Container(
-              margin: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(color: Colors.grey),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2)),
+                ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0), // Same as parent
-                child: const Center(
-                  child: MyMapWidget(),
-                ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        hintText: 'Search for a location...',
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.blue),
+                    onPressed: () {
+                      final query = _searchController.text;
+                      if (query.isNotEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Searching for "$query"...')),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           ),
+        ],
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF00A2FF),
+        unselectedItemColor: const Color(0xFF00A2FF),
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
+          BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

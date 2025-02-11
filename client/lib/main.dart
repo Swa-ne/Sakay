@@ -4,8 +4,6 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
-import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
 void main() async {
