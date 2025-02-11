@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
+import 'package:sakay_app/presentation/screens/commuters/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: const AdminChatPage(),
+          home: const HomePage(),
         ),
       ),
     );
