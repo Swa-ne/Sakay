@@ -10,159 +10,135 @@ class GuideScreen extends StatefulWidget {
 }
 
 class _GuideScreenState extends State<GuideScreen> {
+  int _currentIndex = 0;
   final PageController _pageController = PageController();
+
+  final List<Map<String, String>> _slides = [
+    {
+      'image': 'assets/guidescreen1.png',
+      'title': 'INTRODUCING',
+      'description':
+          'Sakay is a real-time bus tracking system designed to improve public transportation along the Lingayen-Dagupan route. Using advanced GPS technology, it provides accurate updates on vehicle locations, estimated arrival times, and proximity alerts for a more convenient travel experience.',
+      'buttonText': 'Next'
+    },
+    {
+      'image': 'assets/guidescreen2.png',
+      'title': 'KEY FEATURES',
+      'description':
+          'Sakay reduces waiting times, enhances commuting efficiency, and provides drivers with route optimization insights. It also promotes sustainable transportation by encouraging public transport use and reducing congestion.',
+      'buttonText': 'Next'
+    },
+    {
+      'image': 'assets/guidescreen3.png',
+      'title': 'BENEFITS',
+      'description':
+          'Sakay offers real-time vehicle tracking, accurate arrival estimates, and proximity alerts, all presented through an easy-to-navigate, user-friendly interface.',
+      'buttonText': 'Continue'
+    },
+  ];
+
+  void _nextSlide() {
+    if (_currentIndex < _slides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      context.go('/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // PageView with slides
+          const SizedBox(height: 80),
           Expanded(
-            child: PageView(
+            child: PageView.builder(
               controller: _pageController,
-              physics: const BouncingScrollPhysics(), // Smooth bouncing effect
-              children: [
-                _buildSlide(
-                  'assets/guidescreen1.png', // Image for slide 1
-                  'INTRODUCING', // Header for slide 1
-                  'Learn about our app. Here is some detailed description of how the app works.',
-                  'Next',
-                  () {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  },
-                  null, // No back button on slide 1
-                ),
-                _buildSlide(
-                  'assets/guidescreen2.png', // Image for slide 2
-                  'KEY FEATURES', // Header for slide 2
-                  'This is the second slide. Learn about the features and how to use them.',
-                  'Next',
-                  () {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  },
-                  () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  },
-                ),
-                _buildSlide(
-                  'assets/guidescreen3.png', // Image for slide 3
-                  'BENEFITS', // Header for slide 3
-                  'This is the third slide. Ready to start using the app? Let\'s get you going!',
-                  'Continue',
-                  () {
-                    // Navigate to the login screen
-                    context.go('/login');
-                  },
-                  () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  },
-                ),
-              ],
+              itemCount: _slides.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        _slides[index]['image']!,
+                        height: 250.0,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 40.0),
+                      Text(
+                        _slides[index]['title']!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      Text(
+                        _slides[index]['description']!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
+          const SizedBox(height: 30),
+          SmoothPageIndicator(
+            controller: _pageController,
+            count: _slides.length,
+            effect: const ExpandingDotsEffect(
+              dotWidth: 10.0,
+              dotHeight: 10.0,
+              activeDotColor: Color(0xFF00A2FF),
+              dotColor: Colors.grey,
+              spacing: 10.0,
+              expansionFactor: 4.0,
+              paintStyle: PaintingStyle.fill,
+            ),
+          ),
+          const SizedBox(height: 70),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: _nextSlide,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00A2FF),
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                child: Text(
+                  _slides[_currentIndex]['buttonText']!,
+                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
         ],
       ),
-    );
-  }
-
-  Widget _buildSlide(String imagePath, String header, String description,
-      String buttonText, VoidCallback onPressed, VoidCallback? onBackPressed) {
-    return Stack(
-      children: [
-        // Image at the top
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              imagePath,
-              height: 250.0, // Adjust height as necessary
-              width: double.infinity,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 40.0), // Space between image and text
-            // Header text
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                header,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(
-                height: 20.0), // Space between header and description
-            // Description text
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                description,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0, color: Colors.grey),
-              ),
-            ),
-            const SizedBox(height: 60.0),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: SmoothPageIndicator(
-                controller: _pageController,
-                count: 3,
-                effect: const ExpandingDotsEffect(
-                  dotWidth: 12.0,
-                  dotHeight: 12.0,
-                  activeDotColor: Color(0xFF00A2FF),
-                  dotColor: Colors.grey,
-                  spacing: 20.0,
-                  expansionFactor: 4.0,
-                  paintStyle: PaintingStyle.fill,
-                ),
-              ),
-            ),
-            // Button (Next/Continue)
-            const SizedBox(height: 50.0),
-            ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00A2FF),
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 130.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-              ),
-              child: Text(buttonText,
-                  style: const TextStyle(fontSize: 15.0, color: Colors.white)),
-            ),
-          ],
-        ),
-
-        if (onBackPressed != null)
-          Positioned(
-            left: 10.0,
-            top: 10.0,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: onBackPressed,
-              color: Colors.black,
-            ),
-          ),
-      ],
     );
   }
 }
