@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 
 class AdminMap extends StatefulWidget {
   const AdminMap({super.key});
@@ -9,6 +14,8 @@ class AdminMap extends StatefulWidget {
 }
 
 class _MapState extends State<AdminMap> {
+  String _selectedItem = "Map";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,25 +46,119 @@ class _MapState extends State<AdminMap> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const DrawerItem(icon: Icons.map, text: "Surveillance"),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, '/map');
+                        setState(() {
+                          _selectedItem = "Map";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminMap()),
+                        );
                       },
-                      child: const DrawerItem(icon: Icons.map, text: "Map"),
+                      child: DrawerItem(
+                        icon: Icons.map,
+                        text: "Map",
+                        isSelected: _selectedItem == "Map",
+                      ),
                     ),
-                    const DrawerItem(icon: Icons.bar_chart, text: "Report"),
-                    const DrawerItem(
-                        icon: Icons.notifications, text: "Notifications"),
-                    const DrawerItem(icon: Icons.inbox, text: "Inbox"),
-                    const DrawerItem(icon: Icons.settings, text: "Settings"),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Surveillance";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminSurveillance()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.camera,
+                        text: "Surveillance",
+                        isSelected: _selectedItem == "Surveillance",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Report";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminReports()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.bar_chart,
+                        text: "Report",
+                        isSelected: _selectedItem == "Report",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Notifications";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminNotification()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.notifications,
+                        text: "Notifications",
+                        isSelected: _selectedItem == "Notifications",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Inbox";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminInbox()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.inbox,
+                        text: "Inbox",
+                        isSelected: _selectedItem == "Inbox",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Profile";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminProfile()),
+                        );
+                      },
+                      child: DrawerItem(
+                        icon: Icons.person,
+                        text: "Profile",
+                        isSelected: _selectedItem == "Profile",
+                      ),
+                    ),
                   ],
                 ),
               ),
               const Spacer(),
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: DrawerItem(icon: Icons.logout, text: "Logout"),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: DrawerItem(
+                  icon: Icons.logout,
+                  text: "Logout",
+                  isSelected: _selectedItem == "Logout",
+                ),
               ),
               const SizedBox(height: 20),
             ],
@@ -84,7 +185,7 @@ class _MapState extends State<AdminMap> {
             child: Builder(
               builder: (context) {
                 return IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 50),
+                  icon: const Icon(Icons.menu, color: Colors.white, size: 30),
                   onPressed: () {
                     Scaffold.of(context).openDrawer();
                   },
@@ -97,24 +198,26 @@ class _MapState extends State<AdminMap> {
             left: 70,
             right: 20,
             child: Container(
+              width: 250,
+              height: 40,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade300),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  )
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
                 ],
               ),
               child: const TextField(
                 decoration: InputDecoration(
                   hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search, color: Colors.grey),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
                 ),
               ),
             ),
@@ -128,22 +231,47 @@ class _MapState extends State<AdminMap> {
 class DrawerItem extends StatelessWidget {
   final IconData icon;
   final String text;
+  final bool isSelected;
 
-  const DrawerItem({super.key, required this.icon, required this.text});
+  const DrawerItem({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.isSelected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(width: 30, height: 10),
-          Text(
-            text,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-          )
-        ],
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Container(
+          height: isSelected ? 40 : 50,
+          width: isSelected ? 350 : 250,
+          padding: isSelected
+              ? const EdgeInsets.only(left: 10)
+              : const EdgeInsets.only(left: 10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.black : Colors.white,
+              ),
+              const SizedBox(width: 30),
+              Text(
+                text,
+                style: TextStyle(
+                  color: isSelected ? Colors.black : Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
