@@ -1,20 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CurrentLocationPage(),
-    );
-  }
-}
+import 'package:sakay_app/common/widgets/map.dart';
 
 class CurrentLocationPage extends StatefulWidget {
   @override
@@ -31,10 +16,7 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
           Container(
             color: Colors.blue[100],
             child: const Center(
-              child: Text(
-                "Map Placeholder",
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              ),
+              child: MyMapWidget(),
             ),
           ),
 

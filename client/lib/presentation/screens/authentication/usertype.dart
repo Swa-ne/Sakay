@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/authentication/pwdrequirements_page.dart';
+import 'package:sakay_app/data/models/sign_up.dart';
+// import 'package:sakay_app/presentation/screens/authentication/pwdrequirements_page.dart';
 import 'captcha_page.dart';
-import 'package:sakay_app/presentation/screens/authentication/driverrequirements_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/phone_verification.dart';
-import 'captcha_page.dart';
+import 'package:sakay_app/presentation/screens/authentication/driverrequirements_page.dart';
 
 class UserTypePage extends StatefulWidget {
-  final String firstName;
-
-  const UserTypePage({super.key, required this.firstName});
+  final SignUpUserModel signupData;
+  const UserTypePage({super.key, required this.signupData});
 
   @override
   _UserTypePageState createState() => _UserTypePageState();
@@ -29,11 +28,11 @@ class _UserTypePageState extends State<UserTypePage> {
                 MaterialPageRoute(
                     builder: (context) => PhoneVerificationPage()),
               );
-            } else if (_userType == 'PWD') {
+            } else if (_userType == 'DRIVER') {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const PWDRequirementsPage()),
+                    builder: (context) => const DriverRequirementsPage()),
               );
             }
           },
@@ -58,7 +57,7 @@ class _UserTypePageState extends State<UserTypePage> {
               ),
               const SizedBox(height: 20.0),
               Text(
-                "Hey, ${widget.firstName}",
+                "Hey, ${widget.signupData.first_name}",
                 style: const TextStyle(
                     fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
@@ -71,8 +70,8 @@ class _UserTypePageState extends State<UserTypePage> {
               Column(
                 children: [
                   _buildUserTypeOption('Commuter'),
-                  const SizedBox(height: 10.0),
-                  _buildUserTypeOption('PWD'),
+                  // const SizedBox(height: 10.0),
+                  // _buildUserTypeOption('PWD'),
                   const SizedBox(height: 10.0),
                   _buildUserTypeOption('Driver'),
                 ],
