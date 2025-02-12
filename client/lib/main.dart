@@ -13,8 +13,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  String ACCESS_TOKEN = "${dotenv.env['ACCESS_TOKEN']}";
-  MapboxOptions.setAccessToken(ACCESS_TOKEN);
+  String accessToken = "${dotenv.env['ACCESS_TOKEN']}";
+  MapboxOptions.setAccessToken(accessToken);
 
   runApp(const MyApp());
 }

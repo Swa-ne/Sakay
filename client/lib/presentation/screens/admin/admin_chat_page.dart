@@ -40,13 +40,14 @@ class _AdminChatPageState extends State<AdminChatPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
+        title: const Row(
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage("assets/john.png"), // Replace with actual image
+            CircleAvatar(
+              backgroundImage:
+                  AssetImage("assets/john.png"), // Replace with actual image
             ),
-            const SizedBox(width: 10),
-            const Text("John Doe", style: TextStyle(color: Colors.black)),
+            SizedBox(width: 10),
+            Text("John Doe", style: TextStyle(color: Colors.black)),
           ],
         ),
       ),
@@ -71,14 +72,16 @@ class _AdminChatPageState extends State<AdminChatPage> {
                     if (!isMe)
                       const CircleAvatar(
                         radius: 16,
-                        backgroundImage: AssetImage("assets/john.png"), // User's profile icon
+                        backgroundImage: AssetImage(
+                            "assets/john.png"), // User's profile icon
                       ),
                     const SizedBox(width: 8), // Space between icon & chat
 
                     // Chat bubble
                     Column(
-                      crossAxisAlignment:
-                          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      crossAxisAlignment: isMe
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -96,8 +99,9 @@ class _AdminChatPageState extends State<AdminChatPage> {
                         ),
                         // Time below the chat bubble
                         Align(
-                          alignment:
-                              isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                          alignment: isMe
+                              ? Alignment.bottomRight
+                              : Alignment.bottomLeft,
                           child: Text(
                             formattedTime,
                             style: const TextStyle(
@@ -111,7 +115,8 @@ class _AdminChatPageState extends State<AdminChatPage> {
                     if (isMe)
                       const CircleAvatar(
                         radius: 16,
-                        backgroundImage: AssetImage("assets/bus.png"), // Admin's profile icon
+                        backgroundImage: AssetImage(
+                            "assets/bus.png"), // Admin's profile icon
                       ),
                   ],
                 );

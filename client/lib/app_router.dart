@@ -7,7 +7,7 @@ import 'package:sakay_app/presentation/screens/authentication/phone_verification
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
-import 'package:sakay_app/presentation/screens/commuter/home_page.dart';
+import 'package:sakay_app/presentation/screens/commuters/home.dart';
 import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 

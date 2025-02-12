@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CurrentLocationPage extends StatefulWidget {
+  const CurrentLocationPage({super.key});
+
   @override
   _CurrentLocationPageState createState() => _CurrentLocationPageState();
 }

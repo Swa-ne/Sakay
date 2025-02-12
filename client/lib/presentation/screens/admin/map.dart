@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:sakay_app/common/widgets/map.dart';
-import 'package:sakay_app/presentation/screens/admin/surveillance.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
@@ -41,24 +39,24 @@ class _MapState extends State<Map> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    DrawerItem(icon: Icons.map, text: "Surveillance"),
+                    const DrawerItem(icon: Icons.map, text: "Surveillance"),
                     GestureDetector(
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/map');
                       },
-                      child: DrawerItem(icon: Icons.map, text: "Map"),
+                      child: const DrawerItem(icon: Icons.map, text: "Map"),
                     ),
-                    DrawerItem(icon: Icons.bar_chart, text: "Report"),
-                    DrawerItem(
+                    const DrawerItem(icon: Icons.bar_chart, text: "Report"),
+                    const DrawerItem(
                         icon: Icons.notifications, text: "Notifications"),
-                    DrawerItem(icon: Icons.inbox, text: "Inbox"),
-                    DrawerItem(icon: Icons.settings, text: "Settings"),
+                    const DrawerItem(icon: Icons.inbox, text: "Inbox"),
+                    const DrawerItem(icon: Icons.settings, text: "Settings"),
                   ],
                 ),
               ),
               const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              const Padding(
+                padding: EdgeInsets.all(16.0),
                 child: DrawerItem(icon: Icons.logout, text: "Logout"),
               ),
               const SizedBox(height: 20),
@@ -74,13 +72,12 @@ class _MapState extends State<Map> {
               borderRadius: BorderRadius.circular(16.0),
               border: Border.all(color: Colors.grey),
             ),
-            child: ClipRRect(
+            child: const ClipRRect(
               child: Center(
                 child: MyMapWidget(),
               ),
             ),
           ),
-
           Positioned(
             top: 40,
             left: 10,
@@ -95,7 +92,6 @@ class _MapState extends State<Map> {
               },
             ),
           ),
-
           Positioned(
             top: 50,
             left: 70,
@@ -108,11 +104,11 @@ class _MapState extends State<Map> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
                     blurRadius: 5,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   )
                 ],
               ),
-              child: TextField(
+              child: const TextField(
                 decoration: InputDecoration(
                   hintText: 'Search...',
                   border: InputBorder.none,

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AdminReports extends StatelessWidget {
+  const AdminReports({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -16,7 +18,7 @@ class AdminReports extends StatelessWidget {
                 Icon(Icons.arrow_back),
                 SizedBox(width: 8),
                 Text(
-                  'Reports', 
+                  'Reports',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -28,7 +30,8 @@ class AdminReports extends StatelessWidget {
             ReportItem(
               icon: Icons.directions_car,
               title: 'Incident Report',
-              description: 'Track and review unexpected events and actions taken',
+              description:
+                  'Track and review unexpected events and actions taken',
             ),
             ReportItem(
               icon: Icons.library_books,
@@ -59,6 +62,7 @@ class ReportItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ReportItem({
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
@@ -75,11 +79,12 @@ class ReportItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 3,
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center, // Centers the icon vertically
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Centers the icon vertically
             children: [
               Container(
                 width: 40, // Ensures consistent spacing
@@ -87,7 +92,7 @@ class ReportItem extends StatelessWidget {
                 alignment: Alignment.center, // Centers the icon
                 child: Icon(icon, size: 30, color: Colors.black),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +105,7 @@ class ReportItem extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       description,
                       style: GoogleFonts.inter(
