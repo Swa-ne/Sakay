@@ -1,15 +1,15 @@
 class LoginUserModel {
-  final String email;
+  final String user_identifier;
   final String password;
 
   LoginUserModel({
-    required this.email,
+    required this.user_identifier,
     required this.password,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'email_address': email,
+      'user_identifier': user_identifier,
       'password': password,
     };
   }
