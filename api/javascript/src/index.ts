@@ -5,14 +5,13 @@ import cors from 'cors';
 import bodyParser from "body-parser";
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
+dotenv.config()
 
 import entryRoutes from "./routes/authentication.routes";
-import { server } from './socket';
-
-export const app = express();
+import { app, server } from './socket';
 
 
-dotenv.config()
+
 const port = Number(process.env.API_PORT);
 
 const MONGODB_CONNECTION: any = process.env.MONGODB_CONNECTION;
@@ -55,8 +54,8 @@ app.use(
     }),
 );
 app.use(cookieParser());
-
 app.use(express.json());
+
 app.use("/authentication", entryRoutes)
 
 app.get('/', (req: Request, res: Response) => {
