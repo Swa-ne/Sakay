@@ -29,7 +29,7 @@ class _MyMapScreenState extends State<MyMapWidget> with Tracker {
   @override
   Widget build(BuildContext context) {
     final MapWidget mapWidget = MapWidget(
-      key: ValueKey("mapWidget"),
+      key: const ValueKey("mapWidget"),
       styleUri: MapboxStyles.STANDARD,
       onMapCreated: _onMapCreated,
       cameraOptions: CameraOptions(

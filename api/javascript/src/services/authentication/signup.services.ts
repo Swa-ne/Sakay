@@ -36,6 +36,7 @@ export const signupUsertoDatabase = async (
                 access_token: result.message?.access_token,
                 refresh_token: result.message?.refresh_token,
                 user_id: userCredentialResult._id,
+                user_type: userCredentialResult.user_type,
                 httpCode: 200
             };
         }

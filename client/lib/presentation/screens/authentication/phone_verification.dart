@@ -102,7 +102,7 @@ class PhoneVerificationPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00A2FF),
                   padding: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 145.0),
+                      vertical: 15.0, horizontal: 137.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),

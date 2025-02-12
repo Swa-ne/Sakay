@@ -121,7 +121,7 @@ export const signupUserController = async (req: Request, res: Response) => {
                         sameSite: 'none',
                     }
                 )
-                .json({ message: "Success", access_token: data.access_token, user_id: data.user_id });
+                .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, user_type: data.user_type });
             return;
         }
 
@@ -157,7 +157,7 @@ export const verifyEmailCodeController = async (req: Request & { user?: UserType
             return;
         }
 
-        const { user_id } = user;
+        const { user_id, user_type } = user;
         const { code } = req.body;
         const result = await verifyEmailCode(user_id, code);
         if (result.httpCode === 200) {
@@ -173,7 +173,7 @@ export const verifyEmailCodeController = async (req: Request & { user?: UserType
                         sameSite: 'none',
                     }
                 )
-                .json({ message: "Success", access_token: result_token.message?.access_token, user_id });
+                .json({ message: "Success", access_token: result_token.message?.access_token, user_id, user_type });
             return;
         }
         res.status(result.httpCode).json({ error: result.error });

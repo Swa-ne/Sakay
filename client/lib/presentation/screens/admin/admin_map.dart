@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
@@ -174,7 +173,7 @@ class _MapState extends State<AdminMap> {
               borderRadius: BorderRadius.circular(16.0),
               border: Border.all(color: Colors.grey),
             ),
-            child: ClipRRect(
+            child: const ClipRRect(
               child: Center(
                 child: MyMapWidget(),
               ),
@@ -247,9 +246,7 @@ class DrawerItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
@@ -262,17 +259,13 @@ class DrawerItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? Colors.black
-                    : Colors.white,
+                color: isSelected ? Colors.black : Colors.white,
               ),
               const SizedBox(width: 30),
               Text(
                 text,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.white,
+                  color: isSelected ? Colors.black : Colors.white,
                   fontSize: 14,
                 ),
               ),
