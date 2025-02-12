@@ -3,6 +3,7 @@ import { Schema, Document, ObjectId, model } from 'mongoose';
 export interface UserSchemaInterface extends Document {
     _id: ObjectId,
     first_name: string,
+    middle_name?: string,
     last_name: string,
     profile_picture_url: string,
     email_address: string,
@@ -21,6 +22,9 @@ const UserSchema: Schema = new Schema({
     first_name: {
         type: String,
         required: [true, 'Please enter your first name.'],
+    },
+    middle_name: {
+        type: String,
     },
     last_name: {
         type: String,

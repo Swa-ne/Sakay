@@ -67,8 +67,13 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Map from MyMapWidget
-          const MyMapWidget(), // Use MyMapWidget here
+          // Background Map Placeholder
+          Container(
+            color: Colors.blue[100],
+            child: const Center(
+              child: MyMapWidget(),
+            ),
+          ),
 
           // Top Search Bar
           Positioned(

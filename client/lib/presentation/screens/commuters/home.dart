@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
+import 'package:sakay_app/bloc/tracker/tracker_event.dart';
+import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,8 +12,16 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
+  late TrackerBloc _trackerBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+    _trackerBloc.add(ConnectEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +62,15 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: const Text('Search'),
                 ),
+                TextButton(
+                  onPressed: () async =>
+                      _trackerBloc.add(StartTrackMyVehicleEvent()),
+                  child: Text("pindot mo lang"),
+                ),
+                TextButton(
+                  onPressed: () => _trackerBloc.add(StopTrackMyVehicleEvent()),
+                  child: Text("stop mo lang"),
+                )
               ],
             ),
           ),

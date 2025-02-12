@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class GuideScreen extends StatefulWidget {
@@ -63,11 +63,7 @@ class _GuideScreenState extends State<GuideScreen> {
                   'Continue',
                   () {
                     // Navigate to the login screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
-                    );
+                    context.go('/login');
                   },
                   () {
                     _pageController.previousPage(
