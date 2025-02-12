@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'inbox.dart';
-import 'notifications.dart';
-import 'home.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,24 +8,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final int _selectedIndex = 3; 
-
-  void _onItemTapped(int index) {
-    if (_selectedIndex == index) return; 
-
-    final pages = [
-      const HomePage(),
-      const InboxScreen(),
-      const NotificationsScreen(),
-      const ProfilePage(),
-    ];
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => pages[index]),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,20 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
             // Your profile content here...
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF00A2FF),
-        unselectedItemColor: const Color(0xFF00A2FF),
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
-          BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
       ),
     );
   }
