@@ -1,23 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'; // Import geolocator
 import 'package:sakay_app/common/widgets/map.dart';
-import '../commuters/profile.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CurrentLocationPage(),
-    );
-  }
-}
 
 class CurrentLocationPage extends StatefulWidget {
   const CurrentLocationPage({super.key});
@@ -28,8 +11,6 @@ class CurrentLocationPage extends StatefulWidget {
 }
 
 class _CurrentLocationPageState extends State<CurrentLocationPage> {
-  int _selectedIndex = 0; // Keeps track of the selected tab
-
   // Function to check if the distance is too far
   Future<void> _checkDistanceAndNavigate() async {
     // Get current location
@@ -91,21 +72,6 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
         );
       },
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navigate to ProfilePage if index is 3 (Profile tab)
-    if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const ProfilePage()), // Open ProfilePage
-      );
-    }
   }
 
   @override
@@ -195,30 +161,6 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped, // Calls _onItemTapped when a tab is clicked
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Maps',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inbox),
-            label: 'Inbox',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile', // The Profile tab
           ),
         ],
       ),

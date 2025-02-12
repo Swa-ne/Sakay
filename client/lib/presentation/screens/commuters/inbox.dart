@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../commuters/profile.dart';
-import 'notifications.dart';
-import 'home.dart';
 
 void main() => runApp(const MyApp());
 
@@ -29,33 +26,21 @@ class InboxScreen extends StatefulWidget {
 
 class _InboxScreenState extends State<InboxScreen> {
   final List<InboxItem> inboxItems = [
-    InboxItem(sender: 'Emmanuel Darude', message: 'Yung driver bigla bigla nagppreno parang wan....', time: '4:14 pm'),
-    InboxItem(sender: 'Emmanuel Darude', message: 'Grabe, ambilis ng magpatakbo ni kuya driver', time: '12:22 pm'),
-    InboxItem(sender: 'Emmanuel Darude', message: 'Nagugstomako', time: '9:41 am'),
-    InboxItem(sender: 'Emmanuel Darude', message: 'Clpo with a gravyy', time: '12:22 pm'),
+    InboxItem(
+        sender: 'Emmanuel Darude',
+        message: 'Yung driver bigla bigla nagppreno parang wan....',
+        time: '4:14 pm'),
+    InboxItem(
+        sender: 'Emmanuel Darude',
+        message: 'Grabe, ambilis ng magpatakbo ni kuya driver',
+        time: '12:22 pm'),
+    InboxItem(
+        sender: 'Emmanuel Darude', message: 'Nagugstomako', time: '9:41 am'),
+    InboxItem(
+        sender: 'Emmanuel Darude',
+        message: 'Clpo with a gravyy',
+        time: '12:22 pm'),
   ];
-
-  int _selectedIndex = 1;
-
-  void _onItemTapped(int index) {
-    if (_selectedIndex != index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-
-      final pages = [const HomePage(), const InboxScreen(), const NotificationsScreen(), const ProfilePage()];
-      
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => pages[index],
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return child;
-          },
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,21 +67,6 @@ class _InboxScreenState extends State<InboxScreen> {
               },
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF00A2FF),
-        unselectedItemColor: const Color(0xFF00A2FF),
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
-          BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
