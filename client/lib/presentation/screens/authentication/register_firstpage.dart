@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
-import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sakay_app/common/mixins/input_validation.dart';
+import 'package:sakay_app/data/models/sign_up.dart';
 
 class SignUpPage1 extends StatefulWidget {
   const SignUpPage1({super.key});
@@ -10,13 +13,34 @@ class SignUpPage1 extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage1> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _confirmPasswordController;
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  Timer? _debounceEmail;
+  Timer? _debouncePassword;
+  Timer? _debounceConfirmPassword;
+
+  final Duration debounceDurationEmail = const Duration(milliseconds: 1250);
+  final Duration debounceDurationPassword = const Duration(milliseconds: 1250);
+  final Duration debounceDurationConfirmPassword =
+      const Duration(milliseconds: 1250);
+
+  String? emailError;
+  String? passwordError;
+  String? confirmPasswordError;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +69,22 @@ class _SignUpPageState extends State<SignUpPage1> {
               const SizedBox(height: 30.0),
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
+                onChanged: (text) {
+                  if (_debounceEmail?.isActive ?? false)
+                    _debounceEmail?.cancel();
+                  _debounceEmail = Timer(debounceDurationEmail, () async {
+                    String? validationError = await validateEmailInUse(text);
+                    setState(() {
+                      emailError = validationError;
+                    });
+                  });
+                },
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email, color: Color(0xFF00A2FF)),
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
+                  errorText: emailError,
+                  prefixIcon: const Icon(Icons.email, color: Color(0xFF00A2FF)),
+                  border: const OutlineInputBorder(),
+                  focusedBorder: const OutlineInputBorder(
                     borderSide:
                         BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
@@ -58,9 +93,20 @@ class _SignUpPageState extends State<SignUpPage1> {
               const SizedBox(height: 20.0),
               TextField(
                 controller: _passwordController,
+                onChanged: (text) {
+                  if (_debouncePassword?.isActive ?? false)
+                    _debouncePassword?.cancel();
+                  _debouncePassword = Timer(debounceDurationPassword, () async {
+                    String? validationError = validatePassword(text);
+                    setState(() {
+                      passwordError = validationError;
+                    });
+                  });
+                },
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  errorText: passwordError,
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -85,9 +131,21 @@ class _SignUpPageState extends State<SignUpPage1> {
               const SizedBox(height: 20.0),
               TextField(
                 controller: _confirmPasswordController,
+                onChanged: (text) {
+                  if (_debounceConfirmPassword?.isActive ?? false)
+                    _debounceConfirmPassword?.cancel();
+                  _debouncePassword =
+                      Timer(debounceDurationConfirmPassword, () async {
+                    String? validationError = validatePassword(text);
+                    setState(() {
+                      confirmPasswordError = validationError;
+                    });
+                  });
+                },
                 obscureText: !_isConfirmPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
+                  errorText: confirmPasswordError,
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -112,11 +170,38 @@ class _SignUpPageState extends State<SignUpPage1> {
               const SizedBox(height: 30.0),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterPage()),
+                  String? isValidEmail = validateEmail(_emailController.text);
+                  if (isValidEmail != null) {
+                    setState(() {
+                      emailError = isValidEmail;
+                    });
+                    return;
+                  }
+                  if (_passwordController.text.isEmpty) {
+                    setState(() {
+                      passwordError = "This field can't be empty";
+                    });
+                    return;
+                  }
+                  if (_confirmPasswordController.text.isEmpty) {
+                    setState(() {
+                      confirmPasswordError = "This field can't be empty";
+                    });
+                    return;
+                  }
+                  if (_passwordController.text !=
+                      _confirmPasswordController.text) {
+                    setState(() {
+                      confirmPasswordError = "Doesn't match password";
+                    });
+                    return;
+                  }
+                  final signupData = SignUpUserModel(
+                    email_address: _emailController.text,
+                    password_hash: _passwordController.text,
+                    confirmation_password: _confirmPasswordController.text,
                   );
+                  context.push("/signup2", extra: signupData);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00A2FF),
@@ -142,11 +227,7 @@ class _SignUpPageState extends State<SignUpPage1> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
-                      );
+                      context.go('/login');
                     },
                     child: const Text(
                       "Login",
