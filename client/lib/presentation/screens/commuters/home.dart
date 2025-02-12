@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
+import 'package:sakay_app/bloc/tracker/tracker_event.dart';
+import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import '../commuters/profile.dart';
 import 'notifications.dart';
@@ -11,8 +15,17 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
+  late TrackerBloc _trackerBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+    _trackerBloc.add(ConnectEvent());
+  }
+
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -48,7 +61,6 @@ class _HomePageState extends State<HomePage> {
           const Positioned.fill(
             child: MyMapWidget(),
           ),
-
           Positioned(
             top: 50,
             left: 16,
@@ -59,7 +71,10 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: const [
-                  BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2)),
+                  BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 5,
+                      offset: Offset(0, 2)),
                 ],
               ),
               child: Row(
@@ -86,13 +101,22 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                   ),
+                  // TextButton(
+                  //   onPressed: () async =>
+                  //       _trackerBloc.add(StartTrackMyVehicleEvent()),
+                  //   child: Text("pindot mo lang"),
+                  // ),
+                  // TextButton(
+                  //   onPressed: () =>
+                  //       _trackerBloc.add(StopTrackMyVehicleEvent()),
+                  //   child: Text("stop mo lang"),
+                  // )
                 ],
               ),
             ),
           ),
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -104,7 +128,8 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
           BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: 'Notifications'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

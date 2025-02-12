@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class GuideScreen extends StatefulWidget {
@@ -44,10 +44,7 @@ class _GuideScreenState extends State<GuideScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+      context.go('/login');
     }
   }
 
@@ -58,7 +55,6 @@ class _GuideScreenState extends State<GuideScreen> {
       body: Column(
         children: [
           const SizedBox(height: 80),
-          
           Expanded(
             child: PageView.builder(
               controller: _pageController,
@@ -85,7 +81,7 @@ class _GuideScreenState extends State<GuideScreen> {
                         _slides[index]['title']!,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 22.0, 
+                          fontSize: 22.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -94,7 +90,7 @@ class _GuideScreenState extends State<GuideScreen> {
                         _slides[index]['description']!,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 16.0, 
+                          fontSize: 16.0,
                           color: Colors.grey,
                         ),
                       ),
@@ -104,9 +100,7 @@ class _GuideScreenState extends State<GuideScreen> {
               },
             ),
           ),
-          
-          const SizedBox(height: 30), 
-
+          const SizedBox(height: 30),
           SmoothPageIndicator(
             controller: _pageController,
             count: _slides.length,
@@ -120,9 +114,7 @@ class _GuideScreenState extends State<GuideScreen> {
               paintStyle: PaintingStyle.fill,
             ),
           ),
-
           const SizedBox(height: 70),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40.0),
             child: SizedBox(
@@ -144,7 +136,6 @@ class _GuideScreenState extends State<GuideScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 40),
         ],
       ),
