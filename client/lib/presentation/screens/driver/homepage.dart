@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
-    _trackerBloc.add(ConnectEvent());
   }
 
   @override
