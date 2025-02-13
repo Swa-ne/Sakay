@@ -8,6 +8,7 @@ import 'package:sakay_app/presentation/screens/authentication/register_firstpage
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
 import 'package:sakay_app/presentation/screens/commuters/home.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
 import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
@@ -67,7 +68,7 @@ final GoRouter appRouter = GoRouter(
     // DRIVER paths
     GoRoute(
       path: '/driver/home',
-      builder: (context, state) => const AdminMap(),
+      builder: (context, state) => const DriverLocation(),
     ),
     // ADMIN paths
     GoRoute(
