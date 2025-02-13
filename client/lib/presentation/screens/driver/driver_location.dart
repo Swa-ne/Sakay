@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_inbox.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_notification.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_profile.dart';
+// import 'package:sakay_app/presentation/screens/driver/driver_notification.dart';
 
 class DriverLocation extends StatefulWidget {
   const DriverLocation({super.key});
@@ -193,11 +194,11 @@ class _MapState extends State<DriverLocation> {
                     );
                   }),
                   _navBarItem(Icons.person, "Profile", () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => DriverProfile()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverProfile()),
+                    );
                   }),
                 ],
               ),
