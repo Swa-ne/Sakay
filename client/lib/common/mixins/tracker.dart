@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -105,7 +104,7 @@ mixin Tracker {
 
   Future<void> updateOneBus(String bus, num lng, num lat) async {
     if (pointAnnotationManager == null || busses.isEmpty) return;
-
+    if (!busses.containsKey(bus)) return;
     busses[bus]?.geometry = Point(coordinates: Position(lng, lat));
 
     pointAnnotationManager!.update(busses[bus]!);

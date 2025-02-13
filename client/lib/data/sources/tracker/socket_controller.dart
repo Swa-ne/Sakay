@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/data/models/location.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 
@@ -16,10 +17,13 @@ abstract class SocketController {
 }
 
 class SocketControllerImpl extends SocketController with Tracker {
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+
   static final SocketControllerImpl _singleton =
       SocketControllerImpl._internal();
   late IO.Socket socket;
   late TrackerBloc trackerBloc;
+  Set<String> pendingCreations = {};
   Timer? _locationTimer;
 
   factory SocketControllerImpl() {
@@ -32,13 +36,12 @@ class SocketControllerImpl extends SocketController with Tracker {
   SocketControllerImpl._internal();
 
   @override
-  void connect() {
+  void connect() async {
     socket = IO.io(_apiUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {
-        'token':
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcwZDYxNjY2Y2M5YWNlZjI1MDllZTEzIiwiZW1haWwiOiJ1bmlsb2RnZXRlc3RAZ21haWwuY29tIiwidXNlcm5hbWUiOiJVbmlMb2RnZSIsImZ1bGxfbmFtZSI6IlRlc3QgIEFjY291bnQiLCJpYXQiOjE3Mjg5MzA3NzMsImV4cCI6MTcyODkzMjU3M30.bv0vHAii6VUIwPCht9bhyqoFdZ0lYK6uBZyQrJKbVeE",
+        'token': await _tokenController.getAccessToken(),
       }
     });
 
@@ -52,11 +55,11 @@ class SocketControllerImpl extends SocketController with Tracker {
       // TODO: update the map
       Location busLoc = Location.fromJson(data['location']);
       if (!Tracker.busses.containsKey(data['user'])) {
-        await createOneBus(
-          data['user'],
-          busLoc.longitude,
-          busLoc.latitude,
-        );
+        if (!pendingCreations.contains(data['user'])) {
+          pendingCreations.add(data['user']);
+          await createOneBus(data['user'], busLoc.longitude, busLoc.latitude);
+          pendingCreations.remove(data['user']);
+        }
       } else {
         await updateOneBus(
           data['user'],
