@@ -11,12 +11,14 @@ import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_profile.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_manage_account.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_manage_vehicle.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_inbox.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +49,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: AdminSurveillance(),
+          home: DriverLocation(),
         ),
       ),
     );
