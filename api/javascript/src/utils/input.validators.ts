@@ -6,6 +6,7 @@ export interface CustomResponse {
     user_id?: ObjectId,
     message?: string | any[];
     error?: string,
+    user_type?: string,
     access_token?: string,
     refresh_token?: string,
     httpCode: number
@@ -13,7 +14,7 @@ export interface CustomResponse {
 const USER_IDENTIFIER_CONST = { "email_address": "EMAIL_ADDRESS", "phone_number": "PHONE_NUMBER" };
 
 export const checkEveryInputForSignup = async (phone_number: string, email_address: string, password: string, confirmationPassword: string): Promise<CustomResponse> => {
-    if (!checkPhoneNumberValidity(phone_number)) {
+    if (!checkPhoneNumberValidity(phone_number) && phone_number !== "") {
         return { error: 'Please enter a valid phone number', "httpCode": 400 };
     }
     if (!checkEmailValidity(email_address)) {

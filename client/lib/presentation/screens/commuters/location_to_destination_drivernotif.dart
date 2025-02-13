@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationToDestinationPage extends StatelessWidget {
+  const LocationToDestinationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +33,7 @@ class LocationToDestinationPage extends StatelessWidget {
       body: Stack(
         children: [
           // Google Map Widget
-          GoogleMap(
+          const GoogleMap(
             initialCameraPosition: CameraPosition(
               target:
                   LatLng(16.0438, 120.3332), // Replace with your coordinates
@@ -51,6 +53,7 @@ class LocationToDestinationPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
+                    // ignore: deprecated_member_use
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
@@ -58,11 +61,11 @@ class LocationToDestinationPage extends StatelessWidget {
                   ),
                 ],
               ),
-              child: TextField(
+              child: const TextField(
                 decoration: InputDecoration(
                   hintText: "Search available rides",
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  contentPadding: EdgeInsets.symmetric(vertical: 0),
                   border: InputBorder.none,
                 ),
               ),
@@ -84,17 +87,17 @@ class LocationToDestinationPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Current Location
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Current Location",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text(
+                        Text(
                           "5045 P Burgos",
                           style: TextStyle(
                             fontSize: 14,
@@ -105,17 +108,17 @@ class LocationToDestinationPage extends StatelessWidget {
                     ),
                     const Divider(),
                     // Destination
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Destination",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text(
+                        Text(
                           "Harbour Mcdo",
                           style: TextStyle(
                             fontSize: 14,
@@ -158,11 +161,11 @@ class LocationToDestinationPage extends StatelessWidget {
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LocationToDestinationPage(),
     );

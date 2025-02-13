@@ -2,30 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sakay_app/presentation/app_router.dart';
+import 'package:sakay_app/bloc/authentication/auth_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
+import 'package:sakay_app/core/configs/theme/app_theme.dart';
+import 'package:sakay_app/data/sources/authentication/auth_repo_impl.dart';
 import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_driver_verification.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_profile.dart';
-import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_manage_account.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_manage_vehicle.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_inbox.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  String ACCESS_TOKEN = "${dotenv.env['ACCESS_TOKEN']}";
-  MapboxOptions.setAccessToken(ACCESS_TOKEN);
+  String accessToken = "${dotenv.env['ACCESS_TOKEN']}";
+  MapboxOptions.setAccessToken(accessToken);
 
   runApp(const MyApp());
 }
@@ -41,6 +30,9 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => TrackerBloc(SocketControllerImpl()),
           ),
+          BlocProvider(
+            create: (context) => AuthBloc(AuthRepoImpl()),
+          ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -49,7 +41,12 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: DriverLocation(),
+          home: MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            title: 'Sakay',
+            routerConfig: appRouter,
+          ),
         ),
       ),
     );

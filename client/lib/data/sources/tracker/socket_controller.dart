@@ -52,13 +52,13 @@ class SocketControllerImpl extends SocketController with Tracker {
       // TODO: update the map
       Location busLoc = Location.fromJson(data['location']);
       if (!Tracker.busses.containsKey(data['user'])) {
-        await createOneAnnotation(
+        await createOneBus(
           data['user'],
           busLoc.longitude,
           busLoc.latitude,
         );
       } else {
-        await updateOneAnnotations(
+        await updateOneBus(
           data['user'],
           busLoc.longitude,
           busLoc.latitude,
@@ -67,7 +67,7 @@ class SocketControllerImpl extends SocketController with Tracker {
     });
 
     socket.on('track-my-vehicle-stop', (data) async {
-      await removeOneAnnotations(data['user']);
+      await removeOneBus(data['user']);
     });
 
     socket.onDisconnect((_) {
