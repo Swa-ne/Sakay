@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_inbox.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_profile.dart';
+// import 'package:sakay_app/presentation/screens/driver/driver_notification.dart';
 
 class DriverLocation extends StatefulWidget {
   const DriverLocation({super.key});
@@ -26,7 +30,6 @@ class _MapState extends State<DriverLocation> {
               ),
             ),
           ),
-
           Positioned(
             top: 50,
             left: 20,
@@ -34,26 +37,33 @@ class _MapState extends State<DriverLocation> {
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DriverLocation()),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: 22,
                       ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    iconSize: 22,
-                    padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
+                    )),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Container(
@@ -70,12 +80,13 @@ class _MapState extends State<DriverLocation> {
                         ),
                       ],
                     ),
-                    child: TextField(
+                    child: const TextField(
                       decoration: InputDecoration(
                         hintText: 'Search...',
                         hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                         border: InputBorder.none,
-                        prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
+                        prefixIcon:
+                            Icon(Icons.search, color: Colors.grey, size: 22),
                         contentPadding: EdgeInsets.symmetric(vertical: 10),
                       ),
                     ),
@@ -84,7 +95,6 @@ class _MapState extends State<DriverLocation> {
               ],
             ),
           ),
-
           Positioned(
             bottom: 80,
             left: 20,
@@ -107,26 +117,26 @@ class _MapState extends State<DriverLocation> {
                 children: [
                   Container(
                     padding: const EdgeInsets.only(right: 8),
-                    child: Align(
+                    child: const Align(
                       alignment: Alignment.centerLeft,
                       child: Icon(Icons.location_on,
                           color: Colors.black, size: 20),
                     ),
                   ),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'Phinma University of Pangasinan',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold),
                           )
                         ],
                       ),
-                      const SizedBox(height: 2),
-                      const Text(
+                      SizedBox(height: 2),
+                      Text(
                         '28WV+R2R, Arellano St, Downtown District',
                         style: TextStyle(fontSize: 10, color: Colors.grey),
                       ),
@@ -136,7 +146,7 @@ class _MapState extends State<DriverLocation> {
                   Container(
                     width: 35,
                     height: 35,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Color(0xFF00A1F8),
                     ),
@@ -166,10 +176,30 @@ class _MapState extends State<DriverLocation> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _navBarItem(Icons.map, "Map"),
-                  _navBarItem(Icons.inbox, "Inbox"),
-                  _navBarItem(Icons.notifications, "Notification"),
-                  _navBarItem(Icons.person, "Profile"),
+                  _navBarItem(Icons.map, "Map", () {
+                    
+                  }),
+                  _navBarItem(Icons.inbox, "Inbox", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DriverChatPage()),
+                    );
+                  }),
+                  _navBarItem(Icons.notifications, "Notification", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverNotification()),
+                    );
+                  }),
+                  _navBarItem(Icons.person, "Profile", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverProfile()),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -180,20 +210,23 @@ class _MapState extends State<DriverLocation> {
   }
 }
 
-Widget _navBarItem(IconData icon, String label) {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, color: Color(0xFF00A1F8)),
-      const SizedBox(height: 3),
-      Text(
-        label,
-        style: const TextStyle(
-          color: Color(0xFF00A1F8),
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
+Widget _navBarItem(IconData icon, String label, VoidCallback onTap) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: const Color(0xFF00A1F8)),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF00A1F8),
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
