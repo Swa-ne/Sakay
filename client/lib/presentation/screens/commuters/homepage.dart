@@ -5,14 +5,14 @@ import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> with Tracker {
+class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
   late TrackerBloc _trackerBloc;
 
