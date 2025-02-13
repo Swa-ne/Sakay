@@ -3,19 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
+import 'package:sakay_app/presentation/screens/common/inbox.dart';
+import 'package:sakay_app/presentation/screens/common/notifications.dart';
 import 'package:sakay_app/presentation/screens/commuters/homepage.dart';
-import '../commuters/profile.dart';
-import 'notifications.dart';
-import 'inbox.dart';
+import '../common/profile.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> with Tracker {
+class _HomeState extends State<Home> with Tracker {
   late TrackerBloc _trackerBloc;
 
   @override
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> with Tracker {
   int _selectedIndex = 0;
 
   final pages = [
-    const Home(),
+    const HomePage(),
     const InboxScreen(),
     const NotificationsScreen(),
     const ProfilePage(),
