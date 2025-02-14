@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sakay_app/bloc/authentication/auth_bloc.dart';
+import 'package:sakay_app/bloc/authentication/auth_event.dart';
+import 'package:sakay_app/bloc/authentication/auth_state.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,123 +13,141 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late AuthBloc _authBloc;
   String _selectedMapPreference = 'default';
 
   @override
+  void initState() {
+    super.initState();
+    _authBloc = BlocProvider.of<AuthBloc>(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is LogoutSuccess) {
+          context.go("/login");
+        } else if (state is LogoutError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error)),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Profile',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF3A6C8D),
+          automaticallyImplyLeading: true,
+          foregroundColor: Colors.white,
         ),
-        backgroundColor: const Color(0xFF3A6C8D),
-        automaticallyImplyLeading: true,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(10.0),
-                bottomRight: Radius.circular(10.0),
-              ),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(30.0),
-                color: const Color(0xFF3A6C8D),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10.0),
+                  bottomRight: Radius.circular(10.0),
+                ),
                 child: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(38, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 50.0,
-                        backgroundImage: AssetImage('assets/swane.png'),
-                      ),
-                      SizedBox(width: 15.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Swane Bautista',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(30.0),
+                  color: const Color(0xFF3A6C8D),
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(38, 0, 0, 0),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: const Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 50.0,
+                          backgroundImage: AssetImage('assets/swane.png'),
+                        ),
+                        SizedBox(width: 15.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Swane Bautista',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Commuter',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              color: Colors.white70,
+                            Text(
+                              'Commuter',
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                color: Colors.white70,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                'Map Preference',
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              const SizedBox(height: 20.0),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  'Map Preference',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-              child: Text(
-                'Select a preferred view of the map',
-                style: TextStyle(fontSize: 14.0, color: Colors.grey),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                child: Text(
+                  'Select a preferred view of the map',
+                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                ),
               ),
-            ),
-            const SizedBox(height: 30.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildMapOption('default', 'assets/default_map.png'),
-                  _buildMapOption('terrain', 'assets/terrain_map.png'),
-                  _buildMapOption('satellite', 'assets/satellite_map.png'),
-                ],
+              const SizedBox(height: 30.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildMapOption('default', 'assets/default_map.png'),
+                    _buildMapOption('terrain', 'assets/terrain_map.png'),
+                    _buildMapOption('satellite', 'assets/satellite_map.png'),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 30.0),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                'Settings',
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              const SizedBox(height: 30.0),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  'Settings',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const SizedBox(height: 10.0),
-            _buildSettingsOption(Icons.account_circle, 'Account'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.notifications, 'Notifications'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.location_on, 'Saved Locations'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.language, 'Language Preference'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.format_paint, 'Theme Customization'),
-            _buildDivider(),
-            _buildSettingsOption(Icons.info, 'About'),
-            _buildDivider(),
-            const SizedBox(height: 20.0),
-            _buildLogoutOption(),
-            const SizedBox(height: 10.0)
-          ],
+              const SizedBox(height: 10.0),
+              _buildSettingsOption(Icons.account_circle, 'Account'),
+              _buildDivider(),
+              _buildSettingsOption(Icons.notifications, 'Notifications'),
+              _buildDivider(),
+              _buildSettingsOption(Icons.location_on, 'Saved Locations'),
+              _buildDivider(),
+              _buildSettingsOption(Icons.language, 'Language Preference'),
+              _buildDivider(),
+              _buildSettingsOption(Icons.format_paint, 'Theme Customization'),
+              _buildDivider(),
+              _buildSettingsOption(Icons.info, 'About'),
+              _buildDivider(),
+              const SizedBox(height: 20.0),
+              _buildLogoutOption(),
+              const SizedBox(height: 10.0)
+            ],
+          ),
         ),
       ),
     );
@@ -194,10 +217,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       child: GestureDetector(
         onTap: () {
-          // Handle logout logic
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged out successfully')),
-          );
+          _authBloc.add(LogoutEvent());
         },
         child: const Row(
           children: [
