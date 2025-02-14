@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 
 void main() {
   runApp(const MyApp());
@@ -190,40 +188,39 @@ class _AdminSurveillanceState extends State<AdminSurveillance> {
         ),
       ),
       appBar: AppBar(
-  backgroundColor: Colors.white,
-  elevation: 0,
-  leading: IconButton(
-    icon: const Icon(Icons.menu, color: Colors.black),
-    onPressed: () {
-      _scaffoldKey.currentState?.openDrawer();
-    },
-  ),
-  title: SizedBox(
-    width: 250,
-    height: 40,
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const TextField(
-        decoration: InputDecoration(
-          hintText: "Search",
-          prefixIcon: Icon(Icons.search, color: Colors.grey),
-          border: InputBorder.none,
-          //contentPadding: EdgeInsets.all(15),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: SizedBox(
+          width: 250,
+          height: 40,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const TextField(
+              decoration: InputDecoration(
+                hintText: "Search",
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                border: InputBorder.none,
+                //contentPadding: EdgeInsets.all(15),
+              ),
+            ),
+          ),
         ),
       ),
-    ),
-  ),
-),
-
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+          const Padding(
+            padding: EdgeInsets.only(top: 16.0, left: 16.0),
             child: Row(children: [
-              const Text("Units",
+              Text("Units",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -233,7 +230,7 @@ class _AdminSurveillanceState extends State<AdminSurveillance> {
           ),
           Expanded(
             child: ListView(
-              children: [
+              children: const [
                 UnitCard(
                   unitName: "UNIT-17A",
                   address:
@@ -308,7 +305,6 @@ class UnitCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: Colors.grey[300]!,
-
                         width: 1.0,
                       ),
                     ),
@@ -416,9 +412,7 @@ class DrawerItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
@@ -431,17 +425,13 @@ class DrawerItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? Colors.black
-                    : Colors.white,
+                color: isSelected ? Colors.black : Colors.white,
               ),
               const SizedBox(width: 30),
               Text(
                 text,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.white,
+                  color: isSelected ? Colors.black : Colors.white,
                   fontSize: 14,
                 ),
               ),

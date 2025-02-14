@@ -1,26 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart'; // Import geolocator
 import 'package:sakay_app/common/widgets/map.dart';
 
 class CurrentLocationPage extends StatefulWidget {
   const CurrentLocationPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CurrentLocationPageState createState() => _CurrentLocationPageState();
 }
 
 class _CurrentLocationPageState extends State<CurrentLocationPage> {
+  // Function to check if the distance is too far
+  Future<void> _checkDistanceAndNavigate() async {
+    // Get current location
+    Position currentPosition = await Geolocator.getCurrentPosition(
+        // ignore: deprecated_member_use
+        desiredAccuracy: LocationAccuracy.high);
+
+    // Destination location (replace with the actual destination coordinates)
+    const double destinationLatitude =
+        14.5620; // Example: Latitude of destination
+    const double destinationLongitude =
+        121.0137; // Example: Longitude of destination
+
+    // Calculate distance
+    double distanceInMeters = Geolocator.distanceBetween(
+      currentPosition.latitude,
+      currentPosition.longitude,
+      destinationLatitude,
+      destinationLongitude,
+    );
+
+    // Check if the distance is too far (e.g., greater than 5000 meters)
+    if (distanceInMeters > 5000) {
+      // Show a reminder if the destination is too far
+      _showDistanceReminder();
+    } else {
+      // Proceed with normal behavior
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Destination is within reach!")),
+      );
+    }
+  }
+
+  // Show a pop-up reminder if the destination is too far
+  void _showDistanceReminder() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Warning"),
+          content: const Text(
+              "The destination is too far away. Would you like to continue?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text("Continue"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Proceed with destination selection or other actions
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Map Placeholder
-          Container(
-            color: Colors.blue[100],
-            child: const Center(
-              child: MyMapWidget(),
-            ),
-          ),
+          // Background Map from MyMapWidget
+          const MyMapWidget(), // Use MyMapWidget here
 
           // Top Search Bar
           Positioned(
@@ -88,7 +148,8 @@ class _CurrentLocationPageState extends State<CurrentLocationPage> {
                     ),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed:
+                          _checkDistanceAndNavigate, // Check distance when pressed
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),

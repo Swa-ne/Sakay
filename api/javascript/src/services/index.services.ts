@@ -64,7 +64,7 @@ export const verifyEmailCode = async (user_id: string, code: string): Promise<Cu
         await UserValidCode.deleteOne({ user_id });
         await User.findByIdAndUpdate(
             user_id,
-            { valid_email: true },
+            { valid_email_address: true },
         );
         return { message: "Success", httpCode: 200 };
     } catch (error) {

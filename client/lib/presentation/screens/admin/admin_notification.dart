@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:sakay_app/main.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
@@ -13,7 +12,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -279,9 +278,7 @@ class DrawerItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
@@ -294,17 +291,13 @@ class DrawerItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? Colors.black
-                    : Colors.white,
+                color: isSelected ? Colors.black : Colors.white,
               ),
               const SizedBox(width: 30),
               Text(
                 text,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.white,
+                  color: isSelected ? Colors.black : Colors.white,
                   fontSize: 14,
                 ),
               ),

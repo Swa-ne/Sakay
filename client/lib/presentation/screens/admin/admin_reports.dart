@@ -163,32 +163,31 @@ class _AdminReportsState extends State<AdminReports> {
           ),
         ),
       ),
-
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               children: [
                 Positioned(
-                    top: 40,
-                    left: 10,
-                    child: Builder(
-                      builder: (context) {
-                        return IconButton(
-                          icon: const Icon(Icons.menu,
-                              color: Colors.black, size: 25),
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                        );
-                      },
-                    ),
+                  top: 40,
+                  left: 10,
+                  child: Builder(
+                    builder: (context) {
+                      return IconButton(
+                        icon: const Icon(Icons.menu,
+                            color: Colors.black, size: 25),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      );
+                    },
                   ),
+                ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Reports', 
+                  'Reports',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -200,7 +199,8 @@ class _AdminReportsState extends State<AdminReports> {
             const ReportItem(
               icon: Icons.directions_car,
               title: 'Incident Report',
-              description: 'Track and review unexpected events and actions taken',
+              description:
+                  'Track and review unexpected events and actions taken',
             ),
             const ReportItem(
               icon: Icons.library_books,
@@ -231,6 +231,7 @@ class ReportItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ReportItem({
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
@@ -247,11 +248,12 @@ class ReportItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 3,
-        margin: const  EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center, // Centers the icon vertically
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Centers the icon vertically
             children: [
               Container(
                 width: 40, // Ensures consistent spacing
@@ -310,9 +312,7 @@ class DrawerItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
@@ -325,17 +325,13 @@ class DrawerItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? Colors.black
-                    : Colors.white,
+                color: isSelected ? Colors.black : Colors.white,
               ),
               const SizedBox(width: 30),
               Text(
                 text,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.white,
+                  color: isSelected ? Colors.black : Colors.white,
                   fontSize: 14,
                 ),
               ),
