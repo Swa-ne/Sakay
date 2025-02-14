@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_inbox.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_manage_vehicle.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_profile.dart';
 // import 'package:sakay_app/presentation/screens/driver/driver_notification.dart';
@@ -143,19 +144,29 @@ class _MapState extends State<DriverLocation> {
                     ],
                   ),
                   const Spacer(),
-                  Container(
-                    width: 35,
-                    height: 35,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF00A1F8),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const DriverManageVehicle()),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      width: 35,
+                      height: 35,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF00A1F8),
+                      ),
+                      child: const Icon(
+                        Icons.drive_eta,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.drive_eta,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -177,7 +188,11 @@ class _MapState extends State<DriverLocation> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _navBarItem(Icons.map, "Map", () {
-                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DriverLocation()),
+                    );
                   }),
                   _navBarItem(Icons.inbox, "Inbox", () {
                     Navigator.push(
@@ -196,8 +211,7 @@ class _MapState extends State<DriverLocation> {
                   _navBarItem(Icons.person, "Profile", () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => DriverProfile()),
+                      MaterialPageRoute(builder: (context) => DriverProfile()),
                     );
                   }),
                 ],

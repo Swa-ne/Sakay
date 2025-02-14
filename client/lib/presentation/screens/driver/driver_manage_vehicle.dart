@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_inb.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_prof.dart';
 
 class DriverManageVehicle extends StatefulWidget {
   const DriverManageVehicle({super.key});
@@ -495,10 +499,35 @@ class _MapState extends State<DriverManageVehicle> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _navBarItem(Icons.map, "Map"),
-                  _navBarItem(Icons.inbox, "Inbox"),
-                  _navBarItem(Icons.notifications, "Notification"),
-                  _navBarItem(Icons.person, "Profile"),
+                  _navBarItem(Icons.map, "Map", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DriverLocation()
+                      ),
+                    );
+                  }),
+                  _navBarItem(Icons.inbox, "Inbox", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DriverChatPage()),
+                    );
+                  }),
+                  _navBarItem(Icons.notifications, "Notification", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverNotification()),
+                    );
+                  }),
+                  _navBarItem(Icons.person, "Profile", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverProfile()),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -523,21 +552,24 @@ class _MapState extends State<DriverManageVehicle> {
     );
   }
 
-  Widget _navBarItem(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: const Color(0xFF00A1F8)),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF00A1F8),
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
+  Widget _navBarItem(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: const Color(0xFF00A1F8)),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF00A1F8),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
