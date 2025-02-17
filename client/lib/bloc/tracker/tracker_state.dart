@@ -17,6 +17,12 @@ class TrackMyVehicleStarted extends TrackerState {}
 
 class TrackMyVehicleStopped extends TrackerState {}
 
+class TrackMeInitializing extends TrackerState {}
+
+class TrackMeStarted extends TrackerState {}
+
+class TrackMeStopped extends TrackerState {}
+
 class ConnectionError extends TrackerState {
   final String error;
 
