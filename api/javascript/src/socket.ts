@@ -26,20 +26,33 @@ io.on("connection", async (socket) => {
     // if (socket.newAccessToken) {
     //     socket.emit('newAccessToken', { access_token: socket.newAccessToken });
     // }
-    // addUserToRedisController(socket.id, socket.user);
+    addUserToRedisController(socket.id, socket.user);
+    // Person traker
+    socket.on('track-me', async (location) => {
+        socket.broadcast.emit("update-map-driver", {
+            location, user: socket.id
+        });
+    });
+
+    socket.on('pause-track-me', async (location) => {
+        socket.broadcast.emit("track-me-stop", {
+            user: socket.id
+        });
+    });
+
+    // Vehicle tracker
     socket.on('track-my-vehicle', async (location) => {
-        console.log(`location of user ${socket.id}: Longitude is ${location.longitude}, Latitude is ${location.latitude}, Speed is ${location.speed}`)
         socket.broadcast.emit("update-map", {
             location, user: socket.id
-        })
+        });
+    });
 
-    })
     socket.on('pause-track-my-vehicle', async (location) => {
         socket.broadcast.emit("track-my-vehicle-stop", {
             user: socket.id
-        })
+        });
+    });
 
-    })
     socket.on("disconnect", async () => {
         socket.broadcast.emit("track-my-vehicle-stop", {
             user: socket.id
