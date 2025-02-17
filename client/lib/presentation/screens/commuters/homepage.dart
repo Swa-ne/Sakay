@@ -15,11 +15,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
   late TrackerBloc _trackerBloc;
-  int _selectedIndex = 0;
   OverlayEntry? _hintOverlay;
   bool _showInboxHint = true;
   bool _showNotificationsHint = false;
   bool _showProfileHint = false;
+  bool isTrackerOn = false;
 
   @override
   void initState() {
@@ -303,21 +303,23 @@ class _HomePageState extends State<HomePage> with Tracker {
                   const Spacer(),
                   InkWell(
                     // replace na lungs
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Location sent"),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                    onTap: () async {
+                      _trackerBloc.add(isTrackerOn
+                          ? StopTrackMeEvent()
+                          : StartTrackMeEvent());
+                      setState(() {
+                        isTrackerOn = !isTrackerOn;
+                      });
                     },
                     borderRadius: BorderRadius.circular(50),
                     child: Container(
                       width: 35,
                       height: 35,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFF00A1F8),
+                        color: isTrackerOn
+                            ? const Color(0xFFFF0000)
+                            : const Color(0xFF00A1F8),
                       ),
                       child: const Icon(
                         Icons.location_on,
@@ -330,31 +332,6 @@ class _HomePageState extends State<HomePage> with Tracker {
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navBarItem(Icons.map, "Map"),
-                  _navBarItem(Icons.inbox, "Inbox"),
-                  _navBarItem(Icons.notifications, "Notifications"),
-                  _navBarItem(Icons.person, "Profile"),
-                  // nav sa baba
-                ],
-              ),
-            ),
-          )
         ],
       ),
     );
@@ -382,22 +359,4 @@ class ArrowClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-Widget _navBarItem(IconData icon, String label) {
-  return GestureDetector(
-      child: Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, color: const Color(0xFF00A1F8)),
-      const SizedBox(height: 3),
-      Text(
-        label,
-        style: const TextStyle(
-            color: Color(0xFF00A1F8),
-            fontSize: 10,
-            fontWeight: FontWeight.w600),
-      )
-    ],
-  ));
 }
