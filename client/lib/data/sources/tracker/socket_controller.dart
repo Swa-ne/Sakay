@@ -10,9 +10,12 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 final _apiUrl = "${dotenv.env['API_URL']}";
 
 abstract class SocketController {
-  void connect();
+  Future<void> connect();
+  void connectDriver();
   void trackMyVehicle();
   void stopTrackMyVehicle();
+  void trackMe();
+  void stopTrackMe();
   void disconnect();
 }
 
@@ -36,7 +39,7 @@ class SocketControllerImpl extends SocketController with Tracker {
   SocketControllerImpl._internal();
 
   @override
-  void connect() async {
+  Future<void> connect() async {
     socket = IO.io(_apiUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -52,7 +55,6 @@ class SocketControllerImpl extends SocketController with Tracker {
     });
 
     socket.on('update-map', (data) async {
-      // TODO: update the map
       Location busLoc = Location.fromJson(data['location']);
       if (!Tracker.busses.containsKey(data['user'])) {
         if (!pendingCreations.contains(data['user'])) {
@@ -83,6 +85,33 @@ class SocketControllerImpl extends SocketController with Tracker {
   }
 
   @override
+  void connectDriver() async {
+    print("running btc $socket");
+    socket.on('update-map-driver', (data) async {
+      print("running btc $data");
+      Location personLoc = Location.fromJson(data['location']);
+      if (!Tracker.people.containsKey(data['user'])) {
+        if (!pendingCreations.contains(data['user'])) {
+          pendingCreations.add(data['user']);
+          await createOnePerson(
+              data['user'], personLoc.longitude, personLoc.latitude);
+          pendingCreations.remove(data['user']);
+        }
+      } else {
+        await updateOnePerson(
+          data['user'],
+          personLoc.longitude,
+          personLoc.latitude,
+        );
+      }
+    });
+
+    socket.on('track-me-stop', (data) async {
+      await removeOnePerson(data['user']);
+    });
+  }
+
+  @override
   void trackMyVehicle() {
     showMyLocation();
     _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -96,6 +125,24 @@ class SocketControllerImpl extends SocketController with Tracker {
   void stopTrackMyVehicle() {
     hideMyLocation();
     socket.emit('pause-track-my-vehicle');
+    _locationTimer?.cancel();
+    _locationTimer = null;
+  }
+
+  @override
+  void trackMe() {
+    showMyLocation();
+    _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      Location loc = await getLocationandSpeed();
+
+      socket.emit('track-me', loc.toJson());
+    });
+  }
+
+  @override
+  void stopTrackMe() {
+    hideMyLocation();
+    socket.emit('pause-track-me');
     _locationTimer?.cancel();
     _locationTimer = null;
   }
