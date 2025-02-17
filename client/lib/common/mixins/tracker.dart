@@ -13,9 +13,12 @@ mixin Tracker {
   static PointAnnotationManager? pointAnnotationManager;
   static PointAnnotation? pointAnnotation;
   static Map<String, PointAnnotation> busses = HashMap();
+  static Map<String, PointAnnotation> people = HashMap();
 
   static ByteData? carBytes;
   static Uint8List? carImageData;
+  static ByteData? personBytes;
+  static Uint8List? personImageData;
 
   void setMap(MapboxMap map) async {
     mapboxMap = map;
@@ -23,6 +26,8 @@ mixin Tracker {
         await mapboxMap?.annotations.createPointAnnotationManager();
     carBytes = await rootBundle.load('assets/bus.png');
     carImageData = carBytes?.buffer.asUint8List();
+    personBytes = await rootBundle.load('assets/person.png');
+    personImageData = personBytes?.buffer.asUint8List();
   }
 
   Future<Location> getLocationandSpeed() async {
@@ -114,6 +119,40 @@ mixin Tracker {
     if (pointAnnotationManager == null || busses.isEmpty) return;
 
     final removePointAnnotation = busses.remove(bus);
+    pointAnnotationManager!.delete(removePointAnnotation!);
+  }
+
+  Future<void> createOnePerson(String person, num lng, num lat) async {
+    if (pointAnnotationManager == null) {
+      return;
+    }
+    final annotation = await pointAnnotationManager?.create(
+      PointAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(
+            lng,
+            lat,
+          ),
+        ),
+        image: personImageData,
+        iconSize: 0.1,
+      ),
+    );
+    people.addAll({person: annotation!});
+  }
+
+  Future<void> updateOnePerson(String person, num lng, num lat) async {
+    if (pointAnnotationManager == null || people.isEmpty) return;
+    if (!people.containsKey(person)) return;
+    people[person]?.geometry = Point(coordinates: Position(lng, lat));
+
+    pointAnnotationManager!.update(people[person]!);
+  }
+
+  Future<void> removeOnePerson(String person) async {
+    if (pointAnnotationManager == null || people.isEmpty) return;
+
+    final removePointAnnotation = people.remove(person);
     pointAnnotationManager!.delete(removePointAnnotation!);
   }
 }
