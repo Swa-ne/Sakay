@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { authenticateToken } from "../middlewares/token.authentication";
-import { deleteBusController, getBusController, getBussesController, postBusController, putBusController } from "../controllers/admin.controller";
+import { assignUserToBusController, deleteBusController, getBusController, getBussesController, postBusController, putBusController } from "../controllers/admin.controller";
 
 const router = Router();
 
@@ -10,5 +10,7 @@ router.get("/get_busses", authenticateToken, getBussesController);
 router.get("/get_bus/:bus_id", authenticateToken, getBusController);
 router.put("/edit_bus/:bus_id", authenticateToken, putBusController);
 router.delete("/delete/:bus_id", authenticateToken, deleteBusController);
+
+router.post("/assign_driver", authenticateToken, assignUserToBusController);
 
 export default router;
