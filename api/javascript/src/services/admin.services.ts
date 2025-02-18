@@ -143,3 +143,36 @@ export const assignUserToBus = async (user_id: string, bus_id: string) => {
         return { error: 'Internal Server Error', httpCode: 500 };
     }
 }
+
+export const reassignUserToBus = async (user_id: string, bus_id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const user = await UserBusAssigning.findOne({ user_id }).session(session);
+        const bus = await Bus.findById(bus_id).session(session);
+
+        if (!bus) {
+            await session.abortTransaction();
+            session.endSession();
+            return { error: 'Bus not found', httpCode: 404 };
+        }
+        if (!user) {
+            await session.abortTransaction();
+            session.endSession();
+            return { error: 'User not found', httpCode: 404 };
+        }
+        user.bus_id = bus._id;
+
+        user.save({ session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return { message: 'Success', httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: 'Internal Server Error', httpCode: 500 };
+    }
+}
