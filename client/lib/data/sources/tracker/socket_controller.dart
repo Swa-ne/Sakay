@@ -3,23 +3,30 @@ import 'dart:async';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/data/models/location.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 
 final _apiUrl = "${dotenv.env['API_URL']}";
 
 abstract class SocketController {
-  void connect();
+  Future<void> connect();
+  void connectDriver();
   void trackMyVehicle();
   void stopTrackMyVehicle();
+  void trackMe();
+  void stopTrackMe();
   void disconnect();
 }
 
 class SocketControllerImpl extends SocketController with Tracker {
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+
   static final SocketControllerImpl _singleton =
       SocketControllerImpl._internal();
   late IO.Socket socket;
   late TrackerBloc trackerBloc;
+  Set<String> pendingCreations = {};
   Timer? _locationTimer;
 
   factory SocketControllerImpl() {
@@ -32,13 +39,12 @@ class SocketControllerImpl extends SocketController with Tracker {
   SocketControllerImpl._internal();
 
   @override
-  void connect() {
+  Future<void> connect() async {
     socket = IO.io(_apiUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {
-        'token':
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcwZDYxNjY2Y2M5YWNlZjI1MDllZTEzIiwiZW1haWwiOiJ1bmlsb2RnZXRlc3RAZ21haWwuY29tIiwidXNlcm5hbWUiOiJVbmlMb2RnZSIsImZ1bGxfbmFtZSI6IlRlc3QgIEFjY291bnQiLCJpYXQiOjE3Mjg5MzA3NzMsImV4cCI6MTcyODkzMjU3M30.bv0vHAii6VUIwPCht9bhyqoFdZ0lYK6uBZyQrJKbVeE",
+        'token': await _tokenController.getAccessToken(),
       }
     });
 
@@ -49,14 +55,13 @@ class SocketControllerImpl extends SocketController with Tracker {
     });
 
     socket.on('update-map', (data) async {
-      // TODO: update the map
       Location busLoc = Location.fromJson(data['location']);
       if (!Tracker.busses.containsKey(data['user'])) {
-        await createOneBus(
-          data['user'],
-          busLoc.longitude,
-          busLoc.latitude,
-        );
+        if (!pendingCreations.contains(data['user'])) {
+          pendingCreations.add(data['user']);
+          await createOneBus(data['user'], busLoc.longitude, busLoc.latitude);
+          pendingCreations.remove(data['user']);
+        }
       } else {
         await updateOneBus(
           data['user'],
@@ -80,6 +85,33 @@ class SocketControllerImpl extends SocketController with Tracker {
   }
 
   @override
+  void connectDriver() async {
+    print("running btc $socket");
+    socket.on('update-map-driver', (data) async {
+      print("running btc $data");
+      Location personLoc = Location.fromJson(data['location']);
+      if (!Tracker.people.containsKey(data['user'])) {
+        if (!pendingCreations.contains(data['user'])) {
+          pendingCreations.add(data['user']);
+          await createOnePerson(
+              data['user'], personLoc.longitude, personLoc.latitude);
+          pendingCreations.remove(data['user']);
+        }
+      } else {
+        await updateOnePerson(
+          data['user'],
+          personLoc.longitude,
+          personLoc.latitude,
+        );
+      }
+    });
+
+    socket.on('track-me-stop', (data) async {
+      await removeOnePerson(data['user']);
+    });
+  }
+
+  @override
   void trackMyVehicle() {
     showMyLocation();
     _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -93,6 +125,24 @@ class SocketControllerImpl extends SocketController with Tracker {
   void stopTrackMyVehicle() {
     hideMyLocation();
     socket.emit('pause-track-my-vehicle');
+    _locationTimer?.cancel();
+    _locationTimer = null;
+  }
+
+  @override
+  void trackMe() {
+    showMyLocation();
+    _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      Location loc = await getLocationandSpeed();
+
+      socket.emit('track-me', loc.toJson());
+    });
+  }
+
+  @override
+  void stopTrackMe() {
+    hideMyLocation();
+    socket.emit('pause-track-me');
     _locationTimer?.cancel();
     _locationTimer = null;
   }

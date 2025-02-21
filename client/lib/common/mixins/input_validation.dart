@@ -66,13 +66,8 @@ mixin InputValidationMixin {
   }
 
   String? validatePassword(String password) {
-    final RegExp passwordRegExp = RegExp(
-        r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$');
-
     if (password.isEmpty) {
       return 'Password cannot be empty';
-    } else if (!passwordRegExp.hasMatch(password)) {
-      return 'Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character.';
     }
     return null;
   }

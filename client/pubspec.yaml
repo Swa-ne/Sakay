@@ -98,6 +98,7 @@ flutter:
         - assets/sakay_logo.png
         - assets/check.png
         - assets/bus.png
+        - assets/person.png
         - .env
 
     # An image asset can refer to one or more resolution-specific "variants", see

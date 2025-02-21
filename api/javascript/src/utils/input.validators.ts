@@ -53,19 +53,16 @@ export const checkEveryInputForLogin = async (user_identifier: string, password:
 };
 
 export const checkPhoneNumberValidity = (phone_number: string) => {
-    // TODO: max 25 characters
     const regex = /^(09|\+639)\d{9}$/;
     return regex.test(phone_number);
 };
 
 export const checkEmailValidity = (email_address: string) => {
-    // Validates an email address format (e.g., example@domain.com)
     const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
     return regex.test(email_address);
 };
 
 export const checkPasswordValidity = (password: string) => {
-    // least one lowercase letter, one uppercase letter, one numeric digit, and one special character
     const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s)./;
     return regex.test(password);
 };
