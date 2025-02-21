@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_inb.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
+import 'package:sakay_app/presentation/screens/driver/driver_prof.dart';
 
 class DriverManageVehicle extends StatefulWidget {
   const DriverManageVehicle({super.key});
@@ -10,6 +14,7 @@ class DriverManageVehicle extends StatefulWidget {
 
 class _MapState extends State<DriverManageVehicle> {
   bool isContainerVisible = false;
+  int? selectedIndex = -1;
 
   void toggleContainer() {
     setState(() {
@@ -183,27 +188,31 @@ class _MapState extends State<DriverManageVehicle> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: toggleContainer,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF00A1F8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                        Visibility(
+                          visible: !isContainerVisible,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: toggleContainer,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF00A1F8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                            child: const Text(
-                              "Manage Vehicle",
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                              child: const Text(
+                                "Manage Vehicle",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -212,85 +221,265 @@ class _MapState extends State<DriverManageVehicle> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: isContainerVisible
-                      ? Container(
-                          key:
-                              UniqueKey(),
-                          padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              )
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.route, size: 20),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    "Route",
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.location_on, size: 15),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "Dagupan",
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),
+                      ? SingleChildScrollView(
+                          child: Container(
+                            key: UniqueKey(),
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(top: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.route, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Route",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                const Row(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Icon(Icons.location_on, size: 15),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          "Dagupan",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Divider(
+                                          color: Colors.black,
+                                          thickness: 1,
+                                        ),
                                       ),
-                                    ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Icon(Icons.location_on, size: 15),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          "Lingayen",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  "Seat Status",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.location_on, size: 15),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "Lingayen",
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 13),
+                                // Row(
+                                //   mainAxisAlignment:
+                                //       MainAxisAlignment.spaceAround,
+                                //   children: [
+                                //     _statusButton("Full", Colors.red),
+                                //     _statusButton("Half", Colors.orange),
+                                //     _statusButton("Empty", Colors.green),
+                                //   ],
+                                // ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(3, (index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedIndex = selectedIndex == index
+                                              ? null
+                                              : index;
+                                        });
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 200),
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: selectedIndex == index
+                                                  ? const Color(0xFF00A3FF)
+                                                  : Colors.white,
+                                              border: Border.all(
+                                                  color: Colors.grey, width: 2),
+                                            ),
+                                            child: Center(
+                                              child: index == 0
+                                                  ? Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Container(
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 2),
+                                                          width: 10,
+                                                          height: 10,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                              color:
+                                                                  selectedIndex ==
+                                                                          index
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .grey,
+                                                              width: 2,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children:
+                                                              List.generate(2,
+                                                                  (boxIndex) {
+                                                            return Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          2),
+                                                              width: 10,
+                                                              height: 10,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border:
+                                                                    Border.all(
+                                                                  color: selectedIndex ==
+                                                                          index
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .grey,
+                                                                  width: 2,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          }),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : index == 1
+                                                      ? Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children:
+                                                              List.generate(2,
+                                                                  (boxIndex) {
+                                                            return Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          2),
+                                                              width: 10,
+                                                              height: 10,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border:
+                                                                    Border.all(
+                                                                  color: selectedIndex ==
+                                                                          index
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .grey,
+                                                                  width: 2,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          }),
+                                                        )
+                                                      : Container(
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 2),
+                                                          width: 10,
+                                                          height: 10,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                              color:
+                                                                  selectedIndex ==
+                                                                          index
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .grey,
+                                                              width: 2,
+                                                            ),
+                                                          ),
+                                                        ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            index == 0
+                                                ? 'Full'
+                                                : index == 1
+                                                    ? 'Half'
+                                                    : 'Empty',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Text("Seat Status"),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  _statusButton("Full", Colors.red),
-                                  _statusButton("Half", Colors.orange),
-                                  _statusButton("Empty", Colors.green),
-                                ],
-                              ),
-                            ],
+                                    );
+                                  }),
+                                )
+                              ],
+                            ),
                           ),
                         )
-                      : SizedBox.shrink(),
-                ),
+                      : const SizedBox.shrink(),
+                )
               ],
             ),
           ),
@@ -310,10 +499,35 @@ class _MapState extends State<DriverManageVehicle> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _navBarItem(Icons.map, "Map"),
-                  _navBarItem(Icons.inbox, "Inbox"),
-                  _navBarItem(Icons.notifications, "Notification"),
-                  _navBarItem(Icons.person, "Profile"),
+                  _navBarItem(Icons.map, "Map", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DriverLocation()
+                      ),
+                    );
+                  }),
+                  _navBarItem(Icons.inbox, "Inbox", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DriverChatPage()),
+                    );
+                  }),
+                  _navBarItem(Icons.notifications, "Notification", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverNotification()),
+                    );
+                  }),
+                  _navBarItem(Icons.person, "Profile", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverProfile()),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -328,8 +542,8 @@ class _MapState extends State<DriverManageVehicle> {
       onPressed: () {},
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
-        shape: CircleBorder(),
-        padding: EdgeInsets.all(16),
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(16),
       ),
       child: Text(
         label,
@@ -338,21 +552,24 @@ class _MapState extends State<DriverManageVehicle> {
     );
   }
 
-  Widget _navBarItem(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Color(0xFF00A1F8)),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF00A1F8),
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
+  Widget _navBarItem(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: const Color(0xFF00A1F8)),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF00A1F8),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

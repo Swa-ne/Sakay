@@ -68,7 +68,7 @@ class _MapState extends State<AdminMap> {
                         setState(() {
                           _selectedItem = "Surveillance";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminSurveillance()),
@@ -85,7 +85,7 @@ class _MapState extends State<AdminMap> {
                         setState(() {
                           _selectedItem = "Report";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminReports()),
@@ -102,7 +102,7 @@ class _MapState extends State<AdminMap> {
                         setState(() {
                           _selectedItem = "Notifications";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminNotification()),
@@ -119,7 +119,7 @@ class _MapState extends State<AdminMap> {
                         setState(() {
                           _selectedItem = "Inbox";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminInbox()),
@@ -136,7 +136,7 @@ class _MapState extends State<AdminMap> {
                         setState(() {
                           _selectedItem = "Profile";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminProfile()),
