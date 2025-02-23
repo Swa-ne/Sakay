@@ -7,6 +7,8 @@ import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 
 class AdminReports extends StatefulWidget {
+  const AdminReports({super.key});
+
   @override
   _AdminReportsState createState() => _AdminReportsState();
 }
@@ -164,7 +166,7 @@ class _AdminReportsState extends State<AdminReports> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

@@ -23,6 +23,8 @@ class MyApp extends StatelessWidget {
 }
 
 class AdminNotification extends StatefulWidget {
+  const AdminNotification({super.key});
+
   @override
   _AdminNotificationState createState() => _AdminNotificationState();
 }

@@ -84,8 +84,9 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
               TextField(
                 controller: _emailController,
                 onChanged: (text) {
-                  if (_debounceEmail?.isActive ?? false)
+                  if (_debounceEmail?.isActive ?? false) {
                     _debounceEmail?.cancel();
+                  }
                   _debounceEmail = Timer(debounceDurationEmail, () async {
                     String? validationError = await validateEmailInUse(text);
                     setState(() {
@@ -152,8 +153,9 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
               TextField(
                 controller: _confirmPasswordController,
                 onChanged: (text) {
-                  if (_debounceConfirmPassword?.isActive ?? false)
+                  if (_debounceConfirmPassword?.isActive ?? false) {
                     _debounceConfirmPassword?.cancel();
+                  }
                   _debounceConfirmPassword =
                       Timer(debounceDurationConfirmPassword, () async {
                     String? validationError =

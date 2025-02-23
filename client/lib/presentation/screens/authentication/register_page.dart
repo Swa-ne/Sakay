@@ -138,8 +138,9 @@ class _RegisterPageState extends State<RegisterPage> with InputValidationMixin {
                 TextField(
                   controller: _firstNameController,
                   onChanged: (text) {
-                    if (_debounceFirstName?.isActive ?? false)
+                    if (_debounceFirstName?.isActive ?? false) {
                       _debounceFirstName?.cancel();
+                    }
                     _debounceFirstName =
                         Timer(debounceDurationFirstName, () async {
                       String? validationError = validateName(text);
@@ -177,8 +178,9 @@ class _RegisterPageState extends State<RegisterPage> with InputValidationMixin {
                 TextField(
                   controller: _lastNameController,
                   onChanged: (text) {
-                    if (_debounceLastName?.isActive ?? false)
+                    if (_debounceLastName?.isActive ?? false) {
                       _debounceLastName?.cancel();
+                    }
                     _debounceLastName =
                         Timer(debounceDurationLastName, () async {
                       String? validationError = validateName(text);
@@ -190,7 +192,8 @@ class _RegisterPageState extends State<RegisterPage> with InputValidationMixin {
                   decoration: InputDecoration(
                     labelText: 'Last Name',
                     errorText: lastNameError,
-                    prefixIcon: Icon(Icons.person, color: Color(0xFF00A2FF)),
+                    prefixIcon:
+                        const Icon(Icons.person, color: Color(0xFF00A2FF)),
                     border: const OutlineInputBorder(),
                     focusedBorder: const OutlineInputBorder(
                       borderSide:
@@ -235,8 +238,9 @@ class _RegisterPageState extends State<RegisterPage> with InputValidationMixin {
                         child: TextField(
                           controller: _mobileNumberController,
                           onChanged: (text) {
-                            if (_debounceMobileNumber?.isActive ?? false)
+                            if (_debounceMobileNumber?.isActive ?? false) {
                               _debounceMobileNumber?.cancel();
+                            }
                             _debounceMobileNumber =
                                 Timer(debounceDurationMobileNumber, () async {
                               String? validationError =

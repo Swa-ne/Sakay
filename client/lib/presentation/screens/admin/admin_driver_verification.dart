@@ -23,16 +23,16 @@ class AdminDriverVerification extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Profile Picture & Name
-            Row(
+            const Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 50,
                   backgroundImage: AssetImage("assets/user.png"),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "NYAK",
                       style:
@@ -52,9 +52,9 @@ class AdminDriverVerification extends StatelessWidget {
             const SectionTitle(title: "Driver's License"),
             const SizedBox(height: 15),
 
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
+              children: [
                 PlaceholderBox(label: "Front Side"),
                 PlaceholderBox(label: "Back Side"),
               ],
@@ -64,9 +64,9 @@ class AdminDriverVerification extends StatelessWidget {
             // Vehicle Registration Documents
             const SectionTitle(title: "Vehicle Registration Documents"),
             const SizedBox(height: 15),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
+              children: [
                 PlaceholderBox(label: "Front Side"),
                 PlaceholderBox(label: "Back Side"),
               ],
@@ -157,8 +157,8 @@ class PlaceholderBox extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 10, 
-            fontWeight: FontWeight.bold, 
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
             color: Colors.grey,
           ),
         ),

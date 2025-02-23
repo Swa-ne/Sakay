@@ -49,7 +49,7 @@ class _AdminManageAccountState extends State<AdminManageAccount>
                 hintText: "Search...",
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
-                fillColor: Color(0xFFEFEFEF),
+                fillColor: const Color(0xFFEFEFEF),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -102,7 +102,7 @@ class _AdminManageAccountState extends State<AdminManageAccount>
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 4), // Reduced spacing
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 247, 247, 247),
+            color: const Color.fromARGB(255, 247, 247, 247),
             borderRadius: BorderRadius.circular(8),
           ),
           child: ListTile(
@@ -112,7 +112,7 @@ class _AdminManageAccountState extends State<AdminManageAccount>
             ),
             title: Text(dummyAccounts[index]["name"]!),
             subtitle: Text(dummyAccounts[index]["phone"]!),
-            trailing: Icon(Icons.delete, color: Colors.red),
+            trailing: const Icon(Icons.delete, color: Colors.red),
           ),
         );
       },

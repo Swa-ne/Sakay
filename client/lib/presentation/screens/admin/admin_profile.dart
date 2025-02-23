@@ -168,10 +168,10 @@ class AadminProfileState extends State<AdminProfile> {
         ),
       ),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color(0xFF00A2FF),
+          backgroundColor: const Color(0xFF00A2FF),
           elevation: 0,
           flexibleSpace: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -468,8 +468,8 @@ class AadminProfileState extends State<AdminProfile> {
               ),
             ],
           ),
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Icon(Icons.logout, color: Colors.white),
               SizedBox(width: 20.0),
               Text(

@@ -103,8 +103,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     TextField(
                       controller: _emailController,
                       onChanged: (text) {
-                        if (_debounceEmail?.isActive ?? false)
+                        if (_debounceEmail?.isActive ?? false) {
                           _debounceEmail?.cancel();
+                        }
                         _debounceEmail = Timer(debounceDurationEmail, () async {
                           String? validationError =
                               validateEmailOrPhoneNumber(text);
@@ -134,8 +135,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     TextField(
                       controller: _passwordController,
                       onChanged: (text) {
-                        if (_debouncePassword?.isActive ?? false)
+                        if (_debouncePassword?.isActive ?? false) {
                           _debouncePassword?.cancel();
+                        }
                         _debouncePassword =
                             Timer(debounceDurationPassword, () async {
                           String? validationError = validatePassword(text);

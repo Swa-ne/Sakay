@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const AdminSurveillance(),
       routes: {
-        '/map': (context) => AdminMap(),
+        '/map': (context) => const AdminMap(),
       },
     );
   }
