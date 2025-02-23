@@ -1,6 +1,5 @@
 import 'package:go_router/go_router.dart';
 import 'package:sakay_app/data/models/sign_up.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/authentication/email_code.dart';
 import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/phone_verification.dart';
@@ -9,10 +8,8 @@ import 'package:sakay_app/presentation/screens/authentication/register_page.dart
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
 import 'package:sakay_app/presentation/screens/commuters/home.dart'
     as CommuterHome;
-// import 'package:sakay_app/presentation/screens/commuters/homepage.dart';d
 import 'package:sakay_app/presentation/screens/driver/home.dart' as DriverHome;
-// import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
-// import 'package:sakay_app/presentation/screens/driver/driver_manage_vehicle.dart';
+import 'package:sakay_app/presentation/screens/admin/home.dart' as AdminHome;
 import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
@@ -77,7 +74,7 @@ final GoRouter appRouter = GoRouter(
     // ADMIN paths
     GoRoute(
       path: '/admin/home',
-      builder: (context, state) => const AdminMap(),
+      builder: (context, state) => const AdminHome.Home(),
     ),
   ],
 );
