@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 dotenv.config()
 
 import entryRoutes from "./routes/authentication.routes";
+import chatRoutes from "./routes/chat.routes";
 import { app, server } from './socket';
 
 
@@ -34,13 +35,13 @@ export const redis = createClient({
     }
 });
 redis.on('ready', () => {
-    console.log('Connected to Redis Client');
+    console.log('Connected to Redis');
 });
 
 redis.on('error', (err) => {
     console.error('Redis Client Error:', err);
 });
-
+redis.connect();
 app.set('trust proxy', 1);
 app.use(
     cors({
@@ -57,6 +58,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/authentication", entryRoutes)
+app.use("/chat", chatRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
