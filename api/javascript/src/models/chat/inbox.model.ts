@@ -4,7 +4,9 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 export interface InboxSchemeInterface extends Document {
     _id: string,
     user_id: ObjectId,
-    was_active: boolean,
+    is_active: boolean,
+    createdAt?: Date,
+    updatedAt?: Date,
     _doc: any,
 }
 
@@ -13,7 +15,7 @@ const InboxScheme: Schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
     },
-    was_active: {
+    is_active: {
         type: Boolean,
         default: false
     },
