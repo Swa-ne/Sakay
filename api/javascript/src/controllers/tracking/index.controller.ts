@@ -1,5 +1,5 @@
 import { UserType } from "../../middlewares/token.authentication"
-import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime } from "../../services/tracking/index.services";
+import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime, getAdminsFromRedisTracking } from "../../services/tracking/index.services";
 
 export const addUserToRedisTrackingController = async (socket_id: string, user?: UserType) => {
     try {
@@ -16,6 +16,15 @@ export const removeUserFromRedisTrackingController = async (socket_id: string, u
     try {
         if (!user) return { error: "User not found" }
         const result = await removeUserFromRedisTracking(user.user_type, socket_id)
+        if (result.httpCode === 500) return { error: result.error }
+        return { message: result.message }
+    } catch (error) {
+        return { error: "Internal Server Error" }
+    }
+}
+export const getAdminsFromRedisTrackingController = async () => {
+    try {
+        const result = await getAdminsFromRedisTracking()
         if (result.httpCode === 500) return { error: result.error }
         return { message: result.message }
     } catch (error) {
