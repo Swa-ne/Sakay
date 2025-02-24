@@ -1,32 +1,71 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_event.dart';
+import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/widgets/chat_bubble.dart';
+import 'package:sakay_app/data/models/inbox.dart';
+import 'package:sakay_app/data/models/message.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 
 class AdminChatPage extends StatefulWidget {
-  const AdminChatPage({super.key});
+  final String chat_id;
+  final InboxModel inbox;
+
+  const AdminChatPage({super.key, required this.chat_id, required this.inbox});
 
   @override
   State<AdminChatPage> createState() => _AdminChatPageState();
 }
 
+// TODO: Cache messages
 class _AdminChatPageState extends State<AdminChatPage> {
-  List<Map<String, dynamic>> messages = [
-    {"text": "Hey, how's it going?", "isMe": false, "time": DateTime.now()},
-    {"text": "I'm good! You?", "isMe": true, "time": DateTime.now()},
-    {"text": "All good here too!", "isMe": false, "time": DateTime.now()},
-  ];
-
   final TextEditingController messageController = TextEditingController();
 
+  final ScrollController _scrollController = ScrollController();
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+  List<MessageModel> messages = [];
+
+  late String receiver_id;
+  late ChatBloc _chatBloc;
+  late String user_id;
+
+  int currentPage = 1;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = BlocProvider.of<ChatBloc>(context);
+    _initializeUserID();
+    _scrollController.addListener(_onScroll);
+    _chatBloc.add(GetMessageEvent(widget.chat_id, currentPage));
+  }
+
+  Future<void> _initializeUserID() async {
+    user_id = await _tokenController.getUserID();
+  }
+
   void sendMessage() {
-    if (messageController.text.trim().isNotEmpty) {
+    final message = messageController.text.trim();
+    if (message.isNotEmpty) {
+      _chatBloc.add(
+        SaveMessageEvent(
+          message,
+          widget.chat_id,
+          widget.inbox.user_id.id,
+        ),
+      );
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
-        messages.add({
-          "text": messageController.text.trim(),
-          "isMe": true,
-          "time": DateTime.now(),
-        });
-        messageController.clear();
+        isLoading = true;
+        currentPage++;
       });
+      _chatBloc.add(GetMessageEvent(widget.chat_id, currentPage));
     }
   }
 
@@ -40,118 +79,90 @@ class _AdminChatPageState extends State<AdminChatPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Row(
+        title: Row(
           children: [
             CircleAvatar(
-              backgroundImage:
-                  AssetImage("assets/john.png"), // Replace with actual image
+              backgroundImage: NetworkImage(widget.inbox.user_id.profile),
             ),
-            SizedBox(width: 10),
-            Text("John Doe", style: TextStyle(color: Colors.black)),
+            const SizedBox(width: 10),
+            Text(
+              "${widget.inbox.user_id.first_name} ${widget.inbox.user_id.last_name}",
+              style: const TextStyle(color: Colors.black),
+            ),
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // CHAT MESSAGES
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(10),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                bool isMe = messages[index]["isMe"];
-                String formattedTime =
-                    DateFormat.Hm().format(messages[index]["time"]);
-
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment:
-                      isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-                  children: [
-                    // Profile icon for received messages
-                    if (!isMe)
-                      const CircleAvatar(
-                        radius: 16,
-                        backgroundImage: AssetImage(
-                            "assets/john.png"), // User's profile icon
-                      ),
-                    const SizedBox(width: 8), // Space between icon & chat
-
-                    // Chat bubble
-                    Column(
-                      crossAxisAlignment: isMe
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          constraints: const BoxConstraints(maxWidth: 250),
-                          decoration: BoxDecoration(
-                            color: isMe ? Colors.blue : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            messages[index]["text"],
-                            style: TextStyle(
-                                color: isMe ? Colors.white : Colors.black),
-                          ),
-                        ),
-                        // Time below the chat bubble
-                        Align(
-                          alignment: isMe
-                              ? Alignment.bottomRight
-                              : Alignment.bottomLeft,
-                          child: Text(
-                            formattedTime,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Profile icon for sent messages (Admin profile image)
-                    if (isMe)
-                      const CircleAvatar(
-                        radius: 16,
-                        backgroundImage: AssetImage(
-                            "assets/bus.png"), // Admin's profile icon
-                      ),
-                  ],
-                );
-              },
+      body: BlocListener<ChatBloc, ChatState>(
+        listener: (context, state) {
+          if (state is SaveMessageSuccess) {
+            setState(() {
+              messages.insert(
+                0,
+                MessageModel(
+                  message: messageController.text,
+                  sender: user_id,
+                  chat_id: widget.chat_id,
+                  is_read: false,
+                  created_at: DateTime.now().toString(),
+                  updated_at: DateTime.now().toString(),
+                ),
+              );
+              messageController.clear();
+            });
+          } else if (state is GetMessageSuccess) {
+            setState(() {
+              messages.addAll(state.messages);
+              isLoading = false;
+            });
+          } else if (state is OnReceiveMessageSuccess) {
+            if (widget.chat_id == state.message.chat_id) {
+              setState(() {
+                messages.insert(0, state.message);
+              });
+            }
+          }
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: messages.length,
+                reverse: true,
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  bool isMe = user_id == messages[index].sender;
+                  return chatBubble(messages[index].message, isMe);
+                },
+              ),
             ),
-          ),
-
-          // MESSAGE INPUT BOX
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: "Type a message...",
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        hintText: "Type a message...",
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue),
-                  onPressed: sendMessage,
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.blue),
+                    onPressed: sendMessage,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
