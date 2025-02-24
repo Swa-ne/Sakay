@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_event.dart';
+import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
+import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/drawer_item.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
@@ -16,7 +22,26 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with Tracker {
+  late TrackerBloc _trackerBloc;
+  late ChatBloc _chatBloc;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = BlocProvider.of<ChatBloc>(context);
+
+    _chatBloc.add(ConnectRealtimeEvent());
+    _chatBloc.stream
+        .firstWhere((state) => state is ConnectedRealtimeSocket)
+        .then((_) {
+      print("connecting to admin");
+      _chatBloc.add(ConnectAdminEvent());
+    });
+
+    _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+    _trackerBloc.add(ConnectEvent());
+  }
 
   int _selectedItem = 0;
 

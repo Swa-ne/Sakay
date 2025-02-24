@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
@@ -17,10 +19,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with Tracker {
   late TrackerBloc _trackerBloc;
+  late ChatBloc _chatBloc;
 
   @override
   void initState() {
     super.initState();
+    _chatBloc = BlocProvider.of<ChatBloc>(context);
+    _chatBloc.add(ConnectRealtimeEvent());
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
     _trackerBloc.add(ConnectEvent());
   }
