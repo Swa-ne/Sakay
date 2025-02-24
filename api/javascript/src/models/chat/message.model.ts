@@ -5,7 +5,9 @@ export interface MessageProps {
     message: string,
     sender_id: ObjectId,
     chat_id: ObjectId,
-    isRead: boolean
+    isRead: boolean,
+    createdAt?: Date,
+    updatedAt?: Date,
 }
 
 const MessageScheme: Schema = new Schema({
