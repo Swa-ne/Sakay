@@ -4,6 +4,7 @@ import http from "http";
 import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
 import { addUserToRedisRealtimeController, addUserToRedisTrackingController, checkUserFromRedisRealtimeController, getUserFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
+import { getCurrentUserById } from './services/index.services';
 
 declare module "socket.io" {
     interface Socket {
@@ -28,7 +29,7 @@ trackingSocket.use(socketAuthenticate);
 
 trackingSocket.on("connection", async (socket) => {
     if (socket.newAccessToken) {
-        socket.emit('newAccessToken', { access_token: socket.newAccessToken });
+        socket.emit('new-access-token', { access_token: socket.newAccessToken });
     }
     addUserToRedisTrackingController(socket.id, socket.user);
     // Person traker
@@ -70,14 +71,23 @@ realtimeSocket.use(socketAuthenticate);
 
 realtimeSocket.on("connection", async (socket) => {
     if (socket.newAccessToken) {
-        socket.emit('newAccessToken', { access_token: socket.newAccessToken });
+        socket.emit('new-access-token', { access_token: socket.newAccessToken });
     }
     addUserToRedisRealtimeController(socket.id, socket.user?.user_id!);
 
     socket.on("send-msg", async (data) => {
+        const sender = await getCurrentUserById(socket.user?.user_id!);
+        console.log(data.receiver_id, "fjdsfjksf")
+        if (data.receiver_id === "") {
+            console.log("1")
+            socket.broadcast.emit("msg-receive-admin", { message: data.msg, chat_id: data.chat_id, sender_id: socket.user?.user_id!, user: sender });
+            return;
+        }
         if (await checkUserFromRedisRealtimeController(data.receiver_id)) {
+            console.log("2")
             const socket_id = await getUserFromRedisRealtimeController(data.receiver_id);
-            if (socket_id) socket.to(socket_id).emit("msg-receive", { message: data.msg, chat_id: data.chat_id, sender_id: data.sender_id });
+            if (socket_id) socket.to(socket_id).emit("msg-receive", { message: data.msg, chat_id: data.chat_id, sender_id: socket.user?.user_id!, user: sender });
+            return;
         }
     });
 
