@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +21,6 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
   bool _isConfirmPasswordVisible = false;
 
   Timer? _debounceEmail;
-  Timer? _debouncePassword;
   Timer? _debounceConfirmPassword;
 
   final Duration debounceDurationEmail = const Duration(milliseconds: 1250);
@@ -31,8 +29,13 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
       const Duration(milliseconds: 1250);
 
   String? emailError;
-  String? passwordError;
   String? confirmPasswordError;
+
+  bool _hasLowerCase = false;
+  bool _hasUpperCase = false;
+  bool _hasDigit = false;
+  bool _isLongEnough = false;
+  bool _hasSpecialCharacter = false;
 
   @override
   void initState() {
@@ -40,6 +43,17 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+  }
+
+  void _validatePassword(String password) {
+    setState(() {
+      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
+      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+      _hasDigit = password.contains(RegExp(r'\d'));
+      _hasSpecialCharacter =
+          password.contains(RegExp(r'.*[!@#$%^&*(),.?":{}|<>].*'));
+      _isLongEnough = password.length >= 8;
+    });
   }
 
   @override
@@ -51,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 70.0),
+              const SizedBox(height: 20.0),
               const Text(
                 "Sign up",
                 style: TextStyle(
@@ -94,19 +108,11 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
               TextField(
                 controller: _passwordController,
                 onChanged: (text) {
-                  if (_debouncePassword?.isActive ?? false)
-                    _debouncePassword?.cancel();
-                  _debouncePassword = Timer(debounceDurationPassword, () async {
-                    String? validationError = validatePassword(text);
-                    setState(() {
-                      passwordError = validationError;
-                    });
-                  });
+                  _validatePassword(text);
                 },
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  errorText: passwordError,
                   prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -116,6 +122,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                       color: const Color(0xFF00A2FF),
                     ),
                     onPressed: () {
+                      _validatePassword(_passwordController.text);
                       setState(() {
                         _isPasswordVisible = !_isPasswordVisible;
                       });
@@ -128,15 +135,29 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   ),
                 ),
               ),
+              const SizedBox(height: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPasswordCriteria('Lowercase letter', _hasLowerCase),
+                  _buildPasswordCriteria('Uppercase letter', _hasUpperCase),
+                  _buildPasswordCriteria('Digit', _hasDigit),
+                  _buildPasswordCriteria(
+                      'Special character', _hasSpecialCharacter),
+                  _buildPasswordCriteria(
+                      'At least 8 characters', _isLongEnough),
+                ],
+              ),
               const SizedBox(height: 20.0),
               TextField(
                 controller: _confirmPasswordController,
                 onChanged: (text) {
                   if (_debounceConfirmPassword?.isActive ?? false)
                     _debounceConfirmPassword?.cancel();
-                  _debouncePassword =
+                  _debounceConfirmPassword =
                       Timer(debounceDurationConfirmPassword, () async {
-                    String? validationError = validatePassword(text);
+                    String? validationError =
+                        validateConfirmPassword(_passwordController.text, text);
                     setState(() {
                       confirmPasswordError = validationError;
                     });
@@ -174,12 +195,6 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   if (isValidEmail != null) {
                     setState(() {
                       emailError = isValidEmail;
-                    });
-                    return;
-                  }
-                  if (_passwordController.text.isEmpty) {
-                    setState(() {
-                      passwordError = "This field can't be empty";
                     });
                     return;
                   }
@@ -258,7 +273,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   ),
                 ),
               ),
-              const SizedBox(height: 120.0),
+              const SizedBox(height: 50.0),
               Center(
                 child: Text.rich(
                   TextSpan(
@@ -287,6 +302,25 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordCriteria(String text, bool isMet) {
+    return Row(
+      children: [
+        Icon(
+          isMet ? Icons.check : Icons.close,
+          color: isMet ? Colors.green : Colors.red,
+        ),
+        const SizedBox(width: 8.0),
+        Text(
+          text,
+          style: TextStyle(
+            decoration:
+                isMet ? TextDecoration.none : TextDecoration.lineThrough,
+          ),
+        ),
+      ],
     );
   }
 }

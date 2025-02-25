@@ -11,4 +11,10 @@ class StartTrackMyVehicleEvent extends TrackerEvent {}
 
 class StopTrackMyVehicleEvent extends TrackerEvent {}
 
+class StartTrackMeEvent extends TrackerEvent {}
+
+class StopTrackMeEvent extends TrackerEvent {}
+
 class ConnectEvent extends TrackerEvent {}
+
+class ConnectDriverEvent extends TrackerEvent {}

@@ -7,10 +7,19 @@ class TrackerBloc extends Bloc<TrackerEvent, TrackerState> {
   final SocketController _socketRepo;
 
   TrackerBloc(this._socketRepo) : super(ConnectingSocket()) {
-    on<ConnectEvent>((event, emit) {
+    on<ConnectEvent>((event, emit) async {
       try {
         emit(ConnectingSocket());
-        _socketRepo.connect();
+        await _socketRepo.connect();
+        emit(ConnectedSocket());
+      } catch (e) {
+        emit(const ConnectionError("Connection Error"));
+      }
+    });
+    on<ConnectDriverEvent>((event, emit) {
+      try {
+        emit(ConnectingSocket());
+        _socketRepo.connectDriver();
         emit(ConnectedSocket());
       } catch (e) {
         emit(const ConnectionError("Connection Error"));
@@ -33,6 +42,28 @@ class TrackerBloc extends Bloc<TrackerEvent, TrackerState> {
           emit(TrackMyVehicleInitializing());
           _socketRepo.stopTrackMyVehicle();
           emit(TrackMyVehicleStopped());
+        } catch (e) {
+          emit(const ConnectionError("Connection Error"));
+        }
+      },
+    );
+    on<StartTrackMeEvent>(
+      (event, emit) async {
+        try {
+          emit(TrackMeInitializing());
+          _socketRepo.trackMe();
+          emit(TrackMeStarted());
+        } catch (e) {
+          emit(const ConnectionError("Connection Error"));
+        }
+      },
+    );
+    on<StopTrackMeEvent>(
+      (event, emit) async {
+        try {
+          emit(TrackMeInitializing());
+          _socketRepo.stopTrackMe();
+          emit(TrackMeStopped());
         } catch (e) {
           emit(const ConnectionError("Connection Error"));
         }

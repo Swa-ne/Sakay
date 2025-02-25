@@ -7,9 +7,10 @@ import 'package:sakay_app/presentation/screens/authentication/phone_verification
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
-import 'package:sakay_app/presentation/screens/commuters/home.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_manage_vehicle.dart';
+import 'package:sakay_app/presentation/screens/commuters/home.dart'
+    as CommuterHome;
+import 'package:sakay_app/presentation/screens/commuters/homepage.dart';
+import 'package:sakay_app/presentation/screens/driver/home.dart' as DriverHome;
 import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
@@ -64,12 +65,12 @@ final GoRouter appRouter = GoRouter(
     // COMMUTER paths
     GoRoute(
       path: '/commuter/home',
-      builder: (context, state) => const HomePage(),
+      builder: (context, state) => const CommuterHome.Home(),
     ),
     // DRIVER paths
     GoRoute(
       path: '/driver/home',
-      builder: (context, state) => const AdminMap(),
+      builder: (context, state) => const DriverHome.Home(),
     ),
     // ADMIN paths
     GoRoute(

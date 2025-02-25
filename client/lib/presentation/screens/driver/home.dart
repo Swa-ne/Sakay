@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
+import 'package:sakay_app/bloc/tracker/tracker_state.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/presentation/screens/common/inbox.dart';
 import 'package:sakay_app/presentation/screens/common/notifications.dart';
-import 'package:sakay_app/presentation/screens/commuters/homepage.dart';
+import 'package:sakay_app/presentation/screens/driver/homepage.dart';
 import '../common/profile.dart';
 
 class Home extends StatefulWidget {
@@ -22,7 +23,13 @@ class _HomeState extends State<Home> with Tracker {
   void initState() {
     super.initState();
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+
     _trackerBloc.add(ConnectEvent());
+    _trackerBloc.stream
+        .firstWhere((state) => state is ConnectedSocket)
+        .then((_) {
+      _trackerBloc.add(ConnectDriverEvent());
+    });
   }
 
   int _selectedIndex = 0;
