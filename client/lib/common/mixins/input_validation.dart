@@ -119,4 +119,22 @@ mixin InputValidationMixin {
 
     return "$obfuscatedLocalPart@$domainPart";
   }
+
+  String? validateContent(String value) {
+    if (value.isEmpty) {
+      return 'Content is required';
+    } else if (value.length < 10) {
+      return 'Content should be at least 10 characters long';
+    }
+    return null;
+  }
+
+  String? validateHeadline(String value) {
+    if (value.isEmpty) {
+      return 'Headline is required';
+    } else if (value.length < 10) {
+      return 'Headline should be at least 10 characters long';
+    }
+    return null;
+  }
 }

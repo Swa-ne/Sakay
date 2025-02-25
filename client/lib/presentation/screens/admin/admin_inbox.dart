@@ -50,7 +50,7 @@ class _AdminInboxState extends State<AdminInbox> {
           ),
           child: TextField(
             decoration: InputDecoration(
-              hintText: "Search",
+              hintText: "Search", // TODO: add functionality
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               filled: true,
               fillColor: Colors.grey[200],

@@ -14,7 +14,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ConnectRealtimeEvent>((event, emit) async {
       try {
         emit(ConnectingRealtimeSocket());
-        await _socketRealtimeRepo.passBloc(this);
+        await _socketRealtimeRepo.passChatBloc(this);
         await _socketRealtimeRepo.connect();
         emit(ConnectedRealtimeSocket());
       } catch (e) {
@@ -28,7 +28,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         await _socketRealtimeRepo.connectAdmin();
         emit(ConnectedRealtimeSocket());
       } catch (e) {
-        print("irror $e");
         emit(const ConnectionRealtimeError("Connection Error"));
       }
     });
@@ -89,13 +88,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       (event, emit) async {
         try {
           emit(ChatLoading());
-          print("natakbo");
           final messages =
               await _chatRepo.getMessage(event.chat_id, event.page);
-          print("fdasfskjdf $messages");
           emit(GetMessageSuccess(messages));
         } catch (e) {
-          print("irrorsdsdf $e");
           emit(const GetMessageError("Internet Connection Error"));
         }
       },
@@ -112,7 +108,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             created_at: DateTime.now().toString(),
             updated_at: DateTime.now().toString(),
           );
-          print("runningnas ${event.user}");
           emit(OnReceiveMessageSuccess(message, event.user));
         } catch (e) {
           emit(const OnReceiveMessageError("Internet Connection Error"));

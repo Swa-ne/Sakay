@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/bloc/notification/notification_bloc.dart';
+import 'package:sakay_app/bloc/notification/notification_event.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
@@ -23,19 +25,22 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with Tracker {
   late TrackerBloc _trackerBloc;
+  late NotificationBloc _notificationBloc;
   late ChatBloc _chatBloc;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _chatBloc = BlocProvider.of<ChatBloc>(context);
+    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
 
     _chatBloc.add(ConnectRealtimeEvent());
+    _notificationBloc.add(ConnectNotificationRealtimeEvent());
     _chatBloc.stream
         .firstWhere((state) => state is ConnectedRealtimeSocket)
         .then((_) {
-      print("connecting to admin");
       _chatBloc.add(ConnectAdminEvent());
     });
 
