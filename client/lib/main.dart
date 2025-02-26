@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
+import 'package:sakay_app/bloc/notification/notification_bloc.dart';
 import 'package:sakay_app/data/sources/realtime/chat_repo_impl.dart';
+import 'package:sakay_app/data/sources/realtime/notification_repo_impl.dart';
 import 'package:sakay_app/data/sources/realtime/socket_controller.dart';
 import 'package:sakay_app/presentation/app_router.dart';
 import 'package:sakay_app/bloc/authentication/auth_bloc.dart';
@@ -37,8 +39,16 @@ class MyApp extends StatelessWidget {
             create: (context) => AuthBloc(AuthRepoImpl()),
           ),
           BlocProvider(
-            create: (context) =>
-                ChatBloc(ChatRepoImpl(), RealtimeSocketControllerImpl()),
+            create: (context) => ChatBloc(
+              ChatRepoImpl(),
+              RealtimeSocketControllerImpl(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => NotificationBloc(
+              NotificationRepoImpl(),
+              RealtimeSocketControllerImpl(),
+            ),
           ),
         ],
         child: MaterialApp(
