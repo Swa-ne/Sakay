@@ -125,9 +125,9 @@ mixin InputValidationMixin {
     if (content.isEmpty) {
       return 'Content is required';
     } else if (word_count >= 2 && word_count <= 250) {
-      return 'The content must contain between 2 and 250 words.';
+      return null;
     }
-    return null;
+    return 'The content must contain between 2 and 250 words.';
   }
 
   String? validateHeadline(String headline) {
@@ -135,8 +135,8 @@ mixin InputValidationMixin {
     if (headline.isEmpty) {
       return 'Headline is required';
     } else if (word_count >= 1 && word_count <= 15) {
-      return 'The headline must contain between 1 and 15 words.';
+      return null;
     }
-    return null;
+    return 'The headline must contain between 1 and 15 words.';
   }
 }
