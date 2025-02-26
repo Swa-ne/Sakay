@@ -100,6 +100,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<OnReceiveMessageEvent>(
       (event, emit) async {
         try {
+          emit(ChatLoading());
           final message = MessageModel(
             message: event.msg,
             sender: event.sender_id,
