@@ -118,6 +118,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<OnReceiveNotificationEvent>(
       (event, emit) async {
         try {
+          emit(NotificationLoading());
           emit(OnReceiveNotificationSuccess(event.notification));
         } catch (e) {
           emit(const OnReceiveNotificationError("Internet Connection Error"));
