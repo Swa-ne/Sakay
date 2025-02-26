@@ -5,11 +5,13 @@ import { authenticateToken } from "../middlewares/token.authentication"
 
 const router = Router()
 
-router.post("/create-private-inbox", authenticateToken, createPrivateInboxController)
-router.get("/open-inbox-details/:chat_id", authenticateToken, openCreatedInboxContentByChatIDController)
-router.post("/save-message", authenticateToken, saveMessageController)
-router.get("/get-messages/:chat_id/:page", authenticateToken, getMessagesController)
-router.get("/open-inbox", authenticateToken, openInboxByUserIDController)
-router.get("/get-all-inbox/:page", authenticateToken, getAllInboxesController)
+router.use(authenticateToken);
+
+router.post("/create-private-inbox", createPrivateInboxController)
+router.get("/open-inbox-details/:chat_id", openCreatedInboxContentByChatIDController)
+router.post("/save-message", saveMessageController)
+router.get("/get-messages/:chat_id/:page", getMessagesController)
+router.get("/open-inbox", openInboxByUserIDController)
+router.get("/get-all-inbox/:page", getAllInboxesController)
 
 export default router

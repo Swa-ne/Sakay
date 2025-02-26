@@ -5,13 +5,15 @@ import { assignUserToBusController, deleteBusController, getBusController, getBu
 
 const router = Router();
 
-router.post("/create-bus", authenticateToken, postBusController);
-router.get("/get-busses", authenticateToken, getBussesController);
-router.get("/get-bus/:bus-id", authenticateToken, getBusController);
-router.put("/edit-bus/:bus-id", authenticateToken, putBusController);
-router.delete("/delete/:bus-id", authenticateToken, deleteBusController);
+router.use(authenticateToken);
 
-router.post("/assign-driver", authenticateToken, assignUserToBusController);
-router.put("/reassign-driver", authenticateToken, reassignUserToBusController);
+router.post("/create-bus", postBusController);
+router.get("/get-busses", getBussesController);
+router.get("/get-bus/:bus-id", getBusController);
+router.put("/edit-bus/:bus-id", putBusController);
+router.delete("/delete/:bus-id", deleteBusController);
+
+router.post("/assign-driver", assignUserToBusController);
+router.put("/reassign-driver", reassignUserToBusController);
 
 export default router;
