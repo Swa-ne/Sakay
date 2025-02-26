@@ -4,6 +4,7 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +15,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+
   late TrackerBloc _trackerBloc;
   OverlayEntry? _hintOverlay;
   bool _showInboxHint = true;
@@ -25,17 +28,24 @@ class _HomePageState extends State<HomePage> with Tracker {
   void initState() {
     super.initState();
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_showInboxHint) {
-        _showHint(
-          title: "Inbox",
-          icon: Icons.inbox,
-          message:
-              "The inbox is where you can find your chats, messages, and othet communication means within the application",
-          onDismiss: _dismissInboxHint,
-        );
-      }
-    });
+    _checkFirstTime();
+  }
+
+  Future<void> _checkFirstTime() async {
+    String isFirstTime = await _tokenController.getFirstTime();
+    if (isFirstTime.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_showInboxHint) {
+          _showHint(
+            title: "Inbox",
+            icon: Icons.inbox,
+            message:
+                "The inbox is where you can find your chats, messages, and othet communication means within the application",
+            onDismiss: _dismissInboxHint,
+          );
+        }
+      });
+    }
   }
 
   void _dismissInboxHint() {
@@ -78,6 +88,7 @@ class _HomePageState extends State<HomePage> with Tracker {
 
   void _dismissProfileHint() {
     _hintOverlay?.remove();
+    _tokenController.updateFirstTime("yes");
     setState(() {
       _showProfileHint = false;
     });
