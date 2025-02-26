@@ -25,6 +25,10 @@ class AuthRepoImpl extends AuthRepo {
     if (response.statusCode == 200) {
       _tokenController.updateAccessToken(response_body['access_token']);
       _tokenController.updateUserID(response_body['user_id']);
+      _tokenController.updateFirstName(response_body['first_name']);
+      _tokenController.updateLastName(response_body['last_name']);
+      _tokenController.updateEmail(response_body['email']);
+      _tokenController.updateProfile(response_body['profile']);
       String? cookies = response.headers['set-cookie'];
       if (cookies == null) {
         throw Exception("Server connection error");
@@ -60,6 +64,10 @@ class AuthRepoImpl extends AuthRepo {
       if (isThirdParty) {
         _tokenController.updateAccessToken(response_body['access_token']);
         _tokenController.updateUserID(response_body['user_id']);
+        _tokenController.updateFirstName(response_body['first_name']);
+        _tokenController.updateLastName(response_body['last_name']);
+        _tokenController.updateEmail(response_body['email']);
+        _tokenController.updateProfile(response_body['profile']);
 
         String? cookies = response.headers['set-cookie'];
         if (cookies == null) {
@@ -264,6 +272,10 @@ class AuthRepoImpl extends AuthRepo {
       _tokenController.removeAccessToken();
       _tokenController.removeRefreshToken();
       _tokenController.removeUserID();
+      _tokenController.removeFirstName();
+      _tokenController.removeLastName();
+      _tokenController.removeEmail();
+      _tokenController.removeProfile();
       return response_body['message'] == "User logged Out";
     } else {
       throw Exception(response_body['error']);
