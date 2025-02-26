@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/presentation/screens/driver/driver_inb.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_location.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_notifcation.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_prof.dart';
 
 class DriverManageVehicle extends StatefulWidget {
   const DriverManageVehicle({super.key});
@@ -500,12 +497,7 @@ class _MapState extends State<DriverManageVehicle> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _navBarItem(Icons.map, "Map", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DriverLocation()
-                      ),
-                    );
+          
                   }),
                   _navBarItem(Icons.inbox, "Inbox", () {
                     Navigator.push(
@@ -515,18 +507,10 @@ class _MapState extends State<DriverManageVehicle> {
                     );
                   }),
                   _navBarItem(Icons.notifications, "Notification", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DriverNotification()),
-                    );
+
                   }),
                   _navBarItem(Icons.person, "Profile", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DriverProfile()),
-                    );
+
                   }),
                 ],
               ),
