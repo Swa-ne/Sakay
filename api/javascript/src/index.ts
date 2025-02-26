@@ -9,6 +9,8 @@ dotenv.config()
 
 import entryRoutes from "./routes/authentication.routes";
 import chatRoutes from "./routes/chat.routes";
+import notificationRoutes from "./routes/notification.routes";
+
 import { app, server } from './socket';
 
 
@@ -59,6 +61,7 @@ app.use(express.json());
 
 app.use("/authentication", entryRoutes)
 app.use("/chat", chatRoutes)
+app.use("/notification", notificationRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
