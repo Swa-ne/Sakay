@@ -48,7 +48,6 @@ export const saveNotification = async (user_id: string, headline: string, conten
         return { message: notification._id, httpCode: 200 };
     }
     catch (error) {
-        console.log(error)
         await session.abortTransaction();
         session.endSession();
         return { error: "Internal Server Error", httpCode: 500 };
@@ -63,7 +62,6 @@ export const getAllNotifications = async (page: string) => {
             .populate("edited_by")
             .skip((parseInt(page) - 1) * 30)
             .limit(30);
-        console.log(notifications[0].files[0])
         return { message: notifications, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
