@@ -5,6 +5,7 @@ import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
 import { addUserToRedisRealtimeController, addUserToRedisTrackingController, checkUserFromRedisRealtimeController, getUserFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
 import { getCurrentUserById } from './services/index.services';
+import { getFilesFromNotification } from './services/notification.services';
 
 declare module "socket.io" {
     interface Socket {
@@ -77,18 +78,20 @@ realtimeSocket.on("connection", async (socket) => {
 
     socket.on("send-msg", async (data) => {
         const sender = await getCurrentUserById(socket.user?.user_id!);
-        console.log(data.receiver_id, "fjdsfjksf")
         if (data.receiver_id === "") {
-            console.log("1")
             socket.broadcast.emit("msg-receive-admin", { message: data.msg, chat_id: data.chat_id, sender_id: socket.user?.user_id!, user: sender });
             return;
         }
         if (await checkUserFromRedisRealtimeController(data.receiver_id)) {
-            console.log("2")
             const socket_id = await getUserFromRedisRealtimeController(data.receiver_id);
             if (socket_id) socket.to(socket_id).emit("msg-receive", { message: data.msg, chat_id: data.chat_id, sender_id: socket.user?.user_id!, user: sender });
             return;
         }
+    });
+
+    socket.on("send-notification", async (data) => {
+        const files = await getFilesFromNotification(data.notif_id);
+        socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, files });
     });
 
     socket.on("disconnect", async () => {
