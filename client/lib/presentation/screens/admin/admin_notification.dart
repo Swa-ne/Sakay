@@ -35,7 +35,7 @@ class _AdminNotificationState extends State<AdminNotification>
 
   final ScrollController _scrollController = ScrollController();
 
-  bool _isLoading = false;
+  bool _isButtonLoading = false;
 
   final List<NotificationModel> notifications = [];
 
@@ -77,25 +77,25 @@ class _AdminNotificationState extends State<AdminNotification>
 
   Future<void> _openCamera(Function setState) async {
     setState(() {
-      _isLoading = true;
+      _isButtonLoading = true;
     });
 
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
       setState(() {
         files.add(File(image.path));
-        _isLoading = false;
+        _isButtonLoading = false;
       });
     } else {
       setState(() {
-        _isLoading = false;
+        _isButtonLoading = false;
       });
     }
   }
 
   Future<void> _pickMedia(Function setState) async {
     setState(() {
-      _isLoading = true;
+      _isButtonLoading = true;
     });
 
     final List<XFile>? pickedMedia = await _picker.pickMultipleMedia();
@@ -127,13 +127,13 @@ class _AdminNotificationState extends State<AdminNotification>
     }
 
     setState(() {
-      _isLoading = false;
+      _isButtonLoading = false;
     });
   }
 
   Future<void> _pickFiles(Function setState) async {
     setState(() {
-      _isLoading = true;
+      _isButtonLoading = true;
     });
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -180,7 +180,7 @@ class _AdminNotificationState extends State<AdminNotification>
     }
 
     setState(() {
-      _isLoading = false;
+      _isButtonLoading = false;
     });
   }
 
@@ -241,6 +241,10 @@ class _AdminNotificationState extends State<AdminNotification>
             _headlineController.clear();
             _contentController.clear();
             files.clear();
+          });
+        } else if (state is OnReceiveNotificationSuccess) {
+          setState(() {
+            notifications.insert(0, state.notification);
           });
         } else if (state is GetAllNotificationsSuccess) {
           setState(() {
@@ -348,7 +352,7 @@ class _AdminNotificationState extends State<AdminNotification>
                             );
                           },
                         ),
-                )
+                ),
               ],
             ),
           ),
@@ -435,7 +439,7 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: isLoading
+                                    onPressed: _isButtonLoading
                                         ? null
                                         : () => _openCamera(setState),
                                   ),
@@ -445,7 +449,7 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: isLoading
+                                    onPressed: _isButtonLoading
                                         ? null
                                         : () => _pickMedia(setState),
                                   ),
@@ -455,11 +459,11 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: isLoading
+                                    onPressed: _isButtonLoading
                                         ? null
                                         : () => _pickFiles(setState),
                                   ),
-                                  if (_isLoading)
+                                  if (_isButtonLoading)
                                     const Padding(
                                       padding: EdgeInsets.only(left: 8.0),
                                       child: SizedBox(
@@ -600,183 +604,6 @@ class _AdminNotificationState extends State<AdminNotification>
           ),
         ),
       );
-    }
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    int maxLines = 1,
-    int minLines = 1,
-    EdgeInsetsGeometry contentPadding =
-        const EdgeInsets.symmetric(vertical: 16.0),
-    String? Function(String?)? validator,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        minLines: minLines,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.grey[200],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide.none,
-          ),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            height: 1.3,
-          ),
-          labelText: label,
-          hintText: hint,
-          hintStyle: const TextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey,
-          ),
-          contentPadding: contentPadding,
-        ),
-        validator: validator,
-        keyboardType: label == 'Price'
-            ? const TextInputType.numberWithOptions(decimal: true)
-            : TextInputType.text,
-      ),
-    );
-  }
-
-  void _showBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 16.0,
-            left: 16.0,
-            right: 16.0,
-          ),
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-          ),
-          child: Column(
-            children: [
-              const Text(
-                'Post Announcements',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: _headlineController,
-                          label: 'Headline',
-                          hint: 'Enter Headline',
-                          contentPadding: const EdgeInsets.all(16),
-                          validator: (value) => validateHeadline(value ?? ''),
-                        ),
-                        _buildTextField(
-                          controller: _contentController,
-                          label: 'Content',
-                          hint: 'Enter content',
-                          maxLines: 20,
-                          minLines: 8,
-                          contentPadding: const EdgeInsets.all(16),
-                          validator: (value) => validateContent(value ?? ''),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  bottom: 8.0,
-                ),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.photo_camera_outlined,
-                              color: Colors.black,
-                              size: 22,
-                            ),
-                            onPressed: _openCamera,
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.image_outlined,
-                              color: Colors.black,
-                              size: 22,
-                            ),
-                            onPressed: _pickImages,
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.upload_file_outlined,
-                              color: Colors.black,
-                              size: 22,
-                            ),
-                            onPressed: _pickFiles,
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 40,
-                        child: FloatingActionButton.extended(
-                          onPressed: _submitNotification,
-                          backgroundColor: const Color(0xFF00A3FF),
-                          icon: const Icon(
-                            Icons.send,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                          label: const Text(
-                            'Post',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                          elevation: 2,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _submitNotification() {
-    if (_formKey.currentState?.validate() ?? false) {
-      Navigator.pop(context);
     }
   }
 
