@@ -42,7 +42,9 @@ export const loginUserController = async (req: Request, res: Response) => {
                             sameSite: 'none',
                         }
                     )
-                    .json({ message: "Success", access_token: result.message?.access_token, user_id: user_data._id, user_type: user_data.user_type });
+                    .json({
+                        message: "Success", access_token: result.message?.access_token, user_id: user_data._id, user_type: user_data.user_type, first_name: user_data.first_name, last_name: user_data.last_name, email: user_data.email_address, profile: user_data.profile_picture_url
+                    });
                 return;
             }
             res.status(data.httpCode).json({ error: data.error });
