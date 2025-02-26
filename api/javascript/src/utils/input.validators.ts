@@ -9,7 +9,11 @@ export interface CustomResponse {
     user_type?: string,
     access_token?: string,
     refresh_token?: string,
-    httpCode: number
+    httpCode: number,
+    first_name?: string,
+    last_name?: string,
+    email?: string,
+    profile?: string,
 }
 const USER_IDENTIFIER_CONST = { "email_address": "EMAIL_ADDRESS", "phone_number": "PHONE_NUMBER" };
 
@@ -76,14 +80,14 @@ export const validateRequiredFields = (fields: Record<string, any>, fieldLabels:
     return { valid: true };
 };
 
-export const validateDescriptionLength = (description: string) => {
-    const wordCount = description.trim().split(/\s+/).length;
-    return wordCount <= 250;
+export const validateHeadlineLength = (headline: string) => {
+    const wordCount = headline.trim().split(/\s+/).length;
+    return wordCount >= 1 && wordCount <= 15;
 };
 
-export const validateReviewCommentLength = (description: string) => {
-    const wordCount = description.trim().split(/\s+/).length;
-    return wordCount <= 250;
+export const validateContentLength = (content: string) => {
+    const wordCount = content.trim().split(/\s+/).length;
+    return wordCount >= 2 && wordCount <= 250;
 };
 
 export const checkInputType = async (user_identifier: string) => {
