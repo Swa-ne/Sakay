@@ -20,7 +20,7 @@ class AadminProfileState extends State<AdminProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey, // Assign the scaffold key to the scaffold
+      key: _scaffoldKey,
       drawer: Drawer(
         child: Container(
           color: const Color(0xFF00A3FF),
@@ -29,7 +29,7 @@ class AadminProfileState extends State<AdminProfile> {
             children: [
               const SizedBox(height: 50),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -458,7 +458,7 @@ class AadminProfileState extends State<AdminProfile> {
         child: Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: Colors.red,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -468,15 +468,15 @@ class AadminProfileState extends State<AdminProfile> {
               ),
             ],
           ),
-          child: Row(
-            children: const [
-              Icon(Icons.logout, color: Colors.white),
+          child: const Row(
+            children: [
+              Icon(Icons.logout, color: Colors.black),
               SizedBox(width: 20.0),
               Text(
                 'Logout',
                 style: TextStyle(
                   fontSize: 16.0,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ],
