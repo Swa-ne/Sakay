@@ -47,6 +47,11 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> updateFirstTime(String toggle) async {
+    await _storage.write(key: "First Time", value: toggle);
+  }
+
+  @override
   Future<void> removeRefreshToken() async {
     await _storage.delete(key: "Refresh Token");
   }
@@ -82,6 +87,11 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> removeFirstTime() async {
+    await _storage.delete(key: "First Time");
+  }
+
+  @override
   Future<String> getRefreshToken() async {
     return await _storage.read(key: "Refresh Token") ?? "";
   }
@@ -114,6 +124,11 @@ class TokenControllerImpl extends TokenController {
   @override
   Future<String> getProfile() async {
     return await _storage.read(key: "Profile") ?? "";
+  }
+
+  @override
+  Future<String> getFirstTime() async {
+    return await _storage.read(key: "First Time") ?? "";
   }
 
   @override
