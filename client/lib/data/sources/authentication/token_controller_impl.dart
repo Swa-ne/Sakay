@@ -27,6 +27,26 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> updateFirstName(String first_name) async {
+    await _storage.write(key: "First Name", value: first_name);
+  }
+
+  @override
+  Future<void> updateLastName(String last_name) async {
+    await _storage.write(key: "Last Name", value: last_name);
+  }
+
+  @override
+  Future<void> updateEmail(String email) async {
+    await _storage.write(key: "Email", value: email);
+  }
+
+  @override
+  Future<void> updateProfile(String profile) async {
+    await _storage.write(key: "Profile", value: profile);
+  }
+
+  @override
   Future<void> removeRefreshToken() async {
     await _storage.delete(key: "Refresh Token");
   }
@@ -42,6 +62,26 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> removeFirstName() async {
+    await _storage.delete(key: "First Name");
+  }
+
+  @override
+  Future<void> removeLastName() async {
+    await _storage.delete(key: "Last Name");
+  }
+
+  @override
+  Future<void> removeEmail() async {
+    await _storage.delete(key: "Email");
+  }
+
+  @override
+  Future<void> removeProfile() async {
+    await _storage.delete(key: "Profile");
+  }
+
+  @override
   Future<String> getRefreshToken() async {
     return await _storage.read(key: "Refresh Token") ?? "";
   }
@@ -54,6 +94,26 @@ class TokenControllerImpl extends TokenController {
   @override
   Future<String> getUserID() async {
     return await _storage.read(key: "User ID") ?? "";
+  }
+
+  @override
+  Future<String> getFirstName() async {
+    return await _storage.read(key: "First Name") ?? "";
+  }
+
+  @override
+  Future<String> getLastName() async {
+    return await _storage.read(key: "Last Name") ?? "";
+  }
+
+  @override
+  Future<String> getEmail() async {
+    return await _storage.read(key: "Email") ?? "";
+  }
+
+  @override
+  Future<String> getProfile() async {
+    return await _storage.read(key: "Profile") ?? "";
   }
 
   @override
