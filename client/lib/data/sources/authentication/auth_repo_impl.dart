@@ -276,6 +276,7 @@ class AuthRepoImpl extends AuthRepo {
       _tokenController.removeLastName();
       _tokenController.removeEmail();
       _tokenController.removeProfile();
+      _tokenController.removeFirstTime();
       return response_body['message'] == "User logged Out";
     } else {
       throw Exception(response_body['error']);
