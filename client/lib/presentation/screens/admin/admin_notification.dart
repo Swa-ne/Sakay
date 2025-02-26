@@ -1,10 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/notification/notification_bloc.dart';
+import 'package:sakay_app/bloc/notification/notification_event.dart';
+import 'package:sakay_app/bloc/notification/notification_state.dart';
 import 'package:sakay_app/common/mixins/input_validation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:sakay_app/data/models/file.dart';
+import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/user.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 
+// TODO: cache notifications list
 class AdminNotification extends StatefulWidget {
   final VoidCallback openDrawer;
 
@@ -14,16 +23,57 @@ class AdminNotification extends StatefulWidget {
   _AdminNotificationState createState() => _AdminNotificationState();
 }
 
+// TODO: add something bago makalipat nag page if may laman ang files, and controllers
 class _AdminNotificationState extends State<AdminNotification>
     with InputValidationMixin {
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+
+  late NotificationBloc _notificationBloc;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _headlineController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  final ScrollController _scrollController = ScrollController();
+
   bool _isLoading = false;
+
+  final List<NotificationModel> notifications = [];
 
   final List<File> files = [];
   final ImagePicker _picker = ImagePicker();
+  late UserModel _myUserModel;
+
+  int currentPage = 1;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
+    _notificationBloc.add(GetAllNotificationsEvent(currentPage));
+    _scrollController.addListener(_onScroll);
+    _initializeMyUserModel();
+  }
+
+  Future<void> _initializeMyUserModel() async {
+    _myUserModel = UserModel(
+      id: await _tokenController.getUserID(),
+      first_name: await _tokenController.getFirstName(),
+      last_name: await _tokenController.getLastName(),
+      email: await _tokenController.getEmail(),
+      profile: await _tokenController.getProfile(),
+    );
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels <= 100 && !isLoading) {
+      setState(() {
+        isLoading = true;
+        currentPage++;
+      });
+      _notificationBloc.add(GetAllNotificationsEvent(currentPage));
+    }
+  }
 
   Future<void> _openCamera(Function setState) async {
     setState(() {
@@ -56,10 +106,9 @@ class _AdminNotificationState extends State<AdminNotification>
 
       for (XFile media in pickedMedia) {
         File file = File(media.path);
-        int fileSize = await file.length(); // Get file size in bytes
+        int fileSize = await file.length();
 
         if (fileSize <= 50 * 1024 * 1024) {
-          // 50MB limit
           validFiles.add(file);
         } else {
           invalidFiles.add(media.name);
@@ -110,10 +159,9 @@ class _AdminNotificationState extends State<AdminNotification>
 
       for (var path in result.paths.whereType<String>()) {
         File file = File(path);
-        int fileSize = await file.length(); // Get file size in bytes
+        int fileSize = await file.length();
 
         if (fileSize <= 50 * 1024 * 1024) {
-          // 50MB limit
           validFiles.add(file);
         } else {
           invalidFiles.add(file.path.split('/').last);
@@ -161,82 +209,148 @@ class _AdminNotificationState extends State<AdminNotification>
     );
   }
 
+  List<FileModel> convertFilesToFileModels(List<File> files) {
+    return files.map((file) {
+      return FileModel(
+        file_name: file.uri.pathSegments.last,
+        file_type: file.path.split('.').last,
+        file_category: 'default',
+        file_url: file.path,
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showBottomSheet,
-        backgroundColor: const Color(0xFF00A3FF),
-        child: const Icon(
-          Icons.add,
-          color: Color(0xfffdfdfd),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.black, size: 25),
-                    onPressed: () {
-                      widget.openDrawer();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Notification',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+    return BlocListener<NotificationBloc, NotificationState>(
+      listener: (context, state) {
+        if (state is NotificationLoading) {
+          // TODO: add lottie??
+        } else if (state is SaveNotificationSuccess) {
+          Navigator.pop(context);
+          setState(() {
+            notifications.insert(
+              0,
+              NotificationModel(
+                headline: _headlineController.text.trim(),
+                content: _contentController.text.trim(),
+                posted_by: _myUserModel,
+                files: convertFilesToFileModels(files),
               ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEEEEEE),
-                        borderRadius: BorderRadius.circular(8),
+            );
+            _headlineController.clear();
+            _contentController.clear();
+            files.clear();
+          });
+        } else if (state is GetAllNotificationsSuccess) {
+          setState(() {
+            notifications.addAll(state.notifications);
+          });
+        } else if (state is SaveNotificationError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (state is GetAllNotificationsError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showBottomSheet,
+          backgroundColor: const Color(0xFF00A3FF),
+          child: const Icon(
+            Icons.add,
+            color: Color(0xfffdfdfd),
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon:
+                          const Icon(Icons.menu, color: Colors.black, size: 25),
+                      onPressed: () {
+                        widget.openDrawer();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Notification',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.notifications, color: Color(0xFF00A3FF)),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Driver Verification Details',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'See Details...',
-                                  style: TextStyle(color: Color(0xFF888888)),
-                                )
-                              ],
-                            ),
-                          ),
-                          Icon(Icons.more_horiz, color: Colors.black),
-                        ],
-                      ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              )
-            ],
+                const SizedBox(height: 12),
+                Expanded(
+                  child: notifications.isEmpty
+                      ? const Center(
+                          child: Text("No notifications yet"),
+                        )
+                      : ListView.builder(
+                          itemCount: notifications.length,
+                          controller: _scrollController,
+                          itemBuilder: (context, index) {
+                            final notification = notifications[index];
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEEEEEE),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.notifications,
+                                      color: Color(0xFF00A3FF)),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          notification.headline,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          notification.content,
+                                          style: const TextStyle(
+                                              color: Color(0xFF888888)),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.more_horiz,
+                                      color: Colors.black),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -321,7 +435,9 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: () => _openCamera(setState),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _openCamera(setState),
                                   ),
                                   IconButton(
                                     icon: const Icon(
@@ -329,7 +445,9 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: () => _pickMedia(setState),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _pickMedia(setState),
                                   ),
                                   IconButton(
                                     icon: const Icon(
@@ -337,7 +455,9 @@ class _AdminNotificationState extends State<AdminNotification>
                                       color: Colors.black,
                                       size: 22,
                                     ),
-                                    onPressed: () => _pickFiles(setState),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _pickFiles(setState),
                                   ),
                                   if (_isLoading)
                                     const Padding(
@@ -471,7 +591,15 @@ class _AdminNotificationState extends State<AdminNotification>
 
   void _submitNotification() {
     if (_formKey.currentState?.validate() ?? false) {
-      Navigator.pop(context);
+      _notificationBloc.add(
+        SaveNotificationEvent(
+          files,
+          NotificationModel(
+            headline: _headlineController.text.trim(),
+            content: _contentController.text.trim(),
+          ),
+        ),
+      );
     }
   }
 
