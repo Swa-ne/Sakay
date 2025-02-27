@@ -9,79 +9,130 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FilterScreen(),
+      home: ReportsScreen(),
     );
   }
 }
 
-class FilterScreen extends StatefulWidget {
+class ReportsScreen extends StatefulWidget {
   @override
-  _FilterScreenState createState() => _FilterScreenState();
+  _ReportsScreenState createState() => _ReportsScreenState();
 }
 
-class _FilterScreenState extends State<FilterScreen> {
-  int _selectedOption = 1; // Default selected option
+class _ReportsScreenState extends State<ReportsScreen> {
+  String selectedReport = "Performance Report";
+
+  Widget getReportScreen() {
+    switch (selectedReport) {
+      case "Incident Report":
+        return reportContent("Incident Report");
+      case "Maintenance Report":
+        return reportContent("Maintenance Report");
+      default:
+        return reportContent("Performance Report");
+    }
+  }
+
+  Widget reportContent(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.warning, color: Colors.white),
+              ),
+              title: Text(
+                "UNIT-72K",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text("See report details"),
+              trailing: Icon(Icons.more_vert),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black54,
-      body: Center(
-        child: Container(
-          width: 350,
-          height: 600,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(),
-              ),
-              Container(
-                width: 140,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
+      body: SafeArea(
+        child: Center(
+          child: Container(
+            width: 350,
+            height: 600,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_forward, color: Colors.white),
+                        onPressed: () {},
+                      ),
+                      menuItem("Incident Report", Icons.car_repair),
+                      menuItem("Performance Report", Icons.article),
+                      menuItem("Maintenance Report", Icons.settings),
+                    ],
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward, color: Colors.white),
-                      onPressed: () {},
-                    ),
-                    _buildOption(0, Icons.directions_car, "Incident reports"),
-                    _buildOption(
-                        1, Icons.insert_drive_file, "Performance Report"),
-                    _buildOption(2, Icons.settings, "Maintenance Report"),
-                  ],
-                ),
-              ),
-            ],
+                Expanded(child: getReportScreen()),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildOption(int index, IconData icon, String title) {
+  Widget menuItem(String title, IconData icon) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: TextStyle(color: Colors.white)),
-      trailing: Radio<int>(
-        value: index,
-        groupValue: _selectedOption,
-        onChanged: (int? value) {
+      title: Text(
+        title,
+        style: TextStyle(color: Colors.white),
+      ),
+      trailing: Radio<String>(
+        value: title,
+        groupValue: selectedReport,
+        onChanged: (value) {
           setState(() {
-            _selectedOption = value!;
+            selectedReport = value!;
           });
         },
-        activeColor: Colors.white,
       ),
     );
   }
