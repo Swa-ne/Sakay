@@ -308,7 +308,7 @@ class AdminProfileState extends State<AdminProfile> {
         child: Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: Colors.red,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -320,13 +320,13 @@ class AdminProfileState extends State<AdminProfile> {
           ),
           child: const Row(
             children: [
-              Icon(Icons.logout, color: Colors.white),
+              Icon(Icons.logout, color: Colors.black),
               SizedBox(width: 20.0),
               Text(
                 'Logout',
                 style: TextStyle(
                   fontSize: 16.0,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ],

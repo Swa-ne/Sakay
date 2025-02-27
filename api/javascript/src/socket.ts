@@ -90,11 +90,7 @@ realtimeSocket.on("connection", async (socket) => {
     });
     socket.on("send-notification", async (data) => {
         const files = await getFilesFromNotification(data.notif_id);
-        socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, files });
-    });
-
-    socket.on("send-notification", async (data) => {
-        const files = await getFilesFromNotification(data.notif_id);
+        console.log(data)
         socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, files });
     });
 
