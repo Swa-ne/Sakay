@@ -4,22 +4,23 @@ import 'package:sakay_app/bloc/tracker/tracker_state.dart';
 import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
 
 class TrackerBloc extends Bloc<TrackerEvent, TrackerState> {
-  final SocketController _socketRepo;
+  final TrackingSocketController _socketRepo;
 
   TrackerBloc(this._socketRepo) : super(ConnectingSocket()) {
     on<ConnectEvent>((event, emit) async {
       try {
         emit(ConnectingSocket());
+        _socketRepo.passBloc(this);
         await _socketRepo.connect();
         emit(ConnectedSocket());
       } catch (e) {
         emit(const ConnectionError("Connection Error"));
       }
     });
-    on<ConnectDriverEvent>((event, emit) {
+    on<ConnectDriverEvent>((event, emit) async {
       try {
         emit(ConnectingSocket());
-        _socketRepo.connectDriver();
+        await _socketRepo.connectDriver();
         emit(ConnectedSocket());
       } catch (e) {
         emit(const ConnectionError("Connection Error"));

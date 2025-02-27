@@ -7,11 +7,12 @@ import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 
-final _apiUrl = "${dotenv.env['API_URL']}";
+final _apiUrl = "${dotenv.env['API_URL']}/tracking";
 
-abstract class SocketController {
+abstract class TrackingSocketController {
+  void passBloc(TrackerBloc bloc);
   Future<void> connect();
-  void connectDriver();
+  Future<void> connectDriver();
   void trackMyVehicle();
   void stopTrackMyVehicle();
   void trackMe();
@@ -19,24 +20,27 @@ abstract class SocketController {
   void disconnect();
 }
 
-class SocketControllerImpl extends SocketController with Tracker {
+class TrackingSocketControllerImpl extends TrackingSocketController
+    with Tracker {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
 
-  static final SocketControllerImpl _singleton =
-      SocketControllerImpl._internal();
+  static final TrackingSocketControllerImpl _singleton =
+      TrackingSocketControllerImpl._internal();
   late IO.Socket socket;
   late TrackerBloc trackerBloc;
   Set<String> pendingCreations = {};
   Timer? _locationTimer;
 
-  factory SocketControllerImpl() {
+  factory TrackingSocketControllerImpl() {
     return _singleton;
   }
+
+  @override
   void passBloc(TrackerBloc bloc) {
     trackerBloc = bloc;
   }
 
-  SocketControllerImpl._internal();
+  TrackingSocketControllerImpl._internal();
 
   @override
   Future<void> connect() async {
@@ -51,7 +55,7 @@ class SocketControllerImpl extends SocketController with Tracker {
     socket.connect();
 
     socket.onConnect((_) {
-      print('Connected to socket');
+      print('Connected to tracking socket');
     });
 
     socket.on('update-map', (data) async {
@@ -76,7 +80,7 @@ class SocketControllerImpl extends SocketController with Tracker {
     });
 
     socket.onDisconnect((_) {
-      print('Disconnected from socket');
+      print('Disconnected from tracking socket');
     });
 
     socket.onError((error) {
@@ -85,10 +89,8 @@ class SocketControllerImpl extends SocketController with Tracker {
   }
 
   @override
-  void connectDriver() async {
-    print("running btc $socket");
+  Future<void> connectDriver() async {
     socket.on('update-map-driver', (data) async {
-      print("running btc $data");
       Location personLoc = Location.fromJson(data['location']);
       if (!Tracker.people.containsKey(data['user'])) {
         if (!pendingCreations.contains(data['user'])) {

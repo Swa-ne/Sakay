@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -34,26 +29,17 @@ class AProfilePageState extends State<ProfilePage> {
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFF00A2FF),
           elevation: 0,
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    // function
-                  },
+          flexibleSpace: const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Center(
+              child: Text(
+                'Profile',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -70,10 +56,7 @@ class AProfilePageState extends State<ProfilePage> {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
-                    top: 10.0,
-                    left: 30.0,
-                    right: 30.0,
-                    bottom: 30.0),
+                    top: 10.0, left: 30.0, right: 30.0, bottom: 30.0),
                 color: const Color(0xFF00A2FF),
                 child: Container(
                   padding: const EdgeInsets.all(10.0),
@@ -325,48 +308,47 @@ class AProfilePageState extends State<ProfilePage> {
             );
           } else if (title == 'Theme Customization') {
             showDialog(
-  context: context,
-  builder: (context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool isDarkMode = false;
-        bool isNotificationEnabled = false;
-        bool isSoundEffectEnabled = false;
-        int fontSize = 14;
-        int vibrationIntensity = 3;
-        double soundVolume1 = 0.5;
-        double soundVolume2 = 0.5;
+              context: context,
+              builder: (context) {
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    bool isDarkMode = false;
+                    bool isNotificationEnabled = false;
+                    bool isSoundEffectEnabled = false;
+                    int fontSize = 14;
+                    int vibrationIntensity = 3;
+                    double soundVolume1 = 0.5;
+                    double soundVolume2 = 0.5;
 
-        return Dialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)),
-          child: _themeCustomizationPage(
-            context,
-            isDarkMode,
-            isNotificationEnabled,
-            isSoundEffectEnabled,
-            fontSize,
-            vibrationIntensity,
-            soundVolume1,
-            soundVolume2,
-            (val) => setState(() => isDarkMode = val),
-            (val) => setState(() => isNotificationEnabled = val),
-            (val) => setState(() => isSoundEffectEnabled = val),
-            (val) => setState(() => fontSize = val),
-            (val) => setState(() => vibrationIntensity = val),
-            (val) => setState(() => soundVolume1 = val),
-            (val) => setState(() => soundVolume2 = val),
-          ),
-        );
-      },
-    );
-  },
-);
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: _themeCustomizationPage(
+                        context,
+                        isDarkMode,
+                        isNotificationEnabled,
+                        isSoundEffectEnabled,
+                        fontSize,
+                        vibrationIntensity,
+                        soundVolume1,
+                        soundVolume2,
+                        (val) => setState(() => isDarkMode = val),
+                        (val) => setState(() => isNotificationEnabled = val),
+                        (val) => setState(() => isSoundEffectEnabled = val),
+                        (val) => setState(() => fontSize = val),
+                        (val) => setState(() => vibrationIntensity = val),
+                        (val) => setState(() => soundVolume1 = val),
+                        (val) => setState(() => soundVolume2 = val),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
           } else if (title == 'About') {
             showDialog(
               context: context,
-              barrierColor:
-                  Colors.transparent,
+              barrierColor: Colors.transparent,
               builder: (context) => Dialog(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(0)),
@@ -1022,7 +1004,6 @@ Widget _themeCustomizationPage(
         ),
         const Divider(thickness: 1, color: Colors.grey),
         const SizedBox(height: 8),
-
         _customizationOption(
           icon: Icons.dark_mode,
           text: 'Dark Mode',
@@ -1031,7 +1012,6 @@ Widget _themeCustomizationPage(
             onChanged: onDarkModeChanged,
           ),
         ),
-
         _customizationOption(
           icon: Icons.notifications,
           text: 'Notification Alert',
@@ -1040,7 +1020,6 @@ Widget _themeCustomizationPage(
             onChanged: onNotificationChanged,
           ),
         ),
-
         _customizationOption(
           icon: Icons.volume_up,
           text: 'Sound Effect',
@@ -1049,7 +1028,6 @@ Widget _themeCustomizationPage(
             onChanged: onSoundEffectChanged,
           ),
         ),
-
         _customizationOption(
           icon: Icons.text_fields,
           text: 'Font Size',
@@ -1072,7 +1050,6 @@ Widget _themeCustomizationPage(
             ],
           ),
         ),
-
         const SizedBox(height: 12),
         const Text(
           'Sound and Vibration',
@@ -1080,7 +1057,6 @@ Widget _themeCustomizationPage(
         ),
         const Divider(thickness: 1, color: Colors.grey),
         const SizedBox(height: 8),
-
         _customizationOption(
           icon: Icons.vibration,
           text: 'Vibration Intensity',
@@ -1108,14 +1084,12 @@ Widget _themeCustomizationPage(
             ],
           ),
         ),
-
         _soundSlider(value: soundVolume1, onChanged: onSoundVolume1Changed),
         _soundSlider(value: soundVolume2, onChanged: onSoundVolume2Changed),
       ],
     ),
   );
 }
-
 
 Widget _customizationOption(
     {required IconData icon, required String text, required Widget trailing}) {
@@ -1250,14 +1224,25 @@ Widget _aboutPage(BuildContext context) {
           Column(
             children: [
               _teamMemberPlaceholder(
-                  'Lance Manaois', 'Project Manager & Lead Developer'),
+                'Lance Manaois',
+                'Project Manager & Lead Developer',
+              ),
               _teamMemberPlaceholder(
-                  'Stephen Bautista', 'Backend Developer & Team Manager'),
+                'Stephen Bautista',
+                'Full-stack Developer & Team Manager',
+              ),
               _teamMemberPlaceholder(
-                  'Jaspher Tania', 'UI/UX Designer & Frontend Developer'),
+                'Jaspher Tania',
+                'UI/UX Designer & Frontend Developer',
+              ),
               _teamMemberPlaceholder(
-                  'Mark Joshua Sarmiento', 'Frontend Developer'),
-              _teamMemberPlaceholder('Christian Majin', 'Frontend Developer'),
+                'Mark Joshua Sarmiento',
+                'Frontend Developer',
+              ),
+              _teamMemberPlaceholder(
+                'Christian Majin',
+                'Frontend Developer',
+              ),
             ],
           ),
         ],

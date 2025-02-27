@@ -119,4 +119,24 @@ mixin InputValidationMixin {
 
     return "$obfuscatedLocalPart@$domainPart";
   }
+
+  String? validateContent(String content) {
+    int word_count = content.trim().split(RegExp(r'\s+')).length;
+    if (content.isEmpty) {
+      return 'Content is required';
+    } else if (word_count >= 2 && word_count <= 250) {
+      return null;
+    }
+    return 'The content must contain between 2 and 250 words.';
+  }
+
+  String? validateHeadline(String headline) {
+    int word_count = headline.trim().split(RegExp(r'\s+')).length;
+    if (headline.isEmpty) {
+      return 'Headline is required';
+    } else if (word_count >= 1 && word_count <= 15) {
+      return null;
+    }
+    return 'The headline must contain between 1 and 15 words.';
+  }
 }

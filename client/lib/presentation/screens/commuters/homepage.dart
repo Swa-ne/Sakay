@@ -4,6 +4,7 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 
@@ -16,6 +17,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with Tracker {
   final TextEditingController _searchController = TextEditingController();
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+
   late TrackerBloc _trackerBloc;
   OverlayEntry? _hintOverlay;
   bool _showInboxHint = true;
@@ -27,17 +30,24 @@ class _HomePageState extends State<HomePage> with Tracker {
   void initState() {
     super.initState();
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_showInboxHint) {
-        _showHint(
-          title: "Inbox",
-          icon: Icons.inbox,
-          message:
-              "The inbox is where you can find your chats, messages, and othet communication means within the application",
-          onDismiss: _dismissInboxHint,
-        );
-      }
-    });
+    _checkFirstTime();
+  }
+
+  Future<void> _checkFirstTime() async {
+    String isFirstTime = await _tokenController.getFirstTime();
+    if (isFirstTime.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_showInboxHint) {
+          _showHint(
+            title: "Inbox",
+            icon: Icons.inbox,
+            message:
+                "The inbox is where you can find your chats, messages, and othet communication means within the application",
+            onDismiss: _dismissInboxHint,
+          );
+        }
+      });
+    }
   }
 
   void _dismissInboxHint() {
@@ -80,6 +90,7 @@ class _HomePageState extends State<HomePage> with Tracker {
 
   void _dismissProfileHint() {
     _hintOverlay?.remove();
+    _tokenController.updateFirstTime("yes");
     setState(() {
       _showProfileHint = false;
     });
@@ -442,23 +453,26 @@ void _showReportDialog(BuildContext context) {
                       SizedBox(width: 8),
                       Text(
                         "Select an option",
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  
+
                   // Incident Report Option
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop(); // Close the dialog
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const IncidentReportPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const IncidentReportPage()),
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
@@ -473,17 +487,21 @@ void _showReportDialog(BuildContext context) {
                               children: [
                                 Text(
                                   "Incident Report",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   "Send reports about events and actions occurred",
-                                  style: TextStyle(fontSize: 8, color: Colors.black),
+                                  style: TextStyle(
+                                      fontSize: 8, color: Colors.black),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+                          Icon(Icons.arrow_forward_ios,
+                              size: 16, color: Colors.black),
                         ],
                       ),
                     ),
@@ -493,11 +511,14 @@ void _showReportDialog(BuildContext context) {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PerformanceReportPage()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const PerformanceReportPage()),
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
@@ -512,17 +533,21 @@ void _showReportDialog(BuildContext context) {
                               children: [
                                 Text(
                                   "Performance Report",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   "Analyze key metrics and evaluate progress",
-                                  style: TextStyle(fontSize: 8, color: Colors.black),
+                                  style: TextStyle(
+                                      fontSize: 8, color: Colors.black),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+                          Icon(Icons.arrow_forward_ios,
+                              size: 16, color: Colors.black),
                         ],
                       ),
                     ),
@@ -541,7 +566,8 @@ void _showReportDialog(BuildContext context) {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 100, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

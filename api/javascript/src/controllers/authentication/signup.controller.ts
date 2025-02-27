@@ -121,7 +121,7 @@ export const signupUserController = async (req: Request, res: Response) => {
                         sameSite: 'none',
                     }
                 )
-                .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, user_type: data.user_type });
+                .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, user_type: data.user_type, first_name: data.first_name, last_name: data.last_name, email: data.email, profile: data.profile });
             return;
         }
 

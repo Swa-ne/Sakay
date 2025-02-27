@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/common/widgets/map.dart';
-import 'package:sakay_app/presentation/screens/driver/driver_inb.dart';
 
 class DriverManageVehicle extends StatefulWidget {
   const DriverManageVehicle({super.key});
 
   @override
-  _MapState createState() => _MapState();
+  _DriverManageVehicleState createState() => _DriverManageVehicleState();
 }
 
-class _MapState extends State<DriverManageVehicle> {
+class _DriverManageVehicleState extends State<DriverManageVehicle> {
   bool isContainerVisible = false;
   int? selectedIndex = -1;
 
@@ -478,78 +477,6 @@ class _MapState extends State<DriverManageVehicle> {
                       : const SizedBox.shrink(),
                 )
               ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navBarItem(Icons.map, "Map", () {
-          
-                  }),
-                  _navBarItem(Icons.inbox, "Inbox", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DriverChatPage()),
-                    );
-                  }),
-                  _navBarItem(Icons.notifications, "Notification", () {
-
-                  }),
-                  _navBarItem(Icons.person, "Profile", () {
-
-                  }),
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _statusButton(String label, Color color) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(16),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 12),
-      ),
-    );
-  }
-
-  Widget _navBarItem(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF00A1F8)),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF00A1F8),
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ],
