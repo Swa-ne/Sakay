@@ -1,102 +1,133 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_bloc.dart';
+import 'package:sakay_app/bloc/chat/chat_event.dart';
+import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/widgets/chat_bubble.dart';
+import 'package:sakay_app/data/models/message.dart';
 
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Inbox App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const InboxScreen(),
-    );
-  }
-}
-
+// TODO: add refresh callback
 class InboxScreen extends StatefulWidget {
-  const InboxScreen({super.key});
+  final List<MessageModel> messages;
+  final ScrollController scrollInboxController;
+  final bool is_loading_inbox;
+  final String chat_id;
+  final String user_id;
+  final void Function(MessageModel) onMessageSent;
+  const InboxScreen({
+    super.key,
+    required this.messages,
+    required this.scrollInboxController,
+    required this.is_loading_inbox,
+    required this.chat_id,
+    required this.user_id,
+    required this.onMessageSent,
+  });
 
   @override
-  _InboxScreenState createState() => _InboxScreenState();
+  State<InboxScreen> createState() => _InboxScreenState();
 }
 
 class _InboxScreenState extends State<InboxScreen> {
-  final List<InboxItem> inboxItems = [
-    InboxItem(
-        sender: 'Emmanuel Darude',
-        message: 'Yung driver bigla bigla nagppreno parang wan....',
-        time: '4:14 pm'),
-    InboxItem(
-        sender: 'Emmanuel Darude',
-        message: 'Grabe, ambilis ng magpatakbo ni kuya driver',
-        time: '12:22 pm'),
-    InboxItem(
-        sender: 'Emmanuel Darude', message: 'Nagugstomako', time: '9:41 am'),
-    InboxItem(
-        sender: 'Emmanuel Darude',
-        message: 'Clpo with a gravyy',
-        time: '12:22 pm'),
-  ];
+  late ChatBloc _chatBloc;
+
+  final TextEditingController messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = BlocProvider.of<ChatBloc>(context);
+  }
+
+  void sendMessage() {
+    final message = messageController.text.trim();
+    if (message.isNotEmpty) {
+      _chatBloc.add(
+        SaveMessageEvent(
+          message,
+          widget.chat_id,
+          "",
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inbox'),
-      ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
+    return BlocListener<ChatBloc, ChatState>(
+      listener: (context, state) {
+        if (state is SaveMessageSuccess) {
+          widget.onMessageSent(
+            MessageModel(
+              message: messageController.text,
+              sender: widget.user_id,
+              chat_id: widget.chat_id,
+              is_read: false,
+              created_at: DateTime.now().toString(),
+              updated_at: DateTime.now().toString(),
+            ),
+          );
+          setState(() {
+            messageController.clear();
+          });
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 1,
+          title: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                backgroundImage: AssetImage("assets/bus.png"),
+              ),
+              SizedBox(width: 10),
+              Text("Sakay", style: TextStyle(color: Colors.black)),
+            ],
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.messages.length,
+                reverse: true,
+                controller: widget.scrollInboxController,
+                itemBuilder: (context, index) {
+                  bool isMe = widget.user_id == widget.messages[index].sender;
+                  return chatBubble(widget.messages[index].message, isMe);
+                },
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: inboxItems.length,
-              itemBuilder: (context, index) {
-                return InboxItemWidget(inboxItems[index]);
-              },
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        hintText: "Type a message...",
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.blue),
+                    onPressed: sendMessage,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class InboxItem {
-  final String sender;
-  final String message;
-  final String time;
-
-  InboxItem({required this.sender, required this.message, required this.time});
-}
-
-class InboxItemWidget extends StatelessWidget {
-  final InboxItem item;
-
-  const InboxItemWidget(this.item, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.blue,
-          child: Icon(Icons.person, color: Colors.white),
+          ],
         ),
-        title: Text(item.sender),
-        subtitle: Text(item.message),
-        trailing: Text(item.time),
       ),
     );
   }

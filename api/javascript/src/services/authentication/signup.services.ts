@@ -37,6 +37,10 @@ export const signupUsertoDatabase = async (
                 refresh_token: result.message?.refresh_token,
                 user_id: userCredentialResult._id,
                 user_type: userCredentialResult.user_type,
+                first_name: userCredentialResult.first_name,
+                last_name: userCredentialResult.last_name,
+                email: userCredentialResult.email_address,
+                profile: userCredentialResult.profile_picture_url,
                 httpCode: 200
             };
         }

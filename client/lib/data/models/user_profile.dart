@@ -1,49 +1,49 @@
 class UserProfileModel {
   final String? id;
-  final String firstName;
-  final String middleName;
-  final String lastName;
+  final String first_name;
+  final String middle_name;
+  final String last_name;
   final String username;
-  final String fullName;
-  final String profilePictureUrl;
-  final String personalEmail;
+  final String full_name;
+  final String profile_picture_url;
+  final String personal_email;
   final DateTime birthday;
 
   UserProfileModel({
     this.id,
-    required this.firstName,
-    required this.middleName,
-    required this.lastName,
+    required this.first_name,
+    required this.middle_name,
+    required this.last_name,
     required this.username,
-    required this.fullName,
-    required this.profilePictureUrl,
-    required this.personalEmail,
+    required this.full_name,
+    required this.profile_picture_url,
+    required this.personal_email,
     required this.birthday,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
       id: json['_id'] ?? "",
-      firstName: json['first_name'],
-      middleName: json['middle_name'] ?? '',
-      lastName: json['last_name'] ?? "",
+      first_name: json['first_name'],
+      middle_name: json['middle_name'] ?? '',
+      last_name: json['last_name'] ?? "",
       username: json['username'] ?? "",
-      fullName: json['full_name'],
-      profilePictureUrl: json['profile_picture_url'] ?? '',
-      personalEmail: json['personal_email'],
+      full_name: json['full_name'],
+      profile_picture_url: json['profile_picture_url'] ?? '',
+      personal_email: json['personal_email'],
       birthday: DateTime.parse(json['birthday']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'first_name': firstName,
-      'middle_name': middleName,
-      'last_name': lastName,
+      'first_name': first_name,
+      'middle_name': middle_name,
+      'last_name': last_name,
       'username': username,
-      'full_name': fullName,
-      'profile_picture_url': profilePictureUrl,
-      'personal_email': personalEmail,
+      'full_name': full_name,
+      'profile_picture_url': profile_picture_url,
+      'personal_email': personal_email,
       'birthday': birthday.toIso8601String(),
     };
   }
