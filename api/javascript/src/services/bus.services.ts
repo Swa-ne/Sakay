@@ -29,7 +29,8 @@ export const getBusses = async () => {
     session.startTransaction();
 
     try {
-        const busses = await Bus.find().session(session);
+        const busses = await Bus.find()
+            .session(session);
 
         await session.commitTransaction();
         session.endSession();
