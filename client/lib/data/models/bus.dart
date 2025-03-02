@@ -1,9 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:sakay_app/data/models/user.dart';
 
 class BusModel extends Equatable {
   final String? id;
   final String plate_number;
   final String bus_number;
+  final UserModel? current_driver;
   final double? speed;
   final double? milage;
 
@@ -11,6 +13,7 @@ class BusModel extends Equatable {
     this.id,
     required this.plate_number,
     required this.bus_number,
+    this.current_driver,
     this.speed,
     this.milage,
   });
@@ -20,6 +23,9 @@ class BusModel extends Equatable {
       id: json['_id'],
       plate_number: json['plate_number'],
       bus_number: json['bus_number'],
+      current_driver: json['current_driver'] != null
+          ? UserModel.fromJson(json['current_driver']['user_id'])
+          : null,
       speed: json['speed'],
       milage: json['milage'],
     );
@@ -29,6 +35,7 @@ class BusModel extends Equatable {
       '_id': id,
       'plate_number': plate_number,
       'bus_number': bus_number,
+      'current_driver': current_driver,
       'speed': speed,
       'milage': milage,
     };
