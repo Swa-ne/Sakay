@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/mixins/convertion.dart';
 import 'package:sakay_app/common/widgets/chat_bubble.dart';
 import 'package:sakay_app/data/models/message.dart';
 
@@ -28,7 +29,7 @@ class InboxScreen extends StatefulWidget {
   State<InboxScreen> createState() => _InboxScreenState();
 }
 
-class _InboxScreenState extends State<InboxScreen> {
+class _InboxScreenState extends State<InboxScreen> with Convertion {
   late ChatBloc _chatBloc;
 
   final TextEditingController messageController = TextEditingController();
@@ -89,16 +90,59 @@ class _InboxScreenState extends State<InboxScreen> {
         ),
         body: Column(
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.messages.length,
-                reverse: true,
-                controller: widget.scrollInboxController,
-                itemBuilder: (context, index) {
-                  bool isMe = widget.user_id == widget.messages[index].sender;
-                  return chatBubble(widget.messages[index].message, isMe);
-                },
-              ),
+            ListView.builder(
+              itemCount: widget.messages.length,
+              reverse: true,
+              controller: widget.scrollInboxController,
+              itemBuilder: (context, index) {
+                bool isMe = widget.user_id == widget.messages[index].sender;
+                String formattedTime =
+                    formatDateTime(widget.messages[index].created_at);
+
+                bool showTimeSeparator = false;
+
+                if (index < widget.messages.length - 1) {
+                  DateTime currentMessageTime =
+                      DateTime.parse(widget.messages[index].created_at);
+                  DateTime previousMessageTime =
+                      DateTime.parse(widget.messages[index + 1].created_at);
+
+                  if (currentMessageTime
+                          .difference(previousMessageTime)
+                          .inMinutes >
+                      10) {
+                    showTimeSeparator = true;
+                  }
+                } else {
+                  showTimeSeparator = true;
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (showTimeSeparator)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Center(
+                          child: Text(
+                            formatDate(widget.messages[index].created_at),
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    Align(
+                      alignment:
+                          isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      child: chatBubble(
+                        widget.messages[index].message,
+                        isMe,
+                        formattedTime,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
