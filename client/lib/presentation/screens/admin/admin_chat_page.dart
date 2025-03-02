@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/mixins/convertion.dart';
 import 'package:sakay_app/common/widgets/chat_bubble.dart';
 import 'package:sakay_app/data/models/inbox.dart';
 import 'package:sakay_app/data/models/message.dart';
@@ -19,7 +20,7 @@ class AdminChatPage extends StatefulWidget {
 }
 
 // TODO: Cache messages
-class _AdminChatPageState extends State<AdminChatPage> {
+class _AdminChatPageState extends State<AdminChatPage> with Convertion {
   final TextEditingController messageController = TextEditingController();
 
   final ScrollController _scrollController = ScrollController();
@@ -131,7 +132,51 @@ class _AdminChatPageState extends State<AdminChatPage> {
                 controller: _scrollController,
                 itemBuilder: (context, index) {
                   bool isMe = user_id == messages[index].sender;
-                  return chatBubble(messages[index].message, isMe);
+                  String formattedTime =
+                      formatDateTime(messages[index].created_at);
+
+                  bool showTimeSeparator = false;
+                  if (index < messages.length - 1) {
+                    DateTime currentMessageTime =
+                        DateTime.parse(messages[index].created_at);
+                    DateTime previousMessageTime =
+                        DateTime.parse(messages[index + 1].created_at);
+
+                    if (currentMessageTime
+                            .difference(previousMessageTime)
+                            .inMinutes >
+                        10) {
+                      showTimeSeparator = true;
+                    }
+                  } else {
+                    showTimeSeparator = true;
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showTimeSeparator)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Center(
+                            child: Text(
+                              formatDate(messages[index].created_at),
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      Align(
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: chatBubble(
+                          messages[index].message,
+                          isMe,
+                          formattedTime,
+                        ),
+                      ),
+                    ],
+                  );
                 },
               ),
             ),

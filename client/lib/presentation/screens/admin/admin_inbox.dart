@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/mixins/convertion.dart';
 import 'package:sakay_app/data/models/inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
 
@@ -15,7 +16,7 @@ class AdminInbox extends StatefulWidget {
   State<AdminInbox> createState() => _AdminInboxState();
 }
 
-class _AdminInboxState extends State<AdminInbox> {
+class _AdminInboxState extends State<AdminInbox> with Convertion {
   final List<InboxModel> inboxes = [];
   late ChatBloc _chatBloc;
   final ScrollController _scrollController = ScrollController();
@@ -96,7 +97,9 @@ class _AdminInboxState extends State<AdminInbox> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      inbox.last_message.created_at, //TODO: format time
+                      formatDateTime(
+                        inbox.last_message.created_at,
+                      ),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     if (inbox.last_message.is_read)
