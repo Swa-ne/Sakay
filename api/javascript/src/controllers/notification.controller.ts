@@ -6,7 +6,7 @@ import { saveNotification, deleteNotification, editNotification, getAllNotificat
 export const saveNotificationController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
         const user = req.user;
-        const { headline, content } = req.body;
+        const { headline, content, audience = "EVERYONE" } = req.body;
 
         if (!user) {
             res.status(404).json({ error: "User not found" });
@@ -37,7 +37,7 @@ export const saveNotificationController = async (req: Request & { user?: UserTyp
 
         const files = req.files as Express.Multer.File[];
 
-        const result = await saveNotification(user_id, headline, content, files);
+        const result = await saveNotification(user_id, headline, content, audience, files);
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
             return
@@ -49,8 +49,8 @@ export const saveNotificationController = async (req: Request & { user?: UserTyp
 };
 export const getAllNotificationsController = async (req: Request, res: Response) => {
     try {
-        const { page = 1 } = req.params;
-        const result = await getAllNotifications(page as string);
+        const { page = 1, user_type = "EVERYONE" } = req.params;
+        const result = await getAllNotifications(page as string, user_type as string);
 
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });

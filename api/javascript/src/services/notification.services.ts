@@ -4,7 +4,7 @@ import { categoryFile, deleteFile, bucket } from "../middlewares/save.config";
 import { Notification } from "../models/notification.model";
 import { getFileHash } from "../utils/hashing.util";
 
-export const saveNotification = async (user_id: string, headline: string, content: string, files: Express.Multer.File[] | undefined) => {
+export const saveNotification = async (user_id: string, headline: string, content: string, audience: string, files: Express.Multer.File[] | undefined) => {
     const session = await startSession();
     session.startTransaction();
 
@@ -40,6 +40,7 @@ export const saveNotification = async (user_id: string, headline: string, conten
             posted_by: user_id,
             headline,
             content,
+            audience,
             files: saved_files
         }).save({ session });
 
@@ -53,9 +54,9 @@ export const saveNotification = async (user_id: string, headline: string, conten
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getAllNotifications = async (page: string) => {
+export const getAllNotifications = async (page: string, user_type: string) => {
     try {
-        const notifications = await Notification.find()
+        const notifications = await Notification.find({ audience: user_type })
             .sort({ createdAt: -1 })
             .populate("files")
             .populate("posted_by")
