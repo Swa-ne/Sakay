@@ -130,6 +130,26 @@ mixin InputValidationMixin {
     return 'The content must contain between 2 and 250 words.';
   }
 
+  String? validatePlaceOfIncident(String content) {
+    int word_count = content.trim().split(RegExp(r'\s+')).length;
+    if (content.isEmpty) {
+      return 'Place of incident is required';
+    } else if (word_count >= 1 && word_count <= 20) {
+      return null;
+    }
+    return 'The Place of incident is must contain between 1 and 20 words.';
+  }
+
+  String? validateDescription(String content) {
+    int word_count = content.trim().split(RegExp(r'\s+')).length;
+    if (content.isEmpty) {
+      return 'description is required';
+    } else if (word_count >= 2 && word_count <= 250) {
+      return null;
+    }
+    return 'The description must contain between 2 and 250 words.';
+  }
+
   String? validateHeadline(String headline) {
     int word_count = headline.trim().split(RegExp(r'\s+')).length;
     if (headline.isEmpty) {
