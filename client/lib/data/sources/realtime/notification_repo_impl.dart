@@ -41,6 +41,7 @@ class NotificationRepoImpl extends NotificationRepo {
 
     request.fields['headline'] = notification.headline;
     request.fields['content'] = notification.content;
+    request.fields['audience'] = notification.audience;
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
@@ -133,6 +134,7 @@ class NotificationRepoImpl extends NotificationRepo {
 
     request.fields['headline'] = notification.headline;
     request.fields['content'] = notification.content;
+    request.fields['audience'] = notification.audience;
     request.fields['existing_files'] = json.encode(existing_file_ids);
 
     final streamedResponse = await request.send();
