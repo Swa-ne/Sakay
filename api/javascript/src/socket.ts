@@ -6,6 +6,7 @@ import { UserType } from "./middlewares/token.authentication";
 import { addUserToRedisRealtimeController, addUserToRedisTrackingController, checkUserFromRedisRealtimeController, getUserFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
 import { getCurrentUserById } from './services/index.services';
 import { getFilesFromNotification } from './services/notification.services';
+import { getReport } from './services/report.services';
 
 declare module "socket.io" {
     interface Socket {
@@ -88,10 +89,28 @@ realtimeSocket.on("connection", async (socket) => {
             return;
         }
     });
+
+    socket.on("send-report", async (data) => {
+        const updated_report = await getReport(data.report_id);
+        if (updated_report.message) {
+            socket.broadcast.emit("report-receive-admin", { report: updated_report.message });
+        }
+    });
+
+    socket.on("toggle-report", async (data) => {
+        const updated_report = await getReport(data.report_id);
+        if (updated_report.message) {
+            if (await checkUserFromRedisRealtimeController((updated_report.message.reporter as any)._id.toString())) {
+                const socket_id = await getUserFromRedisRealtimeController(data.receiver_id);
+                if (socket_id) socket.to(socket_id).emit("toggle-report-receive", { report: updated_report.message });
+            }
+            socket.broadcast.emit("toggle-report-receive-admin", { report: updated_report.message });
+        }
+    });
+
     socket.on("send-notification", async (data) => {
         const files = await getFilesFromNotification(data.notif_id);
-        console.log(data)
-        socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, files });
+        socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, audience: data.audience, files });
     });
 
     socket.on("disconnect", async () => {
