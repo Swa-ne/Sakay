@@ -78,8 +78,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         } catch (e) {
           emit(const SaveMessageError("Internet Connection Error"));
         } finally {
-          _isSending = false; // Reset sending flag
-          emit(ChatReady()); // Allow new messages to be sent
+          _isSending = false;
+          emit(ChatReady());
         }
       },
     );
@@ -124,6 +124,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(GetInboxesSuccess(inboxes));
         } catch (e) {
           emit(const GetInboxesError("Internet Connection Error"));
+        }
+      },
+    );
+
+    on<IsReadInboxesEvent>(
+      (event, emit) async {
+        try {
+          emit(ChatLoading());
+          final isRead = await _chatRepo.IsReadInboxes(event.chat_id);
+          if (isRead) {
+            emit(IsReadInboxSuccess(isRead));
+          } else {
+            emit(const IsReadInboxError("Internet Connection Error"));
+          }
+        } catch (e) {
+          emit(const IsReadInboxError("Internet Connection Error"));
         }
       },
     );

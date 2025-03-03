@@ -146,6 +146,24 @@ class GetInboxesError extends ChatState {
   List<Object> get props => [error];
 }
 
+class IsReadInboxSuccess extends ChatState {
+  final bool isRead;
+
+  const IsReadInboxSuccess(this.isRead);
+
+  @override
+  List<Object> get props => [isRead];
+}
+
+class IsReadInboxError extends ChatState {
+  final String error;
+
+  const IsReadInboxError(this.error);
+
+  @override
+  List<Object> get props => [error];
+}
+
 class ConnectionRealtimeError extends ChatState {
   final String error;
 
