@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
+import 'package:sakay_app/common/mixins/convertion.dart';
 import 'package:sakay_app/data/models/inbox.dart';
+import 'package:sakay_app/data/models/message.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_chat_page.dart';
 
 class AdminInbox extends StatefulWidget {
@@ -15,7 +17,7 @@ class AdminInbox extends StatefulWidget {
   State<AdminInbox> createState() => _AdminInboxState();
 }
 
-class _AdminInboxState extends State<AdminInbox> {
+class _AdminInboxState extends State<AdminInbox> with Convertion {
   final List<InboxModel> inboxes = [];
   late ChatBloc _chatBloc;
   final ScrollController _scrollController = ScrollController();
@@ -28,6 +30,15 @@ class _AdminInboxState extends State<AdminInbox> {
     _chatBloc = BlocProvider.of<ChatBloc>(context);
     _chatBloc.add(GetInboxesEvent(currentPage));
     _scrollController.addListener(_onScroll);
+  }
+
+  void _updateInboxList(MessageModel message) {
+    setState(() {
+      final index = inboxes.indexWhere((inbox) => inbox.id == message.chat_id);
+      final updatedInbox =
+          inboxes.removeAt(index).copyWith(last_message: message);
+      inboxes.insert(0, updatedInbox);
+    });
   }
 
   void _onScroll() {
@@ -96,7 +107,9 @@ class _AdminInboxState extends State<AdminInbox> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      inbox.last_message.created_at, //TODO: format time
+                      formatDateTime(
+                        inbox.last_message.created_at,
+                      ),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     if (inbox.last_message.is_read)
@@ -108,12 +121,14 @@ class _AdminInboxState extends State<AdminInbox> {
                 ),
                 onTap: () {
                   setState(() {
+                    _chatBloc.add(IsReadInboxesEvent(inbox.id));
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => AdminChatPage(
                           chat_id: inbox.id,
                           inbox: inbox,
+                          updateInboxList: _updateInboxList,
                         ),
                       ),
                     );

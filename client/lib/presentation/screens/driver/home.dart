@@ -154,7 +154,9 @@ class _HomeState extends State<Home> with Tracker {
         scrollNotificationController: _scrollNotificationController,
         isLoadingNotification: isLoadingNotification,
       ),
-      const ProfilePage(),
+      const ProfilePage(
+        user_type: "DRIVER",
+      ),
     ];
 
     return BlocListener<NotificationBloc, NotificationState>(

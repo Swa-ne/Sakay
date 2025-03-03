@@ -8,6 +8,7 @@ class NotificationModel extends Equatable {
   final UserModel? edited_by;
   final String headline;
   final String content;
+  final String audience;
   final List<FileModel>? files;
 
   const NotificationModel({
@@ -16,6 +17,7 @@ class NotificationModel extends Equatable {
     this.edited_by,
     required this.headline,
     required this.content,
+    required this.audience,
     this.files,
   });
 
@@ -30,6 +32,7 @@ class NotificationModel extends Equatable {
           : null,
       headline: json['headline'],
       content: json['content'],
+      audience: json['audience'] ?? "",
       files: (json['files'] as List)
           .map((json) => FileModel.fromJson(json))
           .toList(),
@@ -42,6 +45,7 @@ class NotificationModel extends Equatable {
       'edited_by': edited_by,
       'headline': headline,
       'content': content,
+      'audience': audience,
       'files': files,
     };
   }
@@ -52,6 +56,7 @@ class NotificationModel extends Equatable {
     UserModel? edited_by,
     String? headline,
     String? content,
+    String? audience,
     List<FileModel>? files,
   }) {
     return NotificationModel(
@@ -60,10 +65,11 @@ class NotificationModel extends Equatable {
       edited_by: edited_by ?? this.edited_by,
       headline: headline ?? this.headline,
       content: content ?? this.content,
+      audience: audience ?? this.audience,
       files: files ?? this.files,
     );
   }
 
   @override
-  List<Object> get props => [headline, content];
+  List<Object> get props => [headline, content, audience];
 }

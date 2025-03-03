@@ -71,3 +71,12 @@ class GetInboxesEvent extends ChatEvent {
   @override
   List<Object> get props => [page];
 }
+
+class IsReadInboxesEvent extends ChatEvent {
+  final String chat_id;
+
+  const IsReadInboxesEvent(this.chat_id);
+
+  @override
+  List<Object> get props => [chat_id];
+}

@@ -43,6 +43,9 @@ class _AdminNotificationState extends State<AdminNotification>
   final ImagePicker _picker = ImagePicker();
   late UserModel _myUserModel;
 
+  String _selectedAudience = "EVERYONE";
+  final List<String> _audienceOptions = ["DRIVER", "COMMUTER", "EVERYONE"];
+
   int currentPage = 1;
   bool isLoading = false;
 
@@ -234,6 +237,7 @@ class _AdminNotificationState extends State<AdminNotification>
               NotificationModel(
                 headline: _headlineController.text.trim(),
                 content: _contentController.text.trim(),
+                audience: _selectedAudience,
                 posted_by: _myUserModel,
                 files: convertFilesToFileModels(files),
               ),
@@ -293,7 +297,7 @@ class _AdminNotificationState extends State<AdminNotification>
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Notification',
+                      'Announcements',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -392,7 +396,7 @@ class _AdminNotificationState extends State<AdminNotification>
                       child: Form(
                         key: _formKey,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             const SizedBox(height: 20),
                             _buildTextField(
@@ -413,16 +417,64 @@ class _AdminNotificationState extends State<AdminNotification>
                               validator: (value) =>
                                   validateContent(value ?? ''),
                             ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.9,
+                              child: DropdownButtonFormField<String>(
+                                value: _selectedAudience,
+                                decoration: InputDecoration(
+                                  labelText: "Select Audience",
+                                  labelStyle: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade400),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade400),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                        color: Colors.blue, width: 2),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 14, horizontal: 16),
+                                ),
+                                dropdownColor: Colors.white,
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Colors.black54),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.black87),
+                                alignment: Alignment.center,
+                                items: _audienceOptions.map((String option) {
+                                  return DropdownMenuItem<String>(
+                                    value: option,
+                                    child: Text(option,
+                                        style: const TextStyle(fontSize: 16)),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedAudience = newValue!;
+                                  });
+                                },
+                                validator: (value) => value == null
+                                    ? "Please select an audience"
+                                    : null,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                      top: 8.0,
-                      bottom: 8.0,
-                    ),
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
@@ -478,7 +530,9 @@ class _AdminNotificationState extends State<AdminNotification>
                               SizedBox(
                                 height: 40,
                                 child: FloatingActionButton.extended(
-                                  onPressed: _submitNotification,
+                                  onPressed: () {
+                                    _submitNotification();
+                                  },
                                   backgroundColor: const Color(0xFF00A3FF),
                                   icon: const Icon(
                                     Icons.send,
@@ -601,6 +655,7 @@ class _AdminNotificationState extends State<AdminNotification>
           NotificationModel(
             headline: _headlineController.text.trim(),
             content: _contentController.text.trim(),
+            audience: _selectedAudience,
           ),
         ),
       );

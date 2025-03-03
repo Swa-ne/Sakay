@@ -6,6 +6,7 @@ import 'package:sakay_app/presentation/screens/authentication/phone_verification
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
+import 'package:sakay_app/presentation/screens/common/connection_error.dart';
 import 'package:sakay_app/presentation/screens/commuters/home.dart'
     as CommuterHome;
 import 'package:sakay_app/presentation/screens/driver/home.dart' as DriverHome;
@@ -75,6 +76,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/admin/home',
       builder: (context, state) => const AdminHome.Home(),
+    ),
+    // CONNECTION paths
+    GoRoute(
+      path: '/no_internet_connection',
+      builder: (context, state) => const NoInternetConnectionPage(),
     ),
   ],
 );

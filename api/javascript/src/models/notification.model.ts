@@ -7,6 +7,7 @@ export interface NotificationSchemaInterface extends Document {
     edited_by?: ObjectId,
     headline: string,
     content: string,
+    audience: "EVERYONE" | "DRIVER" | "COMMUTER",
     files: ObjectId[] | FileSchemaInterface[],
     createdAt?: Date,
     updatedAt?: Date,
@@ -28,6 +29,11 @@ const NotificationSchema: Schema = new Schema({
     content: {
         type: String,
         required: true,
+    },
+    audience: {
+        type: String,
+        enum: ["EVERYONE", "DRIVER", "COMMUTER"],
+        required: true
     },
     files: [
         {

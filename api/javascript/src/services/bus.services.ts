@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { startSession } from "mongoose";
 import { Bus } from "../models/bus.model";
 import { User } from "../models/authentication/user.model";
-import { UserBusAssigning } from "../models/user.bus.assigning.model";
+import { UserBusAssigning } from "../models/user.bus.assigning.model"; import { startOfDay, differenceInDays } from "date-fns";
 
 export const postBus = async (bus_number: string, plate_number: string) => {
     const session = await startSession();
@@ -29,12 +29,18 @@ export const getBusses = async () => {
     session.startTransaction();
 
     try {
-        const busses = await Bus.find().session(session);
+        const busses = await Bus.find()
+            .session(session);
 
         await session.commitTransaction();
         session.endSession();
-
-        return { message: busses, httpCode: 200 };
+        const busesWithDrivers = await Promise.all(
+            busses.map(async (bus) => {
+                const driver = await getTodayDriver(bus._id.toString());
+                return { ...bus.toObject(), current_driver: driver?.message };
+            })
+        );
+        return { message: busesWithDrivers, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
@@ -176,3 +182,57 @@ export const reassignUserToBus = async (user_id: string, bus_id: string) => {
         return { error: 'Internal Server Error', httpCode: 500 };
     }
 }
+export const getTodayDriver = async (bus_id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const bus = await Bus.findById(bus_id).session(session);
+
+        if (!bus) {
+            await session.abortTransaction();
+            session.endSession();
+            return { error: 'Bus not found', httpCode: 404 };
+        }
+        const drivers = await UserBusAssigning.find({ bus_id, is_active: true })
+            .sort({ createdAt: 1 })
+            .populate("user_id")
+            .session(session);
+
+        if (drivers.length === 0) return { message: null, httpCode: 200 };
+
+        const daysElapsed = differenceInDays(startOfDay(new Date()), startOfDay(new Date(1640121596152)));
+
+        return { message: drivers[daysElapsed % drivers.length], httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: 'Internal Server Error', httpCode: 500 };
+    }
+};
+export const getBusDriver = async (bus_id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const bus = await Bus.findById(bus_id).session(session);
+
+        if (!bus) {
+            await session.abortTransaction();
+            session.endSession();
+            return { error: 'Bus not found', httpCode: 404 };
+        }
+        const drivers = await UserBusAssigning.find({ bus_id, is_active: true })
+            .sort({ createdAt: 1 })
+            .populate("user_id")
+            .session(session);
+
+        if (drivers.length === 0) return { message: null, httpCode: 200 };
+
+        return { message: drivers, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: 'Internal Server Error', httpCode: 500 };
+    }
+};

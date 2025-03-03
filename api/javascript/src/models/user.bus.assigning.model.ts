@@ -1,14 +1,15 @@
 import { Document, model, ObjectId, Schema } from "mongoose";
 
-export interface SavedSchemaInterface extends Document {
+export interface UserBusAssigningSchemaInterface extends Document {
     _id: ObjectId,
     user_id: ObjectId,
     bus_id: ObjectId,
+    is_active: boolean,
     createdAt?: Date,
     updatedAt?: Date,
 }
 
-const UserBusAssigningSchema = new Schema<SavedSchemaInterface>({
+const UserBusAssigningSchema = new Schema<UserBusAssigningSchemaInterface>({
     user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -18,8 +19,12 @@ const UserBusAssigningSchema = new Schema<SavedSchemaInterface>({
         type: Schema.Types.ObjectId,
         ref: 'Bus',
     },
+    is_active: {
+        type: Boolean,
+        default: true
+    },
 }, {
     timestamps: true,
 });
 
-export const UserBusAssigning = model<SavedSchemaInterface>("UserBusAssigning", UserBusAssigningSchema)
+export const UserBusAssigning = model<UserBusAssigningSchemaInterface>("UserBusAssigning", UserBusAssigningSchema)

@@ -41,6 +41,7 @@ class NotificationRepoImpl extends NotificationRepo {
 
     request.fields['headline'] = notification.headline;
     request.fields['content'] = notification.content;
+    request.fields['audience'] = notification.audience;
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
@@ -61,13 +62,15 @@ class NotificationRepoImpl extends NotificationRepo {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
-      var response = await http
-          .get(Uri.parse("$_apiUrl/get-all-notifications/$page"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      });
+      final user_type = await _tokenController.getUserType();
+      var response = await http.get(
+          Uri.parse("$_apiUrl/get-all-notifications/$user_type/$page"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': access_token,
+            'Cookie': 'refresh_token=$refresh_token',
+          });
       final response_body = json.decode(response.body);
       if (response.statusCode == 200) {
         List<NotificationModel> notificationList =
@@ -133,6 +136,7 @@ class NotificationRepoImpl extends NotificationRepo {
 
     request.fields['headline'] = notification.headline;
     request.fields['content'] = notification.content;
+    request.fields['audience'] = notification.audience;
     request.fields['existing_files'] = json.encode(existing_file_ids);
 
     final streamedResponse = await request.send();

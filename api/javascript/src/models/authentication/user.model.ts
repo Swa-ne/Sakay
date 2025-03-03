@@ -62,7 +62,7 @@ const UserSchema: Schema = new Schema({
     user_type: {
         type: String,
         default: "COMMUTER",
-        required: [true, 'Please enter your password.'],
+        required: [true, 'Please enter your user type.'],
     },
     refresh_token_version: {
         type: Number,

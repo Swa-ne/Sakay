@@ -3,8 +3,11 @@ import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/notification/notification_bloc.dart';
 import 'package:sakay_app/bloc/notification/notification_event.dart';
+import 'package:sakay_app/bloc/report/report_bloc.dart';
+import 'package:sakay_app/bloc/report/report_event.dart';
 import 'package:sakay_app/data/models/file.dart';
 import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/report.dart';
 import 'package:sakay_app/data/models/user.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -14,6 +17,7 @@ final _apiUrl = "${dotenv.env['API_URL']}/realtime";
 abstract class RealtimeSocketController {
   Future<void> passChatBloc(ChatBloc boc);
   Future<void> passNotificationBloc(NotificationBloc bloc);
+  Future<void> passReportBloc(ReportBloc bloc);
   Future<void> connect();
   Future<void> connectAdmin();
   void sendMessage(
@@ -22,6 +26,8 @@ abstract class RealtimeSocketController {
     String chat_id,
   );
   void sendNotification(NotificationModel notification);
+  void sendReport(ReportModel report);
+  void toggleReport(String report_id);
   void disconnect();
 }
 
@@ -32,6 +38,7 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
   late IO.Socket socket;
   late ChatBloc chatBloc;
   late NotificationBloc notificationBloc;
+  late ReportBloc reportBloc;
 
   factory RealtimeSocketControllerImpl() {
     return _singleton;
@@ -45,6 +52,11 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
   @override
   Future<void> passNotificationBloc(NotificationBloc bloc) async {
     notificationBloc = bloc;
+  }
+
+  @override
+  Future<void> passReportBloc(ReportBloc bloc) async {
+    reportBloc = bloc;
   }
 
   RealtimeSocketControllerImpl._internal();
@@ -80,10 +92,16 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
         posted_by: data["posted_by"],
         headline: data["headline"],
         content: data["content"],
+        audience: data["audience"],
         files: (data['files'] as List)
             .map((json) => FileModel.fromJson(json))
             .toList(),
       )));
+    });
+
+    socket.on('toggle-report-receive', (data) {
+      reportBloc.add(
+          OnReceiveToggleReportEvent(ReportModel.fromJson(data["report"])));
     });
 
     socket.onDisconnect((_) {
@@ -97,18 +115,21 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
 
   @override
   Future<void> connectAdmin() async {
-    print("connected admins $chatBloc");
     socket.on('msg-receive-admin', (message) {
-      print("runninagnas ${message}");
       chatBloc.add(OnReceiveMessageEvent(
         message['chat_id'],
         message['message'],
         message['sender_id'],
         UserModel.fromJson(message['user']),
       ));
-
-      // chatBloc.add(openInboxByUserIDEvent());
-      // TODO: add reupdate list of inbox
+    });
+    socket.on('report-receive-admin', (message) {
+      reportBloc.add(
+          OnReceiveAdminReportEvent(ReportModel.fromJson(message["report"])));
+    });
+    socket.on('toggle-report-receive-admin', (message) {
+      reportBloc.add(OnReceiveAdminToggleReportEvent(
+          ReportModel.fromJson(message["report"])));
     });
   }
 
@@ -131,7 +152,22 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
       'headline': notification.headline,
       'content': notification.content,
       'posted_by': notification.posted_by,
+      'audience': notification.audience,
       'notif_id': notification.id,
+    });
+  }
+
+  @override
+  void sendReport(ReportModel report) {
+    socket.emit('send-report', {
+      'report': report.toJson(),
+    });
+  }
+
+  @override
+  void toggleReport(String report_id) {
+    socket.emit('send-report', {
+      'report_id': report_id,
     });
   }
 

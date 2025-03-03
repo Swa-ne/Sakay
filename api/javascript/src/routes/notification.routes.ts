@@ -9,7 +9,7 @@ const router = Router()
 router.use(authenticateToken);
 
 router.post("/save-notification", uploadFiles.array('file'), saveNotificationController);
-router.get("/get-all-notifications/:page", getAllNotificationsController);
+router.get("/get-all-notifications/:user_type/:page", getAllNotificationsController);
 router.get("/get-notification/:notif_id", getNotificationController);
 router.put("/edit-notification/:notif_id", uploadFiles.array('file'), editNotificationController);
 router.delete("/delete-notification/:notif_id", deleteNotificationController);

@@ -101,3 +101,23 @@ export async function openCreatedInboxContentByChatID(chat_id: string) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
+
+export async function isReadChat(user_id: string, chat_id: string) {
+    try {
+        const last_message = await Message.findOne({ chat_id })
+            .sort({ createdAt: -1 }).limit(1);
+
+        if (!last_message) {
+            return { message: 'Chat ID not found', httpCode: 404 }
+        }
+
+        if (last_message.sender_id.toString() != user_id) {
+            last_message.isRead = true;
+            last_message.save();
+        }
+
+        return { message: "Success", httpCode: 200 };
+    } catch (error) {
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}

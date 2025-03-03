@@ -8,4 +8,5 @@ abstract class ChatRepo {
   Future<List<MessageModel>> getMessage(String chat_id, int page);
   Future<InboxModel> openInbox();
   Future<List<InboxModel>> getAllInboxes(int page);
+  Future<bool> IsReadInboxes(String chat_id);
 }

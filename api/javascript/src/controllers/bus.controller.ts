@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { assignUserToBus, deleteBus, getBus, getBusses, postBus, putBus, reassignUserToBus } from '../services/admin.services';
+import { assignUserToBus, deleteBus, getBus, getBusses, postBus, putBus, reassignUserToBus } from '../services/bus.services';
 import { UserType } from '../middlewares/token.authentication';
 
 export const postBusController = async (req: Request, res: Response) => {
@@ -102,10 +102,9 @@ export const deleteBusController = async (req: Request, res: Response) => {
 
 export const assignUserToBusController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
-        const user = req.user;
-        const { bus_id } = req.params;
+        const { bus_id, user_id } = req.body;
 
-        if (!user) {
+        if (!user_id) {
             res.status(404).json({ error: "User not found" });
             return;
         }
@@ -115,7 +114,7 @@ export const assignUserToBusController = async (req: Request & { user?: UserType
             return;
         }
 
-        const result = await assignUserToBus(user.user_id, bus_id);
+        const result = await assignUserToBus(user_id, bus_id);
         if (result.httpCode === 200) {
             res.status(result.httpCode).json({ message: result.message });
             return;
@@ -129,10 +128,9 @@ export const assignUserToBusController = async (req: Request & { user?: UserType
 
 export const reassignUserToBusController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
-        const user = req.user;
-        const { bus_id } = req.params;
+        const { bus_id, user_id } = req.body;
 
-        if (!user) {
+        if (!user_id) {
             res.status(404).json({ error: "User not found" });
             return;
         }
@@ -142,7 +140,7 @@ export const reassignUserToBusController = async (req: Request & { user?: UserTy
             return;
         }
 
-        const result = await reassignUserToBus(user.user_id, bus_id);
+        const result = await reassignUserToBus(user_id, bus_id);
         if (result.httpCode === 200) {
             res.status(result.httpCode).json({ message: result.message });
             return;
