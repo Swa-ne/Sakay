@@ -12,8 +12,14 @@ import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart
 class AdminChatPage extends StatefulWidget {
   final String chat_id;
   final InboxModel inbox;
+  final Function(MessageModel) updateInboxList;
 
-  const AdminChatPage({super.key, required this.chat_id, required this.inbox});
+  const AdminChatPage({
+    super.key,
+    required this.chat_id,
+    required this.inbox,
+    required this.updateInboxList,
+  });
 
   @override
   State<AdminChatPage> createState() => _AdminChatPageState();
@@ -57,6 +63,14 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
           widget.inbox.user_id.id,
         ),
       );
+      widget.updateInboxList(MessageModel(
+        message: message,
+        sender: user_id,
+        chat_id: widget.chat_id,
+        is_read: false,
+        created_at: DateTime.now().toIso8601String(),
+        updated_at: DateTime.now().toIso8601String(),
+      ));
     }
   }
 
