@@ -2,6 +2,7 @@ abstract class TokenController {
   Future<void> updateRefreshToken(String token);
   Future<void> updateAccessToken(String token);
   Future<void> updateUserID(String user_id);
+  Future<void> updateUserType(String user_id);
   Future<void> updateFirstName(String first_name);
   Future<void> updateLastName(String last_name);
   Future<void> updateEmail(String email);
@@ -10,6 +11,7 @@ abstract class TokenController {
   Future<void> removeRefreshToken();
   Future<void> removeAccessToken();
   Future<void> removeUserID();
+  Future<void> removeUserType();
   Future<void> removeFirstName();
   Future<void> removeLastName();
   Future<void> removeEmail();
@@ -18,6 +20,7 @@ abstract class TokenController {
   Future<String> getRefreshToken();
   Future<String> getAccessToken();
   Future<String> getUserID();
+  Future<String> getUserType();
   Future<String> getFirstName();
   Future<String> getLastName();
   Future<String> getEmail();

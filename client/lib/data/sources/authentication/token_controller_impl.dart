@@ -27,6 +27,11 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> updateUserType(String user_type) async {
+    await _storage.write(key: "User Type", value: user_type);
+  }
+
+  @override
   Future<void> updateFirstName(String first_name) async {
     await _storage.write(key: "First Name", value: first_name);
   }
@@ -67,6 +72,11 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> removeUserType() async {
+    await _storage.delete(key: "User Type");
+  }
+
+  @override
   Future<void> removeFirstName() async {
     await _storage.delete(key: "First Name");
   }
@@ -104,6 +114,11 @@ class TokenControllerImpl extends TokenController {
   @override
   Future<String> getUserID() async {
     return await _storage.read(key: "User ID") ?? "";
+  }
+
+  @override
+  Future<String> getUserType() async {
+    return await _storage.read(key: "User Type") ?? "";
   }
 
   @override
