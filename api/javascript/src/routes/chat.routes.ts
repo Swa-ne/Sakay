@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { createPrivateInboxController, openInboxByUserIDController, openCreatedInboxContentByChatIDController, getMessagesController, saveMessageController, getAllInboxesController } from "../controllers/chat.controller"
+import { createPrivateInboxController, openInboxByUserIDController, openCreatedInboxContentByChatIDController, getMessagesController, saveMessageController, getAllInboxesController, isReadChatController } from "../controllers/chat.controller"
 import { authenticateToken } from "../middlewares/token.authentication"
 
 
@@ -13,5 +13,6 @@ router.post("/save-message", saveMessageController)
 router.get("/get-messages/:chat_id/:page", getMessagesController)
 router.get("/open-inbox", openInboxByUserIDController)
 router.get("/get-all-inbox/:page", getAllInboxesController)
+router.put("/is-read/:chat_id", isReadChatController)
 
 export default router

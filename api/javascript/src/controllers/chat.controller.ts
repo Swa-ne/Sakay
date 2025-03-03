@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createInbox, getChatMessages, openInboxByUserID, openCreatedInboxContentByChatID, saveMessage, getAllInboxes, getLastMessageFromInbox } from "../services/chat.services";
+import { createInbox, getChatMessages, openInboxByUserID, openCreatedInboxContentByChatID, saveMessage, getAllInboxes, getLastMessageFromInbox, isReadChat } from "../services/chat.services";
 import { UserType } from "../middlewares/token.authentication";
 
 export const getAllInboxesController = async (req: Request, res: Response) => {
@@ -19,7 +19,6 @@ export const getAllInboxesController = async (req: Request, res: Response) => {
                     })
                 );
 
-                // Sort inboxes by last_message.createdAt in descending order (latest first)
                 inboxes.sort((a, b) =>
                     new Date(b.last_message.createdAt).getTime() -
                     new Date(a.last_message.createdAt).getTime()
@@ -140,6 +139,32 @@ export const openInboxByUserIDController = async (req: Request & { user?: UserTy
             return;
         }
         const result = await openInboxByUserID(user_id)
+        res.status(200).json({ message: result });
+    } catch (error) {
+        res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+};
+export const isReadChatController = async (req: Request & { user?: UserType }, res: Response): Promise<any> => {
+    try {
+        const user = req.user;
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+
+        const { user_id } = user;
+        if (!user_id) {
+            res.status(400).json({ message: 'User ID not provided' });
+            return;
+        }
+
+        const { chat_id } = req.params;
+        if (!chat_id) {
+            res.status(400).json({ message: 'Chat ID not provided' });
+            return;
+        }
+
+        const result = await isReadChat(user_id, chat_id)
         res.status(200).json({ message: result });
     } catch (error) {
         res.status(500).json({ 'message': 'Internal Server Error' });
