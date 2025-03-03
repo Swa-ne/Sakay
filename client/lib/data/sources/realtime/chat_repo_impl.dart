@@ -161,4 +161,30 @@ class ChatRepoImpl extends ChatRepo {
       throw Exception(response_body['message']);
     }
   }
+
+  @override
+  Future<bool> IsReadInboxes(String chat_id) async {
+    final access_token = await _tokenController.getAccessToken();
+    final refresh_token = await _tokenController.getRefreshToken();
+    try {
+      var response = await http.put(
+        Uri.parse("$_apiUrl/is-read/$chat_id"),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': access_token,
+          'Cookie': 'refresh_token=$refresh_token',
+        },
+      );
+      final response_body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        // _socketController.sendMessage(receiver_id, message, chat_id);
+        return response_body['message'] == "Success";
+      } else {
+        throw Exception(response_body['message']);
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
