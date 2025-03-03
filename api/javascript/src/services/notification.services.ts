@@ -56,13 +56,19 @@ export const saveNotification = async (user_id: string, headline: string, conten
 }
 export const getAllNotifications = async (page: string, user_type: string) => {
     try {
-        const notifications = await Notification.find({ audience: user_type })
+        const notifications = await Notification.find({
+            $or: [
+                { audience: { $exists: false } }, // Include documents where audience is not defined
+                { audience: user_type === "ADMIN" ? { $exists: true } : { $in: [user_type, "EVERYONE"] } }
+            ]
+        })
             .sort({ createdAt: -1 })
             .populate("files")
             .populate("posted_by")
             .populate("edited_by")
             .skip((parseInt(page) - 1) * 30)
             .limit(30);
+        console.log(user_type)
         return { message: notifications, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };

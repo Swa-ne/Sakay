@@ -49,7 +49,7 @@ export const saveNotificationController = async (req: Request & { user?: UserTyp
 };
 export const getAllNotificationsController = async (req: Request, res: Response) => {
     try {
-        const { page = 1, user_type = "EVERYONE" } = req.params;
+        const { page = 1, user_type } = req.params;
         const result = await getAllNotifications(page as string, user_type as string);
 
         if (result.httpCode === 200) {
