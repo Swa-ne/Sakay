@@ -103,14 +103,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         emit(AuthLoading());
         final result = await _authRepo.authenticateToken();
+        if (result["error"] != null) {
+          emit(AuthFailure(result["error"]));
+          return;
+        }
         final isAuthenticated = result["is_authenticated"];
         if (isAuthenticated) {
           emit(AuthSuccess(result["user_type"]));
         } else {
-          emit(AuthFailure());
+          emit(const AuthFailure("Unauthorized"));
         }
       } catch (e) {
-        emit(AuthFailure());
+        emit(AuthFailure(e.toString()));
       }
     });
     on<LogoutEvent>(

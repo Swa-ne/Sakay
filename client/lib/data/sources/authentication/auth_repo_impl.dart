@@ -29,6 +29,8 @@ class AuthRepoImpl extends AuthRepo {
       _tokenController.updateLastName(response_body['last_name']);
       _tokenController.updateEmail(response_body['email']);
       _tokenController.updateProfile(response_body['profile']);
+      _tokenController.updateUserType(response_body["user_type"]);
+
       String? cookies = response.headers['set-cookie'];
       if (cookies == null) {
         throw Exception("Server connection error");
@@ -68,6 +70,7 @@ class AuthRepoImpl extends AuthRepo {
         _tokenController.updateLastName(response_body['last_name']);
         _tokenController.updateEmail(response_body['email']);
         _tokenController.updateProfile(response_body['profile']);
+        _tokenController.updateUserType(response_body["user_type"]);
 
         String? cookies = response.headers['set-cookie'];
         if (cookies == null) {
@@ -277,6 +280,7 @@ class AuthRepoImpl extends AuthRepo {
       _tokenController.removeEmail();
       _tokenController.removeProfile();
       _tokenController.removeFirstTime();
+      _tokenController.removeUserType();
       return response_body['message'] == "User logged Out";
     } else {
       throw Exception(response_body['error']);
@@ -287,30 +291,39 @@ class AuthRepoImpl extends AuthRepo {
   Future<Map<String, dynamic>> authenticateToken() async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
-    var response = await http.get(
-      Uri.parse("$_apiUrl/current-user"),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      },
-    );
-    final response_body = json.decode(response.body);
-    if (response.statusCode == 200) {
-      var newAccessToken = response.headers['authorization'];
-      if (newAccessToken != null) {
-        var tokenValue = newAccessToken.split(' ')[1];
-        await _tokenController.updateAccessToken(tokenValue);
+    if (refresh_token == "") {
+      return {"error": "Unauthorize"};
+    }
+    try {
+      var response = await http.get(
+        Uri.parse("$_apiUrl/current-user"),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': access_token,
+          'Cookie': 'refresh_token=$refresh_token',
+        },
+      );
+      final response_body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        var newAccessToken = response.headers['authorization'];
+        if (newAccessToken != null) {
+          var tokenValue = newAccessToken.split(' ')[1];
+          await _tokenController.updateAccessToken(tokenValue);
+        }
+        await _tokenController
+            .updateUserType(response_body["message"]["user_type"]);
+        return {
+          "is_authenticated": true,
+          "user_type": response_body["message"]["user_type"]
+        };
+      } else if (response.statusCode == 401) {
+        return {"error": 'Unauthorized'};
+      } else {
+        return {"error": "No internet connection"};
       }
-      return {
-        "is_authenticated": true,
-        "user_type": response_body["message"]["user_type"]
-      };
-    } else if (response.statusCode == 401) {
-      throw Exception('Unauthorized');
-    } else {
-      throw Exception(response_body['error']);
+    } catch (e) {
+      return {"error": "No internet connection"};
     }
   }
 }
