@@ -27,27 +27,31 @@ class AadminProfileState extends State<AdminProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 40, color: Colors.black),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Sakay Administrative",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Center(
+                      child: Image.asset(
+                        'assets/bus.png',
+                        height: 100,
+                        width: 100,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Divider(color: Colors.white, thickness: 1),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -70,7 +74,7 @@ class AadminProfileState extends State<AdminProfile> {
                         setState(() {
                           _selectedItem = "Surveillance";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminSurveillance()),
@@ -87,7 +91,7 @@ class AadminProfileState extends State<AdminProfile> {
                         setState(() {
                           _selectedItem = "Report";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminReports()),
@@ -104,7 +108,7 @@ class AadminProfileState extends State<AdminProfile> {
                         setState(() {
                           _selectedItem = "Notifications";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminNotification()),
@@ -121,7 +125,7 @@ class AadminProfileState extends State<AdminProfile> {
                         setState(() {
                           _selectedItem = "Inbox";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminInbox()),
@@ -138,7 +142,7 @@ class AadminProfileState extends State<AdminProfile> {
                         setState(() {
                           _selectedItem = "Profile";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminProfile()),
@@ -153,47 +157,32 @@ class AadminProfileState extends State<AdminProfile> {
                   ],
                 ),
               ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DrawerItem(
-                  icon: Icons.logout,
-                  text: "Logout",
-                  isSelected: _selectedItem == "Logout",
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color(0xFF00A2FF),
-          elevation: 0,
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                  onPressed: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF00A2FF),
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+              );
+            },
+          ),
+        ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),

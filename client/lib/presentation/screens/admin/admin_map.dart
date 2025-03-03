@@ -25,27 +25,31 @@ class _MapState extends State<AdminMap> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 40, color: Colors.black),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Sakay Administrative",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Center(
+                      child: Image.asset(
+                        'assets/bus.png',
+                        height: 100,
+                        width: 100,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Divider(color: Colors.white, thickness: 1),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -151,16 +155,6 @@ class _MapState extends State<AdminMap> {
                   ],
                 ),
               ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DrawerItem(
-                  icon: Icons.logout,
-                  text: "Logout",
-                  isSelected: _selectedItem == "Logout",
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -198,7 +192,6 @@ class _MapState extends State<AdminMap> {
             left: 70,
             right: 20,
             child: Container(
-              width: 250,
               height: 40,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -208,7 +201,7 @@ class _MapState extends State<AdminMap> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -217,6 +210,7 @@ class _MapState extends State<AdminMap> {
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
+                  contentPadding: EdgeInsets.only(top: 2),
                   prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
                 ),
               ),

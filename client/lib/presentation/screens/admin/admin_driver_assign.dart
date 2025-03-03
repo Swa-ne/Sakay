@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart' as inbox;
+import 'package:sakay_app/presentation/screens/admin/admin_map.dart' as map;
+import 'package:sakay_app/presentation/screens/admin/admin_notification.dart'
+    as notification;
+import 'package:sakay_app/presentation/screens/admin/admin_profile.dart'
+    as profile;
+import 'package:sakay_app/presentation/screens/admin/admin_reports.dart'
+    as reports;
+import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart'
+    as surveillance;
 
 void main() {
-  runApp(const BusManagementApp());
+  runApp(const AdminAssignment());
 }
 
-class BusManagementApp extends StatelessWidget {
-  const BusManagementApp({Key? key}) : super(key: key);
+class AdminAssignment extends StatelessWidget {
+  const AdminAssignment({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +40,8 @@ class BusManagementApp extends StatelessWidget {
             backgroundColor: Colors.lightBlue,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -48,7 +59,8 @@ class BusManagementApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             borderSide: const BorderSide(color: Colors.lightBlue, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
       home: const AdminDriverAssign(),
@@ -61,11 +73,7 @@ class Bus {
   final String plateNumber;
   String? driverName;
 
-  Bus({
-    required this.name, 
-    required this.plateNumber, 
-    this.driverName
-  });
+  Bus({required this.name, required this.plateNumber, this.driverName});
 }
 
 class Driver {
@@ -82,38 +90,42 @@ class AdminDriverAssign extends StatefulWidget {
   _AdminDriverAssignState createState() => _AdminDriverAssignState();
 }
 
-class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTickerProviderStateMixin {
+class _AdminDriverAssignState extends State<AdminDriverAssign>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _busController = TextEditingController();
   final TextEditingController _driverController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _plateController = TextEditingController();
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   late TabController _tabController;
-  
+
   List<Bus> buses = [];
   List<Driver> drivers = [];
-  
+
   Bus? selectedBus;
   Driver? selectedDriver;
-  
+
   String searchQuery = '';
-  
+  String _selectedItem = 'Assignment';
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     _addSampleData();
   }
-  
+
   void _addSampleData() {
     buses.add(Bus(name: "UNIT-17A", plateNumber: "ABC 123"));
     buses.add(Bus(name: "UNIT-24K", plateNumber: "XYZ 789"));
-  
-    drivers.add(Driver(name: "Sample Driver A"));
-    drivers.add(Driver(name: "Sample Driver B"));
+
+    drivers.add(Driver(name: "Ernesto Di Magiba"));
+    drivers.add(Driver(name: "Estillo Castillo"));
   }
-  
+
   @override
   void dispose() {
     _busController.dispose();
@@ -127,7 +139,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
   void _addBus() {
     final String name = _busController.text.trim();
     final String plateNumber = _plateController.text.trim().toUpperCase();
-  
+
     if (name.isEmpty || plateNumber.isEmpty) {
       _showSnackBar('Please enter both bus name and plate number');
       return;
@@ -138,17 +150,17 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
       _showSnackBar('Invalid plate number format. Use format: ABC 123');
       return;
     }
-  
+
     if (buses.any((bus) => bus.name.toLowerCase() == name.toLowerCase())) {
       _showSnackBar('A bus with this name already exists');
       return;
     }
-  
+
     if (buses.any((bus) => bus.plateNumber == plateNumber)) {
       _showSnackBar('A bus with this plate number already exists');
       return;
     }
-  
+
     setState(() {
       buses.add(Bus(name: name, plateNumber: plateNumber));
       _busController.clear();
@@ -162,12 +174,14 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
       _showSnackBar('Please enter a driver name');
       return;
     }
-    
-    if (drivers.any((driver) => driver.name.toLowerCase() == _driverController.text.trim().toLowerCase())) {
+
+    if (drivers.any((driver) =>
+        driver.name.toLowerCase() ==
+        _driverController.text.trim().toLowerCase())) {
       _showSnackBar('A driver with this name already exists');
       return;
     }
-    
+
     setState(() {
       drivers.add(Driver(name: _driverController.text.trim()));
       _driverController.clear();
@@ -180,16 +194,17 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
       _showSnackBar('Please select both a bus and a driver');
       return;
     }
-    
+
     if (selectedDriver!.isAssigned) {
       _showSnackBar('This driver is already assigned to another bus');
       return;
     }
-    
+
     setState(() {
       selectedBus!.driverName = selectedDriver!.name;
-      
-      int driverIndex = drivers.indexWhere((d) => d.name == selectedDriver!.name);
+
+      int driverIndex =
+          drivers.indexWhere((d) => d.name == selectedDriver!.name);
       drivers[driverIndex].isAssigned = true;
 
       selectedBus = null;
@@ -200,7 +215,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   void _removeAssignment(Bus bus) {
     if (bus.driverName == null) return;
-    
+
     setState(() {
       int driverIndex = drivers.indexWhere((d) => d.name == bus.driverName);
       if (driverIndex != -1) {
@@ -220,7 +235,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
           drivers[driverIndex].isAssigned = false;
         }
       }
-      
+
       buses.remove(bus);
     });
     _showSnackBar('Bus removed');
@@ -228,10 +243,11 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   void _removeDriver(Driver driver) {
     if (driver.isAssigned) {
-      _showSnackBar('Cannot remove an assigned driver. Please remove the assignment first.');
+      _showSnackBar(
+          'Cannot remove an assigned driver. Please remove the assignment first.');
       return;
     }
-    
+
     setState(() {
       drivers.remove(driver);
     });
@@ -252,18 +268,23 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   List<Bus> get filteredBuses {
     if (searchQuery.isEmpty) return buses;
-    return buses.where((bus) => 
-      bus.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-      bus.plateNumber.toLowerCase().contains(searchQuery.toLowerCase()) ||
-      (bus.driverName != null && bus.driverName!.toLowerCase().contains(searchQuery.toLowerCase()))
-    ).toList();
+    return buses
+        .where((bus) =>
+            bus.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+            bus.plateNumber.toLowerCase().contains(searchQuery.toLowerCase()) ||
+            (bus.driverName != null &&
+                bus.driverName!
+                    .toLowerCase()
+                    .contains(searchQuery.toLowerCase())))
+        .toList();
   }
 
   List<Driver> get filteredDrivers {
     if (searchQuery.isEmpty) return drivers;
-    return drivers.where((driver) => 
-      driver.name.toLowerCase().contains(searchQuery.toLowerCase())
-    ).toList();
+    return drivers
+        .where((driver) =>
+            driver.name.toLowerCase().contains(searchQuery.toLowerCase()))
+        .toList();
   }
 
   List<Driver> get availableDrivers {
@@ -273,6 +294,168 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: Drawer(
+        child: Container(
+          color: const Color(0xFF00A3FF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        'assets/bus.png',
+                        height: 100,
+                        width: 100,
+                      ),
+                    ),
+                    const Center(
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Divider(color: Colors.white, thickness: 1),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Map";
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const map.AdminMap()),
+                        );
+                      },
+                      child: map.DrawerItem(
+                        icon: Icons.map,
+                        text: "Map",
+                        isSelected: _selectedItem == "Map",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Surveillance";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const surveillance.AdminSurveillance()),
+                        );
+                      },
+                      child: surveillance.DrawerItem(
+                        icon: Icons.camera,
+                        text: "Surveillance",
+                        isSelected: _selectedItem == "Surveillance",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Report";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => reports.AdminReports()),
+                        );
+                      },
+                      child: reports.DrawerItem(
+                        icon: Icons.bar_chart,
+                        text: "Report",
+                        isSelected: _selectedItem == "Report",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Notifications";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  notification.AdminNotification()),
+                        );
+                      },
+                      child: notification.DrawerItem(
+                        icon: Icons.notifications,
+                        text: "Notifications",
+                        isSelected: _selectedItem == "Notifications",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Inbox";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const inbox.AdminInbox()),
+                        );
+                      },
+                      child: inbox.DrawerItem(
+                        icon: Icons.inbox,
+                        text: "Inbox",
+                        isSelected: _selectedItem == "Inbox",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Profile";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const profile.AdminProfile()),
+                        );
+                      },
+                      child: profile.DrawerItem(
+                        icon: Icons.person,
+                        text: "Profile",
+                        isSelected: _selectedItem == "Profile",
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = "Assignment";
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const profile.AdminProfile()),
+                        );
+                      },
+                      child: profile.DrawerItem(
+                        icon: Icons.assignment,
+                        text: "Assignment",
+                        isSelected: _selectedItem == "Assignment",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -302,15 +485,17 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
           ),
           const SizedBox(width: 8),
           const Text(
             'Manage Buses & Drivers',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -343,8 +528,9 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             });
           },
           decoration: const InputDecoration(
-            hintText: 'Search buses or drivers...',
-            prefixIcon: Icon(Icons.search, color: Colors.lightBlue),
+            hintText: 'Search for buses',
+            hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+            prefixIcon: Icon(Icons.search, color: Colors.grey),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 15),
           ),
@@ -370,6 +556,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
         labelColor: Colors.lightBlue,
         unselectedLabelColor: Colors.grey,
         indicatorColor: Colors.lightBlue,
+        labelStyle: const TextStyle(fontSize: 13), // Tab font size set to 13
         tabs: const [
           Tab(icon: Icon(Icons.directions_bus), text: 'Buses'),
           Tab(icon: Icon(Icons.person), text: 'Drivers'),
@@ -391,7 +578,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             'Registered Buses (${filteredBuses.length})',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 15,
               color: Colors.lightBlue,
             ),
           ),
@@ -414,6 +601,8 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   Widget _buildAddBusCard() {
     return Card(
+      color: Colors.white,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -423,7 +612,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             const Text(
               'Add New Bus',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15, // Font size set to 15
                 fontWeight: FontWeight.bold,
                 color: Colors.lightBlue,
               ),
@@ -433,6 +622,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
               controller: _busController,
               decoration: const InputDecoration(
                 labelText: 'Bus Name/Number',
+                labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
                 hintText: 'e.g., Bus 101, School Bus A',
                 prefixIcon: Icon(Icons.directions_bus, color: Colors.lightBlue),
               ),
@@ -443,6 +633,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
               controller: _plateController,
               decoration: const InputDecoration(
                 labelText: 'Plate Number',
+                labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
                 hintText: 'e.g., ABC 123',
                 prefixIcon: Icon(Icons.credit_card, color: Colors.lightBlue),
               ),
@@ -459,7 +650,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _addBus,
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, color: Colors.white, size: 15),
               label: const Text('Add Bus'),
             ),
           ],
@@ -470,6 +661,8 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   Widget _buildBusCard(Bus bus) {
     return Card(
+      elevation: 2,
+      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Container(
@@ -479,11 +672,12 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             color: Colors.lightBlue.withOpacity(0.1),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: const Icon(Icons.directions_bus, color: Colors.lightBlue, size: 30),
+          child: const Icon(Icons.directions_bus,
+              color: Colors.lightBlue, size: 30),
         ),
         title: Text(
           bus.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,12 +687,16 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
               style: const TextStyle(
                 color: Colors.lightBlue,
                 fontWeight: FontWeight.w500,
+                fontSize: 13,
               ),
             ),
             Text(
-              bus.driverName != null ? 'Driver: ${bus.driverName}' : 'No driver assigned',
+              bus.driverName != null
+                  ? 'Driver: ${bus.driverName}'
+                  : 'No driver assigned',
               style: TextStyle(
                 color: bus.driverName != null ? Colors.green : Colors.grey,
+                fontSize: 13,
               ),
             ),
           ],
@@ -523,7 +721,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             'Registered Drivers (${filteredDrivers.length})',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 15,
               color: Colors.lightBlue,
             ),
           ),
@@ -546,6 +744,8 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   Widget _buildAddDriverCard() {
     return Card(
+      color: Colors.white,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -555,7 +755,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             const Text(
               'Add New Driver',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.lightBlue,
               ),
@@ -565,6 +765,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
               controller: _driverController,
               decoration: const InputDecoration(
                 labelText: 'Driver Name',
+                labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
                 hintText: 'e.g., John Smith',
                 prefixIcon: Icon(Icons.person, color: Colors.lightBlue),
               ),
@@ -573,7 +774,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _addDriver,
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, color: Colors.white, size: 25),
               label: const Text('Add Driver'),
             ),
           ],
@@ -584,6 +785,8 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
 
   Widget _buildDriverCard(Driver driver) {
     return Card(
+      color: Colors.white,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Container(
@@ -597,13 +800,13 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
         ),
         title: Text(
           driver.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
         ),
         subtitle: Text(
           driver.isAssigned ? 'Assigned' : 'Available',
           style: TextStyle(
-            color: driver.isAssigned ? Colors.orange : Colors.green,
-          ),
+              color: driver.isAssigned ? Colors.orange : Colors.green,
+              fontSize: 13),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete, color: Colors.red),
@@ -625,7 +828,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
             'Current Assignments',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 15,
               color: Colors.lightBlue,
             ),
           ),
@@ -637,79 +840,90 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
   }
 
   Widget _buildAssignmentForm() {
-  return Card(
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Assign Driver to Bus',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.lightBlue,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            decoration: InputDecoration(
-              labelText: 'Select Bus',
-              hintText: 'Enter bus name',
-              prefixIcon: const Icon(Icons.directions_bus, color: Colors.lightBlue),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.lightBlue, width: 2),
+    return Card(
+      color: Colors.white,
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Assign Driver to Bus',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.lightBlue,
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            decoration: InputDecoration(
-              labelText: 'Select Driver',
-              hintText: 'Enter driver name',
-              prefixIcon: const Icon(Icons.person, color: Colors.lightBlue),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.lightBlue, width: 2),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Select Bus',
+                labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                hintText: 'Enter bus name',
+                prefixIcon:
+                    const Icon(Icons.directions_bus, color: Colors.lightBlue),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      const BorderSide(color: Colors.lightBlue, width: 2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _assignDriver,
-            icon: const Icon(Icons.link),
-            label: const Text('Assign Driver to Bus'),
-          ),
-        ],
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Select Driver',
+                labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                hintText: 'Enter driver name',
+                prefixIcon: const Icon(Icons.person, color: Colors.lightBlue),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlue.withOpacity(0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide:
+                      const BorderSide(color: Colors.lightBlue, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _assignDriver,
+              icon: const Icon(Icons.link, color: Colors.white, size: 15),
+              label: const Text('Assign Driver to Bus'),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildAssignmentsList() {
     final assignedBuses = buses.where((bus) => bus.driverName != null).toList();
-    
+
     if (assignedBuses.isEmpty) {
       return _buildEmptyState('No assignments yet', Icons.assignment);
     }
-    
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -726,7 +940,8 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
                 color: Colors.lightBlue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Icon(Icons.assignment, color: Colors.lightBlue, size: 30),
+              child: const Icon(Icons.assignment,
+                  color: Colors.lightBlue, size: 30),
             ),
             title: Text(
               bus.name,
@@ -761,7 +976,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
           Text(
             message,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               color: Colors.grey.shade600,
             ),
           ),
@@ -770,4 +985,3 @@ class _AdminDriverAssignState extends State<AdminDriverAssign> with SingleTicker
     );
   }
 }
-

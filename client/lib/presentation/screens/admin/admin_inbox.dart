@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
@@ -13,43 +14,42 @@ class AdminInbox extends StatefulWidget {
 }
 
 class _AdminInboxState extends State<AdminInbox> {
-
   String _selectedItem = "Inbox";
 
   final List<Map<String, dynamic>> inboxes = [
     {
-      "name": "John Doe",
+      "name": "John Walker",
       "message": "Hey, how's it going?",
       "time": "10:45 AM",
-      "avatar": "assets/john.png",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg",
       "unread": true
     },
     {
-      "name": "Emma Watson",
+      "name": "Tony Stark",
       "message": "I'll call you later.",
       "time": "9:30 AM",
-      "avatar": "assets/emma.png",
+      "avatar": "https://randomuser.me/api/portraits/women/2.jpg",
       "unread": false
     },
     {
       "name": "Chris Evans",
       "message": "Let's meet at 5 PM.",
       "time": "Yesterday",
-      "avatar": "assets/chris.png",
+      "avatar": "https://randomuser.me/api/portraits/men/3.jpg",
       "unread": true
     },
     {
-      "name": "Sophia Lee",
+      "name": "Scarlett Johansson",
       "message": "Can you send me the file?",
       "time": "Monday",
-      "avatar": "assets/sophia.png",
+      "avatar": "https://randomuser.me/api/portraits/women/4.jpg",
       "unread": false
     },
     {
-      "name": "David Brown",
+      "name": "Mark Ruffalo",
       "message": "Thanks for the help!",
       "time": "Sunday",
-      "avatar": "assets/david.png",
+      "avatar": "https://randomuser.me/api/portraits/men/5.jpg",
       "unread": true
     },
   ];
@@ -63,27 +63,31 @@ class _AdminInboxState extends State<AdminInbox> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 40, color: Colors.black),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Sakay Administrative",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Center(
+                      child: Image.asset(
+                        'assets/bus.png',
+                        height: 100,
+                        width: 100,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Divider(color: Colors.white, thickness: 1),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -106,7 +110,7 @@ class _AdminInboxState extends State<AdminInbox> {
                         setState(() {
                           _selectedItem = "Surveillance";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminSurveillance()),
@@ -123,7 +127,7 @@ class _AdminInboxState extends State<AdminInbox> {
                         setState(() {
                           _selectedItem = "Report";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminReports()),
@@ -140,7 +144,7 @@ class _AdminInboxState extends State<AdminInbox> {
                         setState(() {
                           _selectedItem = "Notifications";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminNotification()),
@@ -157,7 +161,7 @@ class _AdminInboxState extends State<AdminInbox> {
                         setState(() {
                           _selectedItem = "Inbox";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminInbox()),
@@ -174,7 +178,7 @@ class _AdminInboxState extends State<AdminInbox> {
                         setState(() {
                           _selectedItem = "Profile";
                         });
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AdminProfile()),
@@ -189,51 +193,42 @@ class _AdminInboxState extends State<AdminInbox> {
                   ],
                 ),
               ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DrawerItem(
-                  icon: Icons.logout,
-                  text: "Logout",
-                  isSelected: _selectedItem == "Logout",
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black, size: 25),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-              ),
+          backgroundColor: const Color(0xFF00A3FF),
+          elevation: 0,
+          title: const Text(
+            'Inbox',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
-            const Text(
-              "Inbox",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+          ),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                );
+              },
             ),
-          ],
+          ),
         ),
-      ),
       body: Column(
         children: [
+          const SizedBox(height: 10),
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Search",
@@ -247,23 +242,33 @@ class _AdminInboxState extends State<AdminInbox> {
               ),
             ),
           ),
-
           Expanded(
             child: ListView.builder(
               itemCount: inboxes.length,
               itemBuilder: (context, index) {
                 final inbox = inboxes[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    radius: 28,
-                    backgroundImage: AssetImage(inbox["avatar"]!),
+                  leading: CachedNetworkImage(
+                    imageUrl: inbox["avatar"]!,
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      radius: 28,
+                      backgroundImage: imageProvider,
+                    ),
+                    placeholder: (context, url) => const CircleAvatar(
+                      radius: 28,
+                      child: Icon(Icons.person),
+                    ),
+                    errorWidget: (context, url, error) => const CircleAvatar(
+                      radius: 28,
+                      child: Icon(Icons.error),
+                    ),
                   ),
                   title: Text(
                     inbox["name"]!,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: inbox["unread"]! ? Colors.blue : Colors.black,
+                      color: Colors.black,
                     ),
                   ),
                   subtitle: Text(
@@ -274,7 +279,10 @@ class _AdminInboxState extends State<AdminInbox> {
                       fontWeight: inbox["unread"]!
                           ? FontWeight.bold
                           : FontWeight.normal,
-                      color: Colors.grey,
+                      color: inbox["unread"]!
+                          ? Colors.black
+                          : Colors
+                              .grey,
                     ),
                   ),
                   trailing: Row(
@@ -285,17 +293,22 @@ class _AdminInboxState extends State<AdminInbox> {
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
-                      if (inbox["unread"]!)
+                      if (inbox[
+                          "unread"]!)
                         const Padding(
                           padding: EdgeInsets.only(left: 8.0),
-                          child:
-                              Icon(Icons.circle, color: Colors.blue, size: 10),
+                          child: Icon(
+                            Icons.circle,
+                            color: Colors.blue,
+                            size: 8,
+                          ),
                         ),
                     ],
                   ),
                   onTap: () {
                     setState(() {
-                      inboxes[index]["unread"] = false;
+                      inboxes[index]["unread"] =
+                          false;
                     });
                   },
                 );
@@ -326,9 +339,7 @@ class DrawerItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
@@ -341,17 +352,13 @@ class DrawerItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? Colors.black
-                    : Colors.white,
+                color: isSelected ? Colors.black : Colors.white,
               ),
               const SizedBox(width: 30),
               Text(
                 text,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.white,
+                  color: isSelected ? Colors.black : Colors.white,
                   fontSize: 14,
                 ),
               ),

@@ -3,6 +3,8 @@ import 'package:sakay_app/data/models/sign_up.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_driver_assign.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_profile.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 import 'package:sakay_app/presentation/screens/authentication/email_code.dart';
 import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/phone_verification.dart';
@@ -21,7 +23,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const SplashScreen(),
+      builder: (context, state) => const AdminMap(),
     ),
     GoRoute(
       path: '/onboarding',
