@@ -3,18 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
-import 'package:sakay_app/bloc/notification/notification_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_event.dart';
-import 'package:sakay_app/bloc/notification/notification_state.dart';
+import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
+import 'package:sakay_app/bloc/announcement/announcement_event.dart';
+import 'package:sakay_app/bloc/announcement/announcement_state.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/bloc/tracker/tracker_state.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/data/models/message.dart';
-import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/common/inbox.dart';
-import 'package:sakay_app/presentation/screens/common/notifications.dart';
+import 'package:sakay_app/presentation/screens/common/announcements.dart';
 import 'package:sakay_app/presentation/screens/driver/homepage.dart';
 import '../common/profile.dart';
 
@@ -27,16 +27,16 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with Tracker {
   late TrackerBloc _trackerBloc;
-  late NotificationBloc _notificationBloc;
+  late AnnouncementBloc _announcementBloc;
   late ChatBloc _chatBloc;
 
   final TokenControllerImpl _tokenController = TokenControllerImpl();
 
-  // Notifications
-  final List<NotificationModel> notifications = [];
-  int currentNotificationPage = 1;
-  final ScrollController _scrollNotificationController = ScrollController();
-  bool isLoadingNotification = false;
+  // Announcements
+  final List<AnnouncementsModel> announcements = [];
+  int currentAnnouncementPage = 1;
+  final ScrollController _scrollAnnouncementController = ScrollController();
+  bool isLoadingAnnouncement = false;
 
   // Messages
   final List<MessageModel> messages = [];
@@ -55,14 +55,14 @@ class _HomeState extends State<Home> with Tracker {
   }
 
   // Scroll Listeners
-  void _onScrollNotification() {
-    if (_scrollNotificationController.position.pixels <= 100 &&
-        !isLoadingNotification) {
+  void _onScrollAnnouncement() {
+    if (_scrollAnnouncementController.position.pixels <= 100 &&
+        !isLoadingAnnouncement) {
       setState(() {
-        isLoadingNotification = true;
-        currentNotificationPage++;
+        isLoadingAnnouncement = true;
+        currentAnnouncementPage++;
       });
-      _notificationBloc.add(GetAllNotificationsEvent(currentNotificationPage));
+      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
     }
   }
 
@@ -83,7 +83,7 @@ class _HomeState extends State<Home> with Tracker {
     super.initState();
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
     _chatBloc = BlocProvider.of<ChatBloc>(context);
-    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
+    _announcementBloc = BlocProvider.of<AnnouncementBloc>(context);
 
     _initializeUserID();
   }
@@ -93,17 +93,17 @@ class _HomeState extends State<Home> with Tracker {
     setState(() => isLoadingUser = false);
 
     _chatBloc.add(ConnectRealtimeEvent());
-    _notificationBloc.add(ConnectNotificationRealtimeEvent());
+    _announcementBloc.add(ConnectAnnouncementRealtimeEvent());
     _trackerBloc.add(ConnectEvent());
     _trackerBloc.stream
         .firstWhere((state) => state is ConnectedSocket)
         .then((_) {
       _trackerBloc.add(ConnectDriverEvent());
     });
-    _notificationBloc.stream
-        .firstWhere((state) => state is ConnectedNotificationRealtimeSocket)
+    _announcementBloc.stream
+        .firstWhere((state) => state is ConnectedAnnouncementRealtimeSocket)
         .then((_) {
-      _notificationBloc.add(GetAllNotificationsEvent(currentNotificationPage));
+      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
     });
 
     _chatBloc.stream
@@ -117,7 +117,7 @@ class _HomeState extends State<Home> with Tracker {
 
     _chatBloc.add(CreateInboxEvent());
 
-    _scrollNotificationController.addListener(_onScrollNotification);
+    _scrollAnnouncementController.addListener(_onScrollAnnouncement);
     _scrollMessageController.addListener(_onScrollMessage);
   }
 
@@ -149,41 +149,41 @@ class _HomeState extends State<Home> with Tracker {
         user_id: user_id,
         onMessageSent: _onMessageSent,
       ),
-      NotificationsScreen(
-        notifications: notifications,
-        scrollNotificationController: _scrollNotificationController,
-        isLoadingNotification: isLoadingNotification,
+      AnnouncementsScreen(
+        announcements: announcements,
+        scrollAnnouncementController: _scrollAnnouncementController,
+        isLoadingAnnouncement: isLoadingAnnouncement,
       ),
       const ProfilePage(
         user_type: "DRIVER",
       ),
     ];
 
-    return BlocListener<NotificationBloc, NotificationState>(
+    return BlocListener<AnnouncementBloc, AnnouncementState>(
       listener: (context, state) {
-        if (state is NotificationLoading) {
-          setState(() => isLoadingNotification = true);
-        } else if (state is GetAllNotificationsSuccess) {
+        if (state is AnnouncementLoading) {
+          setState(() => isLoadingAnnouncement = true);
+        } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
-            notifications.addAll(state.notifications);
-            isLoadingNotification = false;
+            announcements.addAll(state.announcements);
+            isLoadingAnnouncement = false;
           });
-        } else if (state is OnReceiveNotificationSuccess) {
-          // TODO: add simple notification like sa tiktok
+        } else if (state is OnReceiveAnnouncementSuccess) {
+          // TODO: add simple announcement like sa tiktok
           setState(() {
-            notifications.insert(0, state.notification);
-            isLoadingNotification = false;
+            announcements.insert(0, state.announcement);
+            isLoadingAnnouncement = false;
           });
-        } else if (state is GetAllNotificationsError) {
+        } else if (state is GetAllAnnouncementsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.error), backgroundColor: Colors.red),
           );
-          setState(() => isLoadingNotification = false);
-        } else if (state is OnReceiveNotificationError) {
+          setState(() => isLoadingAnnouncement = false);
+        } else if (state is OnReceiveAnnouncementError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.error), backgroundColor: Colors.red),
           );
-          setState(() => isLoadingNotification = false);
+          setState(() => isLoadingAnnouncement = false);
         }
       },
       child: BlocListener<ChatBloc, ChatState>(
@@ -196,7 +196,7 @@ class _HomeState extends State<Home> with Tracker {
               isLoadingMessage = false;
             });
           } else if (state is OnReceiveMessageSuccess) {
-            // TODO: add simple notification like sa tiktok
+            // TODO: add simple announcement like sa tiktok
             if (chat_id == state.message.chat_id) {
               setState(() {
                 messages.insert(0, state.message);
@@ -229,7 +229,7 @@ class _HomeState extends State<Home> with Tracker {
               BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
               BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications), label: 'Notifications'),
+                  icon: Icon(Icons.campaign), label: 'Announcements'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.person), label: 'Profile'),
             ],

@@ -4,17 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
 import 'package:sakay_app/bloc/chat/chat_state.dart';
-import 'package:sakay_app/bloc/notification/notification_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_event.dart';
+import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
+import 'package:sakay_app/bloc/announcement/announcement_event.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/drawer_item.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_bus_assign.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_notification.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_reports.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_announcement.dart';
+import 'package:sakay_app/presentation/screens/admin/admin_report.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 import 'package:sakay_app/presentation/screens/common/profile.dart';
 
@@ -27,7 +28,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with Tracker {
   late TrackerBloc _trackerBloc;
-  late NotificationBloc _notificationBloc;
+  late AnnouncementBloc _announcementBloc;
   late ChatBloc _chatBloc;
   final TokenControllerImpl _tokenController = TokenControllerImpl();
 
@@ -39,10 +40,10 @@ class _HomeState extends State<Home> with Tracker {
   void initState() {
     super.initState();
     _chatBloc = BlocProvider.of<ChatBloc>(context);
-    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
+    _announcementBloc = BlocProvider.of<AnnouncementBloc>(context);
     initializeAsync();
     _chatBloc.add(ConnectRealtimeEvent());
-    _notificationBloc.add(ConnectNotificationRealtimeEvent());
+    _announcementBloc.add(ConnectAnnouncementRealtimeEvent());
     _chatBloc.stream
         .firstWhere((state) => state is ConnectedRealtimeSocket)
         .then((_) {
@@ -71,11 +72,10 @@ class _HomeState extends State<Home> with Tracker {
       AdminMap(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       AdminSurveillance(
           openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
-      AdminSurveillance(
-          openDrawer: () => _scaffoldKey.currentState
-              ?.openDrawer()), //TODO: update this into management page
+      AdminDriverAssign(
+          openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       AdminReports(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
-      AdminNotification(
+      AdminAnnouncement(
           openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       AdminInbox(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       ProfilePage(

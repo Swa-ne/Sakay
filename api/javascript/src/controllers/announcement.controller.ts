@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { UserType } from "../middlewares/token.authentication";
 import { validateContentLength, validateHeadlineLength } from "../utils/input.validators";
-import { saveNotification, deleteNotification, editNotification, getAllNotifications, getNotification } from "../services/notification.services";
+import { saveAnnouncement, deleteAnnouncement, editAnnouncement, getAllAnnouncements, getAnnouncement } from "../services/announcement.services";
 
-export const saveNotificationController = async (req: Request & { user?: UserType }, res: Response) => {
+export const saveAnnouncementController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
         const user = req.user;
         const { headline, content, audience = "EVERYONE" } = req.body;
@@ -37,7 +37,7 @@ export const saveNotificationController = async (req: Request & { user?: UserTyp
 
         const files = req.files as Express.Multer.File[];
 
-        const result = await saveNotification(user_id, headline, content, audience, files);
+        const result = await saveAnnouncement(user_id, headline, content, audience, files);
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
             return
@@ -47,10 +47,25 @@ export const saveNotificationController = async (req: Request & { user?: UserTyp
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-export const getAllNotificationsController = async (req: Request, res: Response) => {
+export const getAllAnnouncementsController = async (req: Request, res: Response) => {
     try {
         const { page = 1, user_type } = req.params;
-        const result = await getAllNotifications(page as string, user_type as string);
+        const result = await getAllAnnouncements(page as string, user_type as string);
+
+        console.log("runningn sdfa", result)
+        if (result.httpCode === 200) {
+            res.status(200).json({ message: result.message });
+            return;
+        }
+        res.status(result.httpCode).json({ error: result.error });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const getAnnouncementController = async (req: Request, res: Response) => {
+    try {
+        const { announcement_id } = req.params;
+        const result = await getAnnouncement(announcement_id as string);
 
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
@@ -61,28 +76,14 @@ export const getAllNotificationsController = async (req: Request, res: Response)
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-export const getNotificationController = async (req: Request, res: Response) => {
+export const editAnnouncementController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
-        const { notif_id } = req.params;
-        const result = await getNotification(notif_id as string);
-
-        if (result.httpCode === 200) {
-            res.status(200).json({ message: result.message });
-            return;
-        }
-        res.status(result.httpCode).json({ error: result.error });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-export const editNotificationController = async (req: Request & { user?: UserType }, res: Response) => {
-    try {
-        const { notif_id } = req.params;
+        const { announcement_id } = req.params;
         const user = req.user;
         const { headline, content, existing_files } = req.body;
 
-        if (!notif_id) {
-            res.status(404).json({ error: "Notification not found" });
+        if (!announcement_id) {
+            res.status(404).json({ error: "Announcement not found" });
             return;
         }
         if (!user) {
@@ -114,7 +115,7 @@ export const editNotificationController = async (req: Request & { user?: UserTyp
 
         const files = req.files as Express.Multer.File[];
 
-        const result = await editNotification(notif_id, user_id, headline, content, files, JSON.parse(existing_files));
+        const result = await editAnnouncement(announcement_id, user_id, headline, content, files, JSON.parse(existing_files));
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
             return
@@ -124,15 +125,15 @@ export const editNotificationController = async (req: Request & { user?: UserTyp
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-export const deleteNotificationController = async (req: Request, res: Response) => {
+export const deleteAnnouncementController = async (req: Request, res: Response) => {
     try {
-        const { notif_id } = req.params;
-        if (!notif_id) {
-            res.status(404).json({ error: "Notification not found" });
+        const { announcement_id } = req.params;
+        if (!announcement_id) {
+            res.status(404).json({ error: "Announcement not found" });
             return;
         }
 
-        const result = await deleteNotification(notif_id);
+        const result = await deleteAnnouncement(announcement_id);
         if (result.httpCode === 200) {
             res.status(result.httpCode).json({ message: result.message });
             return;

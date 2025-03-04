@@ -9,7 +9,7 @@ dotenv.config()
 
 import entryRoutes from "./routes/authentication.routes";
 import chatRoutes from "./routes/chat.routes";
-import notificationRoutes from "./routes/notification.routes";
+import announcementRoutes from "./routes/announcement.routes";
 import reportRoutes from "./routes/report.routes";
 import busRoutes from "./routes/bus.routes";
 
@@ -63,7 +63,7 @@ app.use(express.json());
 
 app.use("/authentication", entryRoutes)
 app.use("/chat", chatRoutes)
-app.use("/notification", notificationRoutes)
+app.use("/announcement", announcementRoutes)
 app.use("/report", reportRoutes)
 app.use("/bus", busRoutes)
 

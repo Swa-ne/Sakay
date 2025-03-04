@@ -2,28 +2,28 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
-import 'package:sakay_app/data/sources/realtime/notification_repo.dart';
+import 'package:sakay_app/data/sources/realtime/announcement_repo.dart';
 import 'package:sakay_app/data/sources/realtime/socket_controller.dart';
 
-final _apiUrl = "${dotenv.env['API_URL']}/notification";
+final _apiUrl = "${dotenv.env['API_URL']}/announcement";
 
-class NotificationRepoImpl extends NotificationRepo {
+class AnnouncementRepoImpl extends AnnouncementRepo {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
   final RealtimeSocketControllerImpl _socketController =
       RealtimeSocketControllerImpl();
 
   @override
-  Future<bool> saveNotification(
+  Future<bool> saveAnnouncement(
     List<File> files,
-    NotificationModel notification,
+    AnnouncementsModel announcement,
   ) async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
 
     final request =
-        http.MultipartRequest('POST', Uri.parse("$_apiUrl/save-notification"));
+        http.MultipartRequest('POST', Uri.parse("$_apiUrl/save-announcement"));
 
     request.headers['Authorization'] = access_token;
     request.headers['Cookie'] = 'refresh_token=$refresh_token';
@@ -39,18 +39,18 @@ class NotificationRepoImpl extends NotificationRepo {
       );
     }
 
-    request.fields['headline'] = notification.headline;
-    request.fields['content'] = notification.content;
-    request.fields['audience'] = notification.audience;
+    request.fields['headline'] = announcement.headline;
+    request.fields['content'] = announcement.content;
+    request.fields['audience'] = announcement.audience;
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
     final response_body = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      final new_notification =
-          notification.copyWith(id: response_body["message"]);
-      _socketController.sendNotification(new_notification);
+      final new_announcement =
+          announcement.copyWith(id: response_body["message"]);
+      _socketController.sendAnnouncement(new_announcement);
       return true;
     } else {
       throw Exception(response_body['error']);
@@ -58,28 +58,32 @@ class NotificationRepoImpl extends NotificationRepo {
   }
 
   @override
-  Future<List<NotificationModel>> getAllNotifications(int page) async {
+  Future<List<AnnouncementsModel>> getAllAnnouncements(int page) async {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
       final user_type = await _tokenController.getUserType();
-      var response = await http.get(
-          Uri.parse("$_apiUrl/get-all-notifications/$user_type/$page"),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': access_token,
-            'Cookie': 'refresh_token=$refresh_token',
-          });
-      final response_body = json.decode(response.body);
-      if (response.statusCode == 200) {
-        List<NotificationModel> notificationList =
-            (response_body['message'] as List)
-                .map((json) => NotificationModel.fromJson(json))
-                .toList();
-        return notificationList;
-      } else {
-        throw Exception(response_body['error']);
+      try {
+        var response = await http.get(
+            Uri.parse("$_apiUrl/get-all-announcements/$user_type/$page"),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': access_token,
+              'Cookie': 'refresh_token=$refresh_token',
+            });
+        final response_body = json.decode(response.body);
+        if (response.statusCode == 200) {
+          List<AnnouncementsModel> announcementList =
+              (response_body['message'] as List)
+                  .map((json) => AnnouncementsModel.fromJson(json))
+                  .toList();
+          return announcementList;
+        } else {
+          throw Exception(response_body['error']);
+        }
+      } catch (e) {
+        throw Exception(e);
       }
     } catch (e) {
       throw Exception(e);
@@ -87,11 +91,11 @@ class NotificationRepoImpl extends NotificationRepo {
   }
 
   @override
-  Future<NotificationModel> getNotification(String notification_id) async {
+  Future<AnnouncementsModel> getAnnouncement(String announcement_id) async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
     var response = await http.get(
-      Uri.parse("$_apiUrl/get-notification/$notification_id"),
+      Uri.parse("$_apiUrl/get-announcement/$announcement_id"),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -102,23 +106,23 @@ class NotificationRepoImpl extends NotificationRepo {
     final response_body = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      return NotificationModel.fromJson(response_body["message"]);
+      return AnnouncementsModel.fromJson(response_body["message"]);
     } else {
       throw Exception(response_body['error']);
     }
   }
 
   @override
-  Future<bool> editNotification(
+  Future<bool> editAnnouncement(
     List<File> files,
     List<String> existing_file_ids,
-    NotificationModel notification,
+    AnnouncementsModel announcement,
   ) async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
     final request = http.MultipartRequest(
       'PUT',
-      Uri.parse("$_apiUrl/edit-notification/${notification.id}"),
+      Uri.parse("$_apiUrl/edit-announcement/${announcement.id}"),
     );
     request.headers['Authorization'] = access_token;
     request.headers['Cookie'] = 'refresh_token=$refresh_token';
@@ -134,9 +138,9 @@ class NotificationRepoImpl extends NotificationRepo {
       );
     }
 
-    request.fields['headline'] = notification.headline;
-    request.fields['content'] = notification.content;
-    request.fields['audience'] = notification.audience;
+    request.fields['headline'] = announcement.headline;
+    request.fields['content'] = announcement.content;
+    request.fields['audience'] = announcement.audience;
     request.fields['existing_files'] = json.encode(existing_file_ids);
 
     final streamedResponse = await request.send();
@@ -145,7 +149,7 @@ class NotificationRepoImpl extends NotificationRepo {
 
     if (response.statusCode == 200) {
       _socketController
-          .sendNotification(notification); //TODO: use update instead
+          .sendAnnouncement(announcement); //TODO: use update instead
       return true;
     } else {
       throw Exception(response_body['message']);
@@ -153,11 +157,11 @@ class NotificationRepoImpl extends NotificationRepo {
   }
 
   @override
-  Future<bool> deleteNotification(String notification_id) async {
+  Future<bool> deleteAnnouncement(String announcement_id) async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
     final response = await http.delete(
-      Uri.parse('$_apiUrl/delete-notification/$notification_id'),
+      Uri.parse('$_apiUrl/delete-announcement/$announcement_id'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -168,7 +172,7 @@ class NotificationRepoImpl extends NotificationRepo {
     final response_body = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      // _socketController.sendMessage(receiver_id, message, Notification_id); TODO: use delete
+      // _socketController.sendMessage(receiver_id, message, Announcement_id); TODO: use delete
       return response_body['message'] == "Success";
     } else {
       throw Exception(response_body['message']);

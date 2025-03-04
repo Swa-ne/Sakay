@@ -2,33 +2,33 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_event.dart';
-import 'package:sakay_app/bloc/notification/notification_state.dart';
+import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
+import 'package:sakay_app/bloc/announcement/announcement_event.dart';
+import 'package:sakay_app/bloc/announcement/announcement_state.dart';
 import 'package:sakay_app/common/mixins/input_validation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:sakay_app/data/models/file.dart';
-import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/models/user.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 
-// TODO: cache notifications list
-class AdminNotification extends StatefulWidget {
+// TODO: cache announcements list
+class AdminAnnouncement extends StatefulWidget {
   final VoidCallback openDrawer;
 
-  const AdminNotification({super.key, required this.openDrawer});
+  const AdminAnnouncement({super.key, required this.openDrawer});
 
   @override
-  _AdminNotificationState createState() => _AdminNotificationState();
+  _AdminAnnouncementState createState() => _AdminAnnouncementState();
 }
 
 // TODO: add something bago makalipat nag page if may laman ang files, and controllers
-class _AdminNotificationState extends State<AdminNotification>
+class _AdminAnnouncementState extends State<AdminAnnouncement>
     with InputValidationMixin {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
 
-  late NotificationBloc _notificationBloc;
+  late AnnouncementBloc _announcementBloc;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _headlineController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
@@ -37,7 +37,7 @@ class _AdminNotificationState extends State<AdminNotification>
 
   bool _isButtonLoading = false;
 
-  final List<NotificationModel> notifications = [];
+  final List<AnnouncementsModel> announcements = [];
 
   final List<File> files = [];
   final ImagePicker _picker = ImagePicker();
@@ -52,8 +52,8 @@ class _AdminNotificationState extends State<AdminNotification>
   @override
   void initState() {
     super.initState();
-    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
-    _notificationBloc.add(GetAllNotificationsEvent(currentPage));
+    _announcementBloc = BlocProvider.of<AnnouncementBloc>(context);
+    _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
     _scrollController.addListener(_onScroll);
     _initializeMyUserModel();
   }
@@ -74,7 +74,7 @@ class _AdminNotificationState extends State<AdminNotification>
         isLoading = true;
         currentPage++;
       });
-      _notificationBloc.add(GetAllNotificationsEvent(currentPage));
+      _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
     }
   }
 
@@ -225,16 +225,16 @@ class _AdminNotificationState extends State<AdminNotification>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<NotificationBloc, NotificationState>(
+    return BlocListener<AnnouncementBloc, AnnouncementState>(
       listener: (context, state) {
-        if (state is NotificationLoading) {
+        if (state is AnnouncementLoading) {
           // TODO: add lottie??
-        } else if (state is SaveNotificationSuccess) {
+        } else if (state is SaveAnnouncementSuccess) {
           Navigator.pop(context);
           setState(() {
-            notifications.insert(
+            announcements.insert(
               0,
-              NotificationModel(
+              AnnouncementsModel(
                 headline: _headlineController.text.trim(),
                 content: _contentController.text.trim(),
                 audience: _selectedAudience,
@@ -246,22 +246,22 @@ class _AdminNotificationState extends State<AdminNotification>
             _contentController.clear();
             files.clear();
           });
-        } else if (state is OnReceiveNotificationSuccess) {
+        } else if (state is OnReceiveAnnouncementSuccess) {
           setState(() {
-            notifications.insert(0, state.notification);
+            announcements.insert(0, state.announcement);
           });
-        } else if (state is GetAllNotificationsSuccess) {
+        } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
-            notifications.addAll(state.notifications);
+            announcements.addAll(state.announcements);
           });
-        } else if (state is SaveNotificationError) {
+        } else if (state is SaveAnnouncementError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.error),
               backgroundColor: Colors.red,
             ),
           );
-        } else if (state is GetAllNotificationsError) {
+        } else if (state is GetAllAnnouncementsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.error),
@@ -307,15 +307,15 @@ class _AdminNotificationState extends State<AdminNotification>
                 ),
                 const SizedBox(height: 12),
                 Expanded(
-                  child: notifications.isEmpty
+                  child: announcements.isEmpty
                       ? const Center(
-                          child: Text("No notifications yet"),
+                          child: Text("No announcements yet"),
                         )
                       : ListView.builder(
-                          itemCount: notifications.length,
+                          itemCount: announcements.length,
                           controller: _scrollController,
                           itemBuilder: (context, index) {
-                            final notification = notifications[index];
+                            final announcement = announcements[index];
                             return Container(
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               padding: const EdgeInsets.all(12),
@@ -325,7 +325,7 @@ class _AdminNotificationState extends State<AdminNotification>
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.notifications,
+                                  const Icon(Icons.campaign,
                                       color: Color(0xFF00A3FF)),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -334,13 +334,13 @@ class _AdminNotificationState extends State<AdminNotification>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          notification.headline,
+                                          announcement.headline,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         Text(
-                                          notification.content,
+                                          announcement.content,
                                           style: const TextStyle(
                                               color: Color(0xFF888888)),
                                           maxLines: 1,
@@ -531,7 +531,7 @@ class _AdminNotificationState extends State<AdminNotification>
                                 height: 40,
                                 child: FloatingActionButton.extended(
                                   onPressed: () {
-                                    _submitNotification();
+                                    _submitAnnouncement();
                                   },
                                   backgroundColor: const Color(0xFF00A3FF),
                                   icon: const Icon(
@@ -647,12 +647,12 @@ class _AdminNotificationState extends State<AdminNotification>
         .any((ext) => path.toLowerCase().endsWith(ext));
   }
 
-  void _submitNotification() {
+  void _submitAnnouncement() {
     if (_formKey.currentState?.validate() ?? false) {
-      _notificationBloc.add(
-        SaveNotificationEvent(
+      _announcementBloc.add(
+        SaveAnnouncementEvent(
           files,
-          NotificationModel(
+          AnnouncementsModel(
             headline: _headlineController.text.trim(),
             content: _contentController.text.trim(),
             audience: _selectedAudience,

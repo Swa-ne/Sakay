@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> with Tracker {
   late TrackerBloc _trackerBloc;
   OverlayEntry? _hintOverlay;
   bool _showInboxHint = true;
-  bool _showNotificationsHint = false;
+  bool _showAnnouncementsHint = false;
   bool _showProfileHint = false;
   bool isTrackerOn = false;
 
@@ -54,25 +54,25 @@ class _HomePageState extends State<HomePage> with Tracker {
     _hintOverlay?.remove();
     setState(() {
       _showInboxHint = false;
-      _showNotificationsHint = true;
+      _showAnnouncementsHint = true;
     });
     Future.delayed(const Duration(milliseconds: 300), () {
-      if (_showNotificationsHint) {
+      if (_showAnnouncementsHint) {
         _showHint(
-          title: "Notifications",
-          icon: Icons.notifications,
+          title: "Announcements",
+          icon: Icons.campaign,
           message:
-              "In the notifications tab, it will provide you with everything you need to be aware of such as alerts and warnings to make sure you know what is happening",
-          onDismiss: _dismissNotificationsHint,
+              "In the announcements tab, it will provide you with everything you need to be aware of such as alerts and warnings to make sure you know what is happening",
+          onDismiss: _dismissAnnouncementsHint,
         );
       }
     });
   }
 
-  void _dismissNotificationsHint() {
+  void _dismissAnnouncementsHint() {
     _hintOverlay?.remove();
     setState(() {
-      _showNotificationsHint = false;
+      _showAnnouncementsHint = false;
       _showProfileHint = true;
     });
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> with Tracker {
     bool isProfileHint = title == "Profile";
     if (title == "Inbox") {
       targetX = screenSize.width * 0.14 + 23;
-    } else if (title == "Notifications") {
+    } else if (title == "Announcements") {
       targetX = screenSize.width * 0.39 + 22;
     } else if (isProfileHint) {
       targetX = screenSize.width * 0.80; // Adjust to right for Profile

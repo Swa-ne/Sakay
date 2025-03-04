@@ -4,10 +4,10 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/bus/bus_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_bloc.dart';
+import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
 import 'package:sakay_app/bloc/report/report_bloc.dart';
 import 'package:sakay_app/data/sources/realtime/chat_repo_impl.dart';
-import 'package:sakay_app/data/sources/realtime/notification_repo_impl.dart';
+import 'package:sakay_app/data/sources/realtime/announcement_repo_impl.dart';
 import 'package:sakay_app/data/sources/realtime/report_repo_impl.dart';
 import 'package:sakay_app/data/sources/realtime/socket_controller.dart';
 import 'package:sakay_app/data/sources/tracker/bus_repo_impl.dart';
@@ -49,8 +49,8 @@ class MyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(
-            create: (context) => NotificationBloc(
-              NotificationRepoImpl(),
+            create: (context) => AnnouncementBloc(
+              AnnouncementRepoImpl(),
               RealtimeSocketControllerImpl(),
             ),
           ),

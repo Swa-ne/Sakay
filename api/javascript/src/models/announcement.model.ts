@@ -1,7 +1,7 @@
 import { Document, model, ObjectId, Schema } from "mongoose"
 import { FileSchemaInterface } from "./utils/file.model"
 
-export interface NotificationSchemaInterface extends Document {
+export interface AnnouncementSchemaInterface extends Document {
     _id: ObjectId,
     posted_by: ObjectId,
     edited_by?: ObjectId,
@@ -13,7 +13,7 @@ export interface NotificationSchemaInterface extends Document {
     updatedAt?: Date,
 }
 
-const NotificationSchema: Schema = new Schema({
+const AnnouncementSchema: Schema = new Schema({
     posted_by: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -45,4 +45,4 @@ const NotificationSchema: Schema = new Schema({
     timestamps: true,
 })
 
-export const Notification = model<NotificationSchemaInterface>("Notification", NotificationSchema)
+export const Announcement = model<AnnouncementSchemaInterface>("Announcement", AnnouncementSchema)

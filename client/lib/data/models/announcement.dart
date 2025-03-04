@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:sakay_app/data/models/file.dart';
 import 'package:sakay_app/data/models/user.dart';
 
-class NotificationModel extends Equatable {
+class AnnouncementsModel extends Equatable {
   final String? id;
   final UserModel? posted_by;
   final UserModel? edited_by;
@@ -11,7 +11,7 @@ class NotificationModel extends Equatable {
   final String audience;
   final List<FileModel>? files;
 
-  const NotificationModel({
+  const AnnouncementsModel({
     this.id,
     this.posted_by,
     this.edited_by,
@@ -21,8 +21,8 @@ class NotificationModel extends Equatable {
     this.files,
   });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
+  factory AnnouncementsModel.fromJson(Map<String, dynamic> json) {
+    return AnnouncementsModel(
       id: json['_id'],
       posted_by: json['posted_by'] != null
           ? UserModel.fromJson(json['posted_by'])
@@ -50,7 +50,7 @@ class NotificationModel extends Equatable {
     };
   }
 
-  NotificationModel copyWith({
+  AnnouncementsModel copyWith({
     String? id,
     UserModel? posted_by,
     UserModel? edited_by,
@@ -59,7 +59,7 @@ class NotificationModel extends Equatable {
     String? audience,
     List<FileModel>? files,
   }) {
-    return NotificationModel(
+    return AnnouncementsModel(
       id: id ?? this.id,
       posted_by: posted_by ?? this.posted_by,
       edited_by: edited_by ?? this.edited_by,

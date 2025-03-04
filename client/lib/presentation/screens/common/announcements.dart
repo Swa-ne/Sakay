@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/announcement.dart';
 
 // TODO: add refresh callback
-class NotificationsScreen extends StatefulWidget {
-  final List<NotificationModel> notifications;
-  final ScrollController scrollNotificationController;
-  final bool isLoadingNotification;
+class AnnouncementsScreen extends StatefulWidget {
+  final List<AnnouncementsModel> announcements;
+  final ScrollController scrollAnnouncementController;
+  final bool isLoadingAnnouncement;
 
-  const NotificationsScreen({
+  const AnnouncementsScreen({
     super.key,
-    required this.notifications,
-    required this.scrollNotificationController,
-    required this.isLoadingNotification,
+    required this.announcements,
+    required this.scrollAnnouncementController,
+    required this.isLoadingAnnouncement,
   });
 
   @override
-  _NotificationsScreenState createState() => _NotificationsScreenState();
+  _AnnouncementsScreenState createState() => _AnnouncementsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Notification',
+          'Announcements',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -38,15 +38,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: widget.notifications.isEmpty
+                child: widget.announcements.isEmpty
                     ? const Center(
-                        child: Text("No notifications yet"),
+                        child: Text("No announcements yet"),
                       )
                     : ListView.builder(
-                        itemCount: widget.notifications.length,
-                        controller: widget.scrollNotificationController,
+                        itemCount: widget.announcements.length,
+                        controller: widget.scrollAnnouncementController,
                         itemBuilder: (context, index) {
-                          final notification = widget.notifications[index];
+                          final announcement = widget.announcements[index];
                           return Container(
                             margin: const EdgeInsets.symmetric(vertical: 4),
                             padding: const EdgeInsets.all(12),
@@ -56,7 +56,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.notifications,
+                                const Icon(Icons.campaign,
                                     color: Color(0xFF00A3FF)),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -65,13 +65,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        notification.headline,
+                                        announcement.headline,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       Text(
-                                        notification.content,
+                                        announcement.content,
                                         style: const TextStyle(
                                             color: Color(0xFF888888)),
                                         maxLines: 1,
@@ -90,35 +90,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               )
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class NotificationItem extends StatelessWidget {
-  final String title;
-  final String description;
-
-  const NotificationItem({
-    super.key,
-    required this.title,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.blue,
-          child: Icon(Icons.person, color: Colors.white),
-        ),
-        title: Text(title),
-        subtitle: Text(description),
-        trailing: IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {},
         ),
       ),
     );

@@ -1,10 +1,10 @@
 import { ObjectId, Schema, startSession } from "mongoose";
 import { File } from "../models/utils/file.model";
 import { categoryFile, deleteFile, bucket } from "../middlewares/save.config";
-import { Notification } from "../models/notification.model";
+import { Announcement } from "../models/announcement.model";
 import { getFileHash } from "../utils/hashing.util";
 
-export const saveNotification = async (user_id: string, headline: string, content: string, audience: string, files: Express.Multer.File[] | undefined) => {
+export const saveAnnouncement = async (user_id: string, headline: string, content: string, audience: string, files: Express.Multer.File[] | undefined) => {
     const session = await startSession();
     session.startTransaction();
 
@@ -36,7 +36,7 @@ export const saveNotification = async (user_id: string, headline: string, conten
             }
         }
 
-        const notification = await new Notification({
+        const announcement = await new Announcement({
             posted_by: user_id,
             headline,
             content,
@@ -46,7 +46,7 @@ export const saveNotification = async (user_id: string, headline: string, conten
 
         await session.commitTransaction();
         session.endSession();
-        return { message: notification._id, httpCode: 200 };
+        return { message: announcement._id, httpCode: 200 };
     }
     catch (error) {
         await session.abortTransaction();
@@ -54,9 +54,9 @@ export const saveNotification = async (user_id: string, headline: string, conten
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getAllNotifications = async (page: string, user_type: string) => {
+export const getAllAnnouncements = async (page: string, user_type: string) => {
     try {
-        const notifications = await Notification.find({
+        const announcements = await Announcement.find({
             $or: [
                 { audience: { $exists: false } }, // Include documents where audience is not defined
                 { audience: user_type === "ADMIN" ? { $exists: true } : { $in: [user_type, "EVERYONE"] } }
@@ -69,24 +69,24 @@ export const getAllNotifications = async (page: string, user_type: string) => {
             .skip((parseInt(page) - 1) * 30)
             .limit(30);
         console.log(user_type)
-        return { message: notifications, httpCode: 200 };
+        return { message: announcements, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getNotification = async (notification_id: string) => {
+export const getAnnouncement = async (announcement_id: string) => {
     try {
-        const notification = await Notification.findById(notification_id)
+        const announcement = await Announcement.findById(announcement_id)
             .populate("files")
             .populate("posted_by")
             .populate("edited_by");
-        return { message: notification, httpCode: 200 };
+        return { message: announcement, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const editNotification = async (
-    notification_id: string,
+export const editAnnouncement = async (
+    announcement_id: string,
     user_id: string,
     headline: string,
     content: string,
@@ -97,14 +97,14 @@ export const editNotification = async (
     session.startTransaction();
 
     try {
-        const existing_notification = await Notification.findById(notification_id).populate('files');
+        const existing_announcement = await Announcement.findById(announcement_id).populate('files');
 
-        if (!existing_notification) {
-            return { error: "Notification not found", httpCode: 404 };
+        if (!existing_announcement) {
+            return { error: "Announcement not found", httpCode: 404 };
         }
 
         // Get all stored files
-        const storedFiles = existing_notification.files.map((file: any) => ({
+        const storedFiles = existing_announcement.files.map((file: any) => ({
             id: file._id.toString(),
             name: file.file_name,
             url: file.file_url,
@@ -153,14 +153,14 @@ export const editNotification = async (
             await File.findByIdAndDelete(file.id);
         }
 
-        existing_notification.set({
+        existing_announcement.set({
             edited_by: user_id,
             headline,
             content,
             files: saved_files
         });
 
-        await existing_notification.save({ session });
+        await existing_announcement.save({ session });
 
         await session.commitTransaction();
         session.endSession();
@@ -171,14 +171,14 @@ export const editNotification = async (
         return { error: "Internal Server Error", httpCode: 500 };
     }
 };
-export const deleteNotification = async (notification_id: string) => {
+export const deleteAnnouncement = async (announcement_id: string) => {
     try {
-        const notification = await Notification.findByIdAndDelete(notification_id);
-        if (!notification) {
-            return { error: "Notification not found", httpCode: 404 };
+        const announcement = await Announcement.findByIdAndDelete(announcement_id);
+        if (!announcement) {
+            return { error: "Announcement not found", httpCode: 404 };
         }
-        if (notification.files.length > 0) {
-            for (const file of notification.files) {
+        if (announcement.files.length > 0) {
+            for (const file of announcement.files) {
                 try {
                     if (typeof file === "object" && "file_url" in file) {
                         await deleteFile(file.file_url);
@@ -189,8 +189,8 @@ export const deleteNotification = async (notification_id: string) => {
                 }
             }
         }
-        if (!notification) {
-            return { error: "Notification not found", httpCode: 404 };
+        if (!announcement) {
+            return { error: "Announcement not found", httpCode: 404 };
         }
 
         return { message: "Success", httpCode: 200 };
@@ -198,13 +198,13 @@ export const deleteNotification = async (notification_id: string) => {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 };
-export const getFilesFromNotification = async (notification_id: string) => {
+export const getFilesFromAnnouncement = async (announcement_id: string) => {
     try {
-        const notification = await Notification.findById(notification_id)
+        const announcement = await Announcement.findById(announcement_id)
             .populate("files")
             .populate("posted_by")
             .populate("edited_by");
-        return notification?.files;
+        return announcement?.files;
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }

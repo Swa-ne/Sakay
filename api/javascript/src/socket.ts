@@ -5,7 +5,7 @@ import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
 import { addUserToRedisRealtimeController, addUserToRedisTrackingController, checkUserFromRedisRealtimeController, getUserFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
 import { getCurrentUserById } from './services/index.services';
-import { getFilesFromNotification } from './services/notification.services';
+import { getFilesFromAnnouncement } from './services/announcement.services';
 import { getReport } from './services/report.services';
 
 declare module "socket.io" {
@@ -108,9 +108,9 @@ realtimeSocket.on("connection", async (socket) => {
         }
     });
 
-    socket.on("send-notification", async (data) => {
-        const files = await getFilesFromNotification(data.notif_id);
-        socket.broadcast.emit("notification-receive", { notif_id: data.notif_id, headline: data.headline, posted_by: data.posted_by, content: data.content, audience: data.audience, files });
+    socket.on("send-announcement", async (data) => {
+        const files = await getFilesFromAnnouncement(data.announcement_id);
+        socket.broadcast.emit("announcement-receive", { announcement_id: data.announcement_id, headline: data.headline, posted_by: data.posted_by, content: data.content, audience: data.audience, files });
     });
 
     socket.on("disconnect", async () => {
