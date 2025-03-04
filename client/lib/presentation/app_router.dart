@@ -11,6 +11,7 @@ import 'package:sakay_app/presentation/screens/authentication/phone_verification
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
+import 'package:sakay_app/presentation/screens/common/notifcation-pop.dart';
 import 'package:sakay_app/presentation/screens/common/profile.dart';
 import 'package:sakay_app/presentation/screens/commuters/home.dart'
     as CommuterHome;
@@ -23,7 +24,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const AdminMap(),
+      builder: (context, state) => NotificationPop(),
     ),
     GoRoute(
       path: '/onboarding',
