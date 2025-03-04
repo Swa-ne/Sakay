@@ -16,12 +16,9 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         emit(BusLoading());
 
         try {
-          final isSent = await _busRepo.saveBus(event.bus);
-          if (isSent) {
-            emit(SaveBusSuccess());
-          } else {
-            emit(const SaveBusError("Failed to send incident bus."));
-          }
+          final id = await _busRepo.saveBus(event.bus);
+          final newBus = event.bus.copyWith(id: id);
+          emit(SaveBusSuccess(newBus));
         } catch (e) {
           emit(const SaveBusError("Internet Connection Error"));
         } finally {
@@ -30,7 +27,6 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         }
       },
     );
-
     on<GetAllBusesEvent>(
       (event, emit) async {
         try {
@@ -42,7 +38,17 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         }
       },
     );
-
+    on<GetAllBusesAndDriversEvent>(
+      (event, emit) async {
+        try {
+          emit(BusLoading());
+          final buss = await _busRepo.getAllBusesAndAllDrivers();
+          emit(GetAllBusesAndDriversSuccess(buss));
+        } catch (e) {
+          emit(const GetAllBusesAndDriversError("Internet Connection Error"));
+        }
+      },
+    );
     on<GetBusEvent>(
       (event, emit) async {
         try {
@@ -54,7 +60,6 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         }
       },
     );
-
     on<EditBusEvent>(
       (event, emit) async {
         if (_isSending) return;
@@ -65,7 +70,7 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         try {
           final isSent = await _busRepo.editBus(event.bus);
           if (isSent) {
-            emit(EditBusSuccess());
+            emit(EditBusSuccess(event.bus));
           } else {
             emit(const EditBusError("Failed to send incident bus."));
           }
@@ -74,6 +79,50 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         } finally {
           _isSending = false;
           emit(BusReady());
+        }
+      },
+    );
+    on<DeleteBusEvent>(
+      (event, emit) async {
+        if (_isSending) return;
+        _isSending = true;
+
+        emit(BusLoading());
+
+        try {
+          final isSent = await _busRepo.deleteBus(event.bus.id!);
+          if (isSent) {
+            emit(DeleteBusSuccess(event.bus));
+          } else {
+            emit(const DeleteBusError("Failed to send incident bus."));
+          }
+        } catch (e) {
+          emit(const DeleteBusError("Internet Connection Error"));
+        } finally {
+          _isSending = false;
+          emit(BusReady());
+        }
+      },
+    );
+    on<GetAllDriversEvent>(
+      (event, emit) async {
+        try {
+          emit(BusLoading());
+          final drivers = await _busRepo.getAllDrivers();
+          emit(GetAllDriversSuccess(drivers));
+        } catch (e) {
+          emit(const GetAllDriversError("Internet Connection Error"));
+        }
+      },
+    );
+    on<GetDriverEvent>(
+      (event, emit) async {
+        try {
+          emit(BusLoading());
+          final driver = await _busRepo.getDriver(event.driver_id);
+          emit(GetDriverSuccess(driver));
+        } catch (e) {
+          emit(const GetDriverError("Internet Connection Error"));
         }
       },
     );
@@ -100,7 +149,7 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         }
       },
     );
-    on<ReassignUserToBusEvent>(
+    on<RemoveAssignUserToBusEvent>(
       (event, emit) async {
         if (_isSending) return;
         _isSending = true;
@@ -108,15 +157,15 @@ class BusBloc extends Bloc<BusEvent, BusState> {
         emit(BusLoading());
 
         try {
-          final isSent =
-              await _busRepo.reassignUserToBus(event.user_id, event.bus_id);
+          final isSent = await _busRepo.removeAssignUserToBus(event.driver.id);
           if (isSent) {
-            emit(ReassignUserToBusSuccess());
+            emit(RemoveAssignUserToBusSuccess(event.bus, event.driver));
           } else {
-            emit(const ReassignUserToBusError("Failed to send incident bus."));
+            emit(const RemoveAssignUserToBusError(
+                "Failed to send incident bus."));
           }
         } catch (e) {
-          emit(const ReassignUserToBusError("Internet Connection Error"));
+          emit(const RemoveAssignUserToBusError("Internet Connection Error"));
         } finally {
           _isSending = false;
           emit(BusReady());
