@@ -9,7 +9,7 @@ export const postBus = async (bus_number: string, plate_number: string) => {
     session.startTransaction();
 
     try {
-        await new Bus({
+        const bus = await new Bus({
             bus_number,
             plate_number
         }).save({ session });
@@ -17,7 +17,7 @@ export const postBus = async (bus_number: string, plate_number: string) => {
         await session.commitTransaction();
         session.endSession();
 
-        return { message: "Success", httpCode: 200 };
+        return { message: bus._id, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
@@ -37,6 +37,29 @@ export const getBusses = async () => {
         const busesWithDrivers = await Promise.all(
             busses.map(async (bus) => {
                 const driver = await getTodayDriver(bus._id.toString());
+                return { ...bus.toObject(), today_driver: driver?.message };
+            })
+        );
+        return { message: busesWithDrivers, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const getBussesAndAllDrivers = async () => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const busses = await Bus.find()
+            .session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+        const busesWithDrivers = await Promise.all(
+            busses.map(async (bus) => {
+                const driver = await getBusDriver(bus._id.toString());
                 return { ...bus.toObject(), current_driver: driver?.message };
             })
         );
@@ -101,6 +124,14 @@ export const deleteBus = async (bus_id: string) => {
     try {
         const bus = await Bus.findByIdAndDelete(bus_id).session(session);
 
+        if (!bus) {
+            await session.abortTransaction();
+            session.endSession();
+            return { error: 'Bus not found', httpCode: 404 };
+        }
+
+        await UserBusAssigning.deleteMany({ bus_id }).session(session);
+
         await session.commitTransaction();
         session.endSession();
 
@@ -108,7 +139,45 @@ export const deleteBus = async (bus_id: string) => {
             return { error: 'Bus not found', httpCode: 404 };
         }
 
-        return { message: bus, httpCode: 200 };
+        return { message: "Success", httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const getDrivers = async () => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const drivers = await User.find({ user_type: "DRIVER" })
+            .session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+        return { message: drivers, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const getDriver = async (bus_id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const driver = await User.findById(bus_id).session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (!driver) {
+            return { error: 'Driver not found', httpCode: 404 };
+        }
+
+        return { message: driver, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
@@ -134,7 +203,7 @@ export const assignUserToBus = async (user_id: string, bus_id: string) => {
             return { error: 'User not found', httpCode: 404 };
         }
 
-        new UserBusAssigning({
+        await new UserBusAssigning({
             user_id,
             bus_id,
         }).save({ session });
@@ -150,27 +219,18 @@ export const assignUserToBus = async (user_id: string, bus_id: string) => {
     }
 }
 
-export const reassignUserToBus = async (user_id: string, bus_id: string) => {
+export const removeAssignUserToBus = async (user_id: string) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        const user = await UserBusAssigning.findOne({ user_id }).session(session);
-        const bus = await Bus.findById(bus_id).session(session);
+        const result = await UserBusAssigning.findOneAndDelete({ user_id }).session(session);
 
-        if (!bus) {
+        if (!result) {
             await session.abortTransaction();
             session.endSession();
-            return { error: 'Bus not found', httpCode: 404 };
+            return { error: 'User assignment not found', httpCode: 404 };
         }
-        if (!user) {
-            await session.abortTransaction();
-            session.endSession();
-            return { error: 'User not found', httpCode: 404 };
-        }
-        user.bus_id = bus._id;
-
-        user.save({ session });
 
         await session.commitTransaction();
         session.endSession();
