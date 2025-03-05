@@ -6,7 +6,7 @@ import { authenticateToken } from "../middlewares/token.authentication";
 import { changePasswordController, editProfileController, forgotPasswordController, loginUserController, postResetPasswordController } from "../controllers/authentication/login.controller";
 import { logoutUserController } from "../controllers/authentication/logout.controller";
 import { refreshAccessTokenController } from "../controllers/authentication/refresh.token.controller";
-import { getCurrentUserController } from "../controllers/authentication/index.controller";
+import { getCurrentUserController, getFile } from "../controllers/authentication/index.controller";
 import { forgetPasswordLimiter, loginLimiter, sendCodeLimiter } from "../middlewares/rate.limiter";
 
 const router = Router();
@@ -32,5 +32,7 @@ router.post("/forgot-password", forgetPasswordLimiter, forgotPasswordController)
 router.post("/reset-password", authenticateToken, postResetPasswordController);
 
 router.get("/current-user", authenticateToken, getCurrentUserController);
+
+router.get('/fetch-file', authenticateToken, getFile);
 
 export default router;

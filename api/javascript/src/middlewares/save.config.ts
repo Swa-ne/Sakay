@@ -26,7 +26,7 @@ export const categoryFile = (file: Express.Multer.File) => {
 
 export const deleteFile = async (filePath: string) => {
     try {
-        const url = extractFilePath(filePath);
+        const url = extractFilePathMedia(filePath);
         if (!url) {
             throw new Error("File not found!");
         }
@@ -38,11 +38,18 @@ export const deleteFile = async (filePath: string) => {
     }
 };
 
-function extractFilePath(url: string): string | null {
+function extractFilePathMedia(url: string): string | null {
     const regex = /\/o\/(.*?)\?alt=media/;
     const match = url.match(regex);
 
     return match && match[1] ? decodeURIComponent(match[1]) : null;
+}
+
+export function extractFilePath(url: string): string {
+    const regex = /https:\/\/storage\.googleapis\.com\/[^/]+\/(.+)/;
+    const match = url.match(regex);
+
+    return match ? match[1] : "";
 }
 
 export const uploadFiles = multer({ storage: multer.memoryStorage(), fileFilter });
