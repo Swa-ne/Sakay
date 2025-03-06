@@ -228,9 +228,9 @@ class AProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 10.0),
               _buildSettingsOption(Icons.account_circle, 'Account',
                   'Manage and update your personal account information'),
-              const SizedBox(height: 10),
-              _buildSettingsOption(Icons.notifications, 'Saved Locations',
-                  'Easily access your most frequented destinations'),
+              // const SizedBox(height: 10),
+              // _buildSettingsOption(Icons.campaign, 'Saved Locations',
+              //     'Easily access your most frequented destinations'),
               const SizedBox(height: 10),
               _buildSettingsOption(Icons.edit, 'Language Preference',
                   'Select the language that best fits your needs'),
@@ -307,33 +307,35 @@ class AProfilePageState extends State<ProfilePage> {
               ),
               builder: (context) => _accountPage(context),
             );
-          } else if (title == 'Saved Locations') {
-            showDialog(
-              context: context,
-              builder: (context) {
-                int? selectedLocation;
+          }
+          // else if (title == 'Saved Locations') {
+          //   showDialog(
+          //     context: context,
+          //     builder: (context) {
+          //       int? selectedLocation;
 
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    void toggleSelection(int value) {
-                      setState(() {
-                        selectedLocation =
-                            (selectedLocation == value) ? null : value;
-                      });
-                    }
+          //       return StatefulBuilder(
+          //         builder: (context, setState) {
+          //           void toggleSelection(int value) {
+          //             setState(() {
+          //               selectedLocation =
+          //                   (selectedLocation == value) ? null : value;
+          //             });
+          //           }
 
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: savedLocationsPage(
-                          context, selectedLocation, toggleSelection),
-                    );
-                  },
-                );
-              },
-            );
-          } else if (title == 'Language Preference') {
+          //           return Dialog(
+          //             shape: RoundedRectangleBorder(
+          //               borderRadius: BorderRadius.circular(10),
+          //             ),
+          //             child: savedLocationsPage(
+          //                 context, selectedLocation, toggleSelection),
+          //           );
+          //         },
+          //       );
+          //     },
+          //   );
+          // }
+          else if (title == 'Language Preference') {
             showDialog(
               context: context,
               builder: (context) {
@@ -366,7 +368,7 @@ class AProfilePageState extends State<ProfilePage> {
                 return StatefulBuilder(
                   builder: (context, setState) {
                     bool isDarkMode = false;
-                    bool isNotificationEnabled = false;
+                    bool isAnnouncementEnabled = false;
                     bool isSoundEffectEnabled = false;
                     int fontSize = 14;
                     int vibrationIntensity = 3;
@@ -379,14 +381,14 @@ class AProfilePageState extends State<ProfilePage> {
                       child: _themeCustomizationPage(
                         context,
                         isDarkMode,
-                        isNotificationEnabled,
+                        isAnnouncementEnabled,
                         isSoundEffectEnabled,
                         fontSize,
                         vibrationIntensity,
                         soundVolume1,
                         soundVolume2,
                         (val) => setState(() => isDarkMode = val),
-                        (val) => setState(() => isNotificationEnabled = val),
+                        (val) => setState(() => isAnnouncementEnabled = val),
                         (val) => setState(() => isSoundEffectEnabled = val),
                         (val) => setState(() => fontSize = val),
                         (val) => setState(() => vibrationIntensity = val),
@@ -818,110 +820,110 @@ class AProfilePageState extends State<ProfilePage> {
 // ----------------------------------------------------------------
 
 // saved location page
-  Widget savedLocationsPage(BuildContext context, int? selectedLocation,
-      void Function(int) toggleSelection) {
-    return Container(
-      height: 550,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.black, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      'Saved Locations',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const Divider(thickness: 1, color: Colors.grey),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          constraints: const BoxConstraints(maxHeight: 32),
-                          prefixIcon: const Icon(Icons.search, size: 18),
-                          hintText: 'Search saved locations',
-                          hintStyle: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.grey),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              children: [
-                _buildLocationTile(
-                    1,
-                    'CSI Lucao',
-                    '28CF+CH5, Dagupan - Binmaley Rd.',
-                    selectedLocation,
-                    toggleSelection),
-                _buildLocationTile(
-                    2,
-                    'King Fisher',
-                    '28CF+CH5, Dagupan - Binmaley Rd.',
-                    selectedLocation,
-                    toggleSelection),
-                _buildLocationTile(
-                    3,
-                    'Lingayen',
-                    '28CF+CH5, Dagupan - Binmaley Rd.',
-                    selectedLocation,
-                    toggleSelection),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10, right: 15, bottom: 10),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.add, color: Colors.blue, size: 20),
-                    onPressed: () {
-                      // Add function
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                    onPressed: () {
-                      // Delete function
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget savedLocationsPage(BuildContext context, int? selectedLocation,
+  //     void Function(int) toggleSelection) {
+  //   return Container(
+  //     height: 550,
+  //     decoration: const BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.all(Radius.circular(5)),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.all(15),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               const Row(
+  //                 children: [
+  //                   Icon(Icons.location_on, color: Colors.black, size: 18),
+  //                   SizedBox(width: 6),
+  //                   Text(
+  //                     'Saved Locations',
+  //                     style:
+  //                         TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const Divider(thickness: 1, color: Colors.grey),
+  //               const SizedBox(height: 10),
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: TextField(
+  //                       decoration: InputDecoration(
+  //                         constraints: const BoxConstraints(maxHeight: 32),
+  //                         prefixIcon: const Icon(Icons.search, size: 18),
+  //                         hintText: 'Search saved locations',
+  //                         hintStyle: const TextStyle(
+  //                             fontSize: 10,
+  //                             fontWeight: FontWeight.normal,
+  //                             color: Colors.grey),
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(5),
+  //                           borderSide: const BorderSide(color: Colors.grey),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Expanded(
+  //           child: ListView(
+  //             children: [
+  //               _buildLocationTile(
+  //                   1,
+  //                   'CSI Lucao',
+  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
+  //                   selectedLocation,
+  //                   toggleSelection),
+  //               _buildLocationTile(
+  //                   2,
+  //                   'King Fisher',
+  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
+  //                   selectedLocation,
+  //                   toggleSelection),
+  //               _buildLocationTile(
+  //                   3,
+  //                   'Lingayen',
+  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
+  //                   selectedLocation,
+  //                   toggleSelection),
+  //             ],
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(top: 10, right: 15, bottom: 10),
+  //           child: Align(
+  //             alignment: Alignment.bottomRight,
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 IconButton(
+  //                   icon: const Icon(Icons.add, color: Colors.blue, size: 20),
+  //                   onPressed: () {
+  //                     // Add function
+  //                   },
+  //                 ),
+  //                 IconButton(
+  //                   icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+  //                   onPressed: () {
+  //                     // Delete function
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildLocationTile(int value, String title, String subtitle,
       int? selectedLocation, void Function(int) toggleSelection) {
@@ -1027,14 +1029,14 @@ class AProfilePageState extends State<ProfilePage> {
   Widget _themeCustomizationPage(
     BuildContext context,
     bool isDarkMode,
-    bool isNotificationEnabled,
+    bool isAnnouncementEnabled,
     bool isSoundEffectEnabled,
     int fontSize,
     int vibrationIntensity,
     double soundVolume1,
     double soundVolume2,
     Function(bool) onDarkModeChanged,
-    Function(bool) onNotificationChanged,
+    Function(bool) onAnnouncementChanged,
     Function(bool) onSoundEffectChanged,
     Function(int) onFontSizeChanged,
     Function(int) onVibrationChanged,
@@ -1079,11 +1081,11 @@ class AProfilePageState extends State<ProfilePage> {
             ),
           ),
           _customizationOption(
-            icon: Icons.notifications,
-            text: 'Notification Alert',
+            icon: Icons.campaign,
+            text: 'Announcement Alert',
             trailing: Switch(
-              value: isNotificationEnabled,
-              onChanged: onNotificationChanged,
+              value: isAnnouncementEnabled,
+              onChanged: onAnnouncementChanged,
             ),
           ),
           _customizationOption(
