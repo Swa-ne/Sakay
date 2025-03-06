@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakay_app/data/models/announcement.dart';
+import 'package:sakay_app/presentation/screens/common/announcement_main.dart';
 
 // TODO: add refresh callback
 class AnnouncementsScreen extends StatefulWidget {
@@ -47,42 +48,56 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                         controller: widget.scrollAnnouncementController,
                         itemBuilder: (context, index) {
                           final announcement = widget.announcements[index];
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEEEEEE),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.campaign,
-                                    color: Color(0xFF00A3FF)),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        announcement.headline,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        announcement.content,
-                                        style: const TextStyle(
-                                            color: Color(0xFF888888)),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    ],
+                          return GestureDetector(
+                            onTap: () {
+                              // Navigate to AnnouncementDetailScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AnnouncementDetailScreen(
+                                    announcement: announcement,
                                   ),
                                 ),
-                                const Icon(Icons.more_horiz,
-                                    color: Colors.black),
-                              ],
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEEEEEE),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.campaign,
+                                      color: Color(0xFF00A3FF)),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          announcement.headline,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          announcement.content,
+                                          style: const TextStyle(
+                                              color: Color(0xFF888888)),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.more_horiz,
+                                      color: Colors.black),
+                                ],
+                              ),
                             ),
                           );
                         },
