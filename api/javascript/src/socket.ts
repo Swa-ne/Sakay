@@ -113,6 +113,11 @@ realtimeSocket.on("connection", async (socket) => {
         socket.broadcast.emit("announcement-receive", { announcement_id: data.announcement_id, headline: data.headline, posted_by: data.posted_by, content: data.content, audience: data.audience, files });
     });
 
+    socket.on("update-announcement", async (data) => {
+        const files = await getFilesFromAnnouncement(data.announcement_id);
+        socket.broadcast.emit("update-announcement-receive", { announcement_id: data.announcement_id, headline: data.headline, posted_by: data.posted_by, content: data.content, audience: data.audience, files });
+    });
+
     socket.on("disconnect", async () => {
         socket.broadcast.emit("track-my-vehicle-stop", {
             user: socket.id
