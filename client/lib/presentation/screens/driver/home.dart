@@ -10,6 +10,7 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/bloc/tracker/tracker_state.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
+import 'package:sakay_app/common/widgets/popup_notification.dart';
 import 'package:sakay_app/data/models/message.dart';
 import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
@@ -169,7 +170,11 @@ class _HomeState extends State<Home> with Tracker {
             isLoadingAnnouncement = false;
           });
         } else if (state is OnReceiveAnnouncementSuccess) {
-          // TODO: add simple announcement like sa tiktok
+          if (_selectedIndex != 2) {
+            showTopNotification(
+              context,
+            );
+          }
           setState(() {
             announcements.insert(0, state.announcement);
             isLoadingAnnouncement = false;
@@ -196,7 +201,15 @@ class _HomeState extends State<Home> with Tracker {
               isLoadingMessage = false;
             });
           } else if (state is OnReceiveMessageSuccess) {
-            // TODO: add simple announcement like sa tiktok
+            if (_selectedIndex != 1) {
+              showTopNotification(
+                context,
+                icon: Icons.chat_bubble,
+                isUserReply: true,
+                message: state.message.message,
+                imageUrl: state.user.profile,
+              );
+            }
             if (chat_id == state.message.chat_id) {
               setState(() {
                 messages.insert(0, state.message);
