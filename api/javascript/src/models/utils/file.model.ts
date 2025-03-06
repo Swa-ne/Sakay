@@ -1,7 +1,7 @@
-import { Document, model, ObjectId, Schema } from "mongoose";
+import { Document, model, Types, Schema } from "mongoose";
 
 export interface FileSchemaInterface extends Document {
-    _id: ObjectId;
+    _id: Types.ObjectId;
     file_name: string;
     file_type: string;
     file_size: number;
