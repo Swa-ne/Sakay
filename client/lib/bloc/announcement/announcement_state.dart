@@ -27,7 +27,14 @@ class SaveAnnouncementError extends AnnouncementState {
   List<Object> get props => [error];
 }
 
-class EditAnnouncementSuccess extends AnnouncementState {}
+class EditAnnouncementSuccess extends AnnouncementState {
+  final AnnouncementsModel announcement;
+
+  const EditAnnouncementSuccess(this.announcement);
+
+  @override
+  List<Object> get props => [announcement];
+}
 
 class EditAnnouncementError extends AnnouncementState {
   final String error;
@@ -51,6 +58,24 @@ class OnReceiveAnnouncementError extends AnnouncementState {
   final String error;
 
   const OnReceiveAnnouncementError(this.error);
+
+  @override
+  List<Object> get props => [error];
+}
+
+class OnReceiveUpdateAnnouncementSuccess extends AnnouncementState {
+  final AnnouncementsModel announcement;
+
+  const OnReceiveUpdateAnnouncementSuccess(this.announcement);
+
+  @override
+  List<Object> get props => [announcement];
+}
+
+class OnReceiveUpdateAnnouncementError extends AnnouncementState {
+  final String error;
+
+  const OnReceiveUpdateAnnouncementError(this.error);
 
   @override
   List<Object> get props => [error];

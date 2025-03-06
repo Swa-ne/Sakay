@@ -86,7 +86,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
             event.announcement,
           );
           if (isSent) {
-            emit(EditAnnouncementSuccess());
+            emit(EditAnnouncementSuccess(event.announcement));
           } else {
             emit(const EditAnnouncementError("Failed to send announcement."));
           }
@@ -122,6 +122,17 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
           emit(OnReceiveAnnouncementSuccess(event.announcement));
         } catch (e) {
           emit(const OnReceiveAnnouncementError("Internet Connection Error"));
+        }
+      },
+    );
+    on<OnReceiveUpdateAnnouncementEvent>(
+      (event, emit) async {
+        try {
+          emit(AnnouncementLoading());
+          emit(OnReceiveUpdateAnnouncementSuccess(event.announcement));
+        } catch (e) {
+          emit(const OnReceiveUpdateAnnouncementError(
+              "Internet Connection Error"));
         }
       },
     );

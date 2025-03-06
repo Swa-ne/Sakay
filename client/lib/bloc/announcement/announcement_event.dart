@@ -72,3 +72,12 @@ class OnReceiveAnnouncementEvent extends AnnouncementEvent {
   @override
   List<Object> get props => [announcement];
 }
+
+class OnReceiveUpdateAnnouncementEvent extends AnnouncementEvent {
+  final AnnouncementsModel announcement;
+
+  const OnReceiveUpdateAnnouncementEvent(this.announcement);
+
+  @override
+  List<Object> get props => [announcement];
+}
