@@ -24,7 +24,7 @@ mixin Tracker {
     mapboxMap = map;
     pointAnnotationManager =
         await mapboxMap?.annotations.createPointAnnotationManager();
-    carBytes = await rootBundle.load('assets/bus.png');
+    carBytes = await rootBundle.load('assets/bus_icon.png');
     carImageData = carBytes?.buffer.asUint8List();
     personBytes = await rootBundle.load('assets/person.png');
     personImageData = personBytes?.buffer.asUint8List();
@@ -101,7 +101,7 @@ mixin Tracker {
           ),
         ),
         image: carImageData,
-        iconSize: 0.1,
+        iconSize: 0.06,
       ),
     );
     busses.addAll({bus: annotation!});
@@ -135,7 +135,7 @@ mixin Tracker {
           ),
         ),
         image: personImageData,
-        iconSize: 0.1,
+        iconSize: 0.05,
       ),
     );
     people.addAll({person: annotation!});
