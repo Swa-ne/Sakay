@@ -25,11 +25,12 @@ class MessageModel extends Equatable {
       message: json['message'] ?? '',
       sender: json['sender_id'] ?? '',
       chat_id: json['chat_id'] ?? '',
-      is_read: json['wasActive'] ?? false,
+      is_read: json['isRead'] ?? false,
       created_at: json['createdAt'] ?? "",
       updated_at: json['updatedAt'] ?? "",
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -40,6 +41,27 @@ class MessageModel extends Equatable {
       'createdAt': created_at,
       'updatedAt': updated_at,
     };
+  }
+
+  // Add the copyWith method
+  MessageModel copyWith({
+    String? id,
+    String? message,
+    String? sender,
+    String? chat_id,
+    bool? is_read,
+    String? created_at,
+    String? updated_at,
+  }) {
+    return MessageModel(
+      id: id ?? this.id,
+      message: message ?? this.message,
+      sender: sender ?? this.sender,
+      chat_id: chat_id ?? this.chat_id,
+      is_read: is_read ?? this.is_read,
+      created_at: created_at ?? this.created_at,
+      updated_at: updated_at ?? this.updated_at,
+    );
   }
 
   @override
