@@ -1,12 +1,12 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_event.dart';
-import 'package:sakay_app/bloc/notification/notification_bloc.dart';
-import 'package:sakay_app/bloc/notification/notification_event.dart';
+import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
+import 'package:sakay_app/bloc/announcement/announcement_event.dart';
 import 'package:sakay_app/bloc/report/report_bloc.dart';
 import 'package:sakay_app/bloc/report/report_event.dart';
 import 'package:sakay_app/data/models/file.dart';
-import 'package:sakay_app/data/models/notificaton.dart';
+import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/models/report.dart';
 import 'package:sakay_app/data/models/user.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
@@ -16,7 +16,7 @@ final _apiUrl = "${dotenv.env['API_URL']}/realtime";
 
 abstract class RealtimeSocketController {
   Future<void> passChatBloc(ChatBloc boc);
-  Future<void> passNotificationBloc(NotificationBloc bloc);
+  Future<void> passAnnouncementBloc(AnnouncementBloc bloc);
   Future<void> passReportBloc(ReportBloc bloc);
   Future<void> connect();
   Future<void> connectAdmin();
@@ -25,7 +25,8 @@ abstract class RealtimeSocketController {
     String message,
     String chat_id,
   );
-  void sendNotification(NotificationModel notification);
+  void sendAnnouncement(AnnouncementsModel announcement);
+  void updateAnnouncement(AnnouncementsModel announcement);
   void sendReport(ReportModel report);
   void toggleReport(String report_id);
   void disconnect();
@@ -37,7 +38,7 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
       RealtimeSocketControllerImpl._internal();
   late IO.Socket socket;
   late ChatBloc chatBloc;
-  late NotificationBloc notificationBloc;
+  late AnnouncementBloc announcementBloc;
   late ReportBloc reportBloc;
 
   factory RealtimeSocketControllerImpl() {
@@ -50,8 +51,8 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
   }
 
   @override
-  Future<void> passNotificationBloc(NotificationBloc bloc) async {
-    notificationBloc = bloc;
+  Future<void> passAnnouncementBloc(AnnouncementBloc bloc) async {
+    announcementBloc = bloc;
   }
 
   @override
@@ -86,9 +87,22 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
       ));
     });
 
-    socket.on('notification-receive', (data) {
-      notificationBloc.add(OnReceiveNotificationEvent(NotificationModel(
-        id: data["notif_id"],
+    socket.on('announcement-receive', (data) {
+      announcementBloc.add(OnReceiveAnnouncementEvent(AnnouncementsModel(
+        id: data["announcement_id"],
+        posted_by: data["posted_by"],
+        headline: data["headline"],
+        content: data["content"],
+        audience: data["audience"],
+        files: (data['files'] as List)
+            .map((json) => FileModel.fromJson(json))
+            .toList(),
+      )));
+    });
+
+    socket.on('update-announcement-receive', (data) {
+      announcementBloc.add(OnReceiveUpdateAnnouncementEvent(AnnouncementsModel(
+        id: data["announcement_id"],
         posted_by: data["posted_by"],
         headline: data["headline"],
         content: data["content"],
@@ -147,13 +161,24 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
   }
 
   @override
-  void sendNotification(NotificationModel notification) {
-    socket.emit('send-notification', {
-      'headline': notification.headline,
-      'content': notification.content,
-      'posted_by': notification.posted_by,
-      'audience': notification.audience,
-      'notif_id': notification.id,
+  void sendAnnouncement(AnnouncementsModel announcement) {
+    socket.emit('send-announcement', {
+      'headline': announcement.headline,
+      'content': announcement.content,
+      'posted_by': announcement.posted_by,
+      'audience': announcement.audience,
+      'announcement_id': announcement.id,
+    });
+  }
+
+  @override
+  void updateAnnouncement(AnnouncementsModel announcement) {
+    socket.emit('update-announcement', {
+      'headline': announcement.headline,
+      'content': announcement.content,
+      'posted_by': announcement.posted_by,
+      'audience': announcement.audience,
+      'announcement_id': announcement.id,
     });
   }
 
@@ -166,7 +191,7 @@ class RealtimeSocketControllerImpl extends RealtimeSocketController {
 
   @override
   void toggleReport(String report_id) {
-    socket.emit('send-report', {
+    socket.emit('toggle-report', {
       'report_id': report_id,
     });
   }
