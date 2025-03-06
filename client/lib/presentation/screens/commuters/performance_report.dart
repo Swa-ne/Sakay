@@ -54,8 +54,8 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
     setState(() {
       _selectedVehicle = newValue;
       driver_name =
-          "${newValue!.current_driver?.first_name} ${newValue.current_driver?.last_name}";
-      profile = newValue.current_driver?.profile;
+          "${newValue!.today_driver?.first_name} ${newValue.today_driver?.last_name}";
+      profile = newValue.today_driver?.profile;
     });
   }
 
@@ -116,7 +116,7 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
           service_rate: _reliabilityRating,
           reliability_rate: _drivingRating,
           is_open: true,
-          driver: _selectedVehicle?.current_driver,
+          driver: _selectedVehicle?.today_driver,
         ),
       ),
     );
@@ -183,8 +183,8 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
             _vehicles.addAll(state.buses);
             _selectedVehicle = _vehicles.first;
             driver_name =
-                "${_selectedVehicle!.current_driver?.first_name} ${_selectedVehicle?.current_driver?.last_name}";
-            profile = _selectedVehicle!.current_driver?.profile;
+                "${_selectedVehicle!.today_driver?.first_name} ${_selectedVehicle?.today_driver?.last_name}";
+            profile = _selectedVehicle!.today_driver?.profile;
           });
         } else if (state is GetAllBusesError) {
           ScaffoldMessenger.of(context).showSnackBar(

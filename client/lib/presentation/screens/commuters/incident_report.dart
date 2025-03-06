@@ -7,6 +7,7 @@ import 'package:sakay_app/bloc/bus/bus_state.dart';
 import 'package:sakay_app/bloc/report/report_bloc.dart';
 import 'package:sakay_app/bloc/report/report_event.dart';
 import 'package:sakay_app/bloc/report/report_state.dart';
+import 'package:sakay_app/common/mixins/convertion.dart';
 import 'package:sakay_app/common/mixins/input_validation.dart';
 import 'package:sakay_app/data/models/bus.dart';
 import 'package:sakay_app/data/models/report.dart';
@@ -19,7 +20,7 @@ class IncidentReportPage extends StatefulWidget {
 }
 
 class _IncidentReportPageState extends State<IncidentReportPage>
-    with InputValidationMixin {
+    with InputValidationMixin, Convertion {
   late BusBloc _busBloc;
   late ReportBloc _reportBloc;
   final TextEditingController _placeOfIncidentController =
@@ -180,7 +181,7 @@ class _IncidentReportPageState extends State<IncidentReportPage>
         ReportModel(
           bus_id: _selectedVehicle?.id,
           date_of_incident: _selectedDate.toString(),
-          time_of_incident: _selectedTime.toString(),
+          time_of_incident: formatTimeOfDay(_selectedTime!),
           type_of_report: "INCIDENT",
           description: _briefDiscussionController.text.trim(),
           place_of_incident: _placeOfIncidentController.text.trim(),
@@ -232,7 +233,7 @@ class _IncidentReportPageState extends State<IncidentReportPage>
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.notifications, color: Colors.black),
+                    Icon(Icons.campaign, color: Colors.black),
                     SizedBox(width: 8),
                     Text(
                       'Details of Reporting the Incident',
@@ -335,7 +336,7 @@ class _IncidentReportPageState extends State<IncidentReportPage>
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        //TODO: add notif na successful ung pag report like ung sa SRM sa ssp
+                        //TODO: add announcement na successful ung pag report like ung sa SRM sa ssp
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
