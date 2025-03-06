@@ -255,24 +255,24 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   ),
                 ],
               ),
-              const SizedBox(height: 30.0),
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Image.asset('assets/google_icon.png', height: 24.0),
-                  label: const Text('Sign up with Google'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 30.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      side: const BorderSide(color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ),
+              // const SizedBox(height: 30.0),
+              // Center(
+              //   child: ElevatedButton.icon(
+              //     onPressed: () {},
+              //     icon: Image.asset('assets/google_icon.png', height: 24.0),
+              //     label: const Text('Sign up with Google'),
+              //     style: ElevatedButton.styleFrom(
+              //       foregroundColor: Colors.black,
+              //       backgroundColor: Colors.white,
+              //       padding: const EdgeInsets.symmetric(
+              //           vertical: 12.0, horizontal: 30.0),
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(8.0),
+              //         side: const BorderSide(color: Colors.grey),
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 50.0),
               Center(
                 child: Text.rich(

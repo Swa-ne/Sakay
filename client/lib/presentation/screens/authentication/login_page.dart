@@ -251,22 +251,22 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     ),
 
                     // Google Sign-In Button
-                    const SizedBox(height: 20.0),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Image.asset('assets/google_icon.png', height: 24.0),
-                      label: const Text('Sign in with Google'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 30.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          side: const BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                    ),
+                    // const SizedBox(height: 20.0),
+                    // ElevatedButton.icon(
+                    //   onPressed: () {},
+                    //   icon: Image.asset('assets/google_icon.png', height: 24.0),
+                    //   label: const Text('Sign in with Google'),
+                    //   style: ElevatedButton.styleFrom(
+                    //     foregroundColor: Colors.black,
+                    //     backgroundColor: Colors.white,
+                    //     padding: const EdgeInsets.symmetric(
+                    //         vertical: 12.0, horizontal: 30.0),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(8.0),
+                    //       side: const BorderSide(color: Colors.grey),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
