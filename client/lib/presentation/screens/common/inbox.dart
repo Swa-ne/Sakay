@@ -90,59 +90,61 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
         ),
         body: Column(
           children: [
-            ListView.builder(
-              itemCount: widget.messages.length,
-              reverse: true,
-              controller: widget.scrollInboxController,
-              itemBuilder: (context, index) {
-                bool isMe = widget.user_id == widget.messages[index].sender;
-                String formattedTime =
-                    formatDateTime(widget.messages[index].created_at);
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.messages.length,
+                reverse: true,
+                controller: widget.scrollInboxController,
+                itemBuilder: (context, index) {
+                  bool isMe = widget.user_id == widget.messages[index].sender;
+                  String formattedTime =
+                      formatDateTime(widget.messages[index].created_at);
 
-                bool showTimeSeparator = false;
+                  bool showTimeSeparator = false;
 
-                if (index < widget.messages.length - 1) {
-                  DateTime currentMessageTime =
-                      DateTime.parse(widget.messages[index].created_at);
-                  DateTime previousMessageTime =
-                      DateTime.parse(widget.messages[index + 1].created_at);
+                  if (index < widget.messages.length - 1) {
+                    DateTime currentMessageTime =
+                        DateTime.parse(widget.messages[index].created_at);
+                    DateTime previousMessageTime =
+                        DateTime.parse(widget.messages[index + 1].created_at);
 
-                  if (currentMessageTime
-                          .difference(previousMessageTime)
-                          .inMinutes >
-                      10) {
+                    if (currentMessageTime
+                            .difference(previousMessageTime)
+                            .inMinutes >
+                        10) {
+                      showTimeSeparator = true;
+                    }
+                  } else {
                     showTimeSeparator = true;
                   }
-                } else {
-                  showTimeSeparator = true;
-                }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (showTimeSeparator)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Center(
-                          child: Text(
-                            formatDate(widget.messages[index].created_at),
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 12),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showTimeSeparator)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Center(
+                            child: Text(
+                              formatDate(widget.messages[index].created_at),
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 12),
+                            ),
                           ),
                         ),
+                      Align(
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: chatBubble(
+                          widget.messages[index].message,
+                          isMe,
+                          formattedTime,
+                        ),
                       ),
-                    Align(
-                      alignment:
-                          isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      child: chatBubble(
-                        widget.messages[index].message,
-                        isMe,
-                        formattedTime,
-                      ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
