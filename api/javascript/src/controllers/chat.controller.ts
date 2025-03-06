@@ -138,8 +138,13 @@ export const openInboxByUserIDController = async (req: Request & { user?: UserTy
             res.status(400).json({ message: 'User ID not provided' });
             return;
         }
+
         const result = await openInboxByUserID(user_id)
-        res.status(200).json({ message: result });
+        if (result.httpCode === 200) {
+            res.status(200).json({ message: result.message });
+            return
+        }
+        res.status(result.httpCode).json({ error: result.error });
     } catch (error) {
         res.status(500).json({ 'message': 'Internal Server Error' });
     }
@@ -151,7 +156,6 @@ export const isReadChatController = async (req: Request & { user?: UserType }, r
             res.status(404).json({ error: "User not found" });
             return;
         }
-
         const { user_id } = user;
         if (!user_id) {
             res.status(400).json({ message: 'User ID not provided' });
@@ -165,7 +169,11 @@ export const isReadChatController = async (req: Request & { user?: UserType }, r
         }
 
         const result = await isReadChat(user_id, chat_id)
-        res.status(200).json({ message: result });
+        if (result.httpCode === 200) {
+            res.status(200).json({ message: result.message });
+            return
+        }
+        res.status(result.httpCode).json({ error: result.error });
     } catch (error) {
         res.status(500).json({ 'message': 'Internal Server Error' });
     }
