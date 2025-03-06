@@ -12,6 +12,7 @@ import 'package:sakay_app/data/models/file.dart';
 import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/models/user.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
+import 'package:sakay_app/presentation/screens/common/announcement_main.dart';
 
 // TODO: cache announcements list
 class AdminAnnouncement extends StatefulWidget {
@@ -66,6 +67,14 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
       email: await _tokenController.getEmail(),
       profile: await _tokenController.getProfile(),
     );
+  }
+
+  void _updateAnnouncementsList(AnnouncementsModel announcement) {
+    setState(() {
+      final index =
+          announcements.indexWhere((inbox) => inbox.id == announcement.id);
+      announcements[index] = announcement;
+    });
   }
 
   void _onScroll() {
@@ -230,7 +239,6 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
         if (state is AnnouncementLoading) {
           // TODO: add lottie??
         } else if (state is SaveAnnouncementSuccess) {
-          Navigator.pop(context);
           setState(() {
             announcements.insert(
               0,
@@ -240,12 +248,14 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                 audience: _selectedAudience,
                 posted_by: _myUserModel,
                 files: convertFilesToFileModels(files),
+                created_at: DateTime.now().toIso8601String(),
               ),
             );
             _headlineController.clear();
             _contentController.clear();
             files.clear();
           });
+          Navigator.pop(context);
         } else if (state is OnReceiveAnnouncementSuccess) {
           setState(() {
             announcements.insert(0, state.announcement);
@@ -316,42 +326,57 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                           controller: _scrollController,
                           itemBuilder: (context, index) {
                             final announcement = announcements[index];
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEEEEEE),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.campaign,
-                                      color: Color(0xFF00A3FF)),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          announcement.headline,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          announcement.content,
-                                          style: const TextStyle(
-                                              color: Color(0xFF888888)),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )
-                                      ],
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AnnouncementDetailScreen(
+                                      announcement: announcement,
+                                      updateAnnouncementsList:
+                                          _updateAnnouncementsList,
                                     ),
                                   ),
-                                  const Icon(Icons.more_horiz,
-                                      color: Colors.black),
-                                ],
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEEEEE),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.campaign,
+                                        color: Color(0xFF00A3FF)),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            announcement.headline,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            announcement.content,
+                                            style: const TextStyle(
+                                                color: Color(0xFF888888)),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.more_horiz,
+                                        color: Colors.black),
+                                  ],
+                                ),
                               ),
                             );
                           },

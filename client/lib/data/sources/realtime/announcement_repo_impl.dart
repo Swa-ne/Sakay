@@ -148,8 +148,7 @@ class AnnouncementRepoImpl extends AnnouncementRepo {
     final response_body = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      _socketController
-          .sendAnnouncement(announcement); //TODO: use update instead
+      _socketController.updateAnnouncement(announcement);
       return true;
     } else {
       throw Exception(response_body['message']);
