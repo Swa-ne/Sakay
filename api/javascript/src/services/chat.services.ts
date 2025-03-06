@@ -41,7 +41,7 @@ export async function openInboxByUserID(user_id: string) {
     try {
         const inbox = await Inbox.findOne({ user_id });
         if (!inbox) {
-            return 'Inbox not found';
+            return { error: 'Inbox not found', httpCode: 404 };
         }
         return { message: inbox, httpCode: 200 };
     } catch (error) {
@@ -110,10 +110,9 @@ export async function isReadChat(user_id: string, chat_id: string) {
         if (!last_message) {
             return { message: 'Chat ID not found', httpCode: 404 }
         }
-
         if (last_message.sender_id.toString() != user_id) {
             last_message.isRead = true;
-            last_message.save();
+            await last_message.save();
         }
 
         return { message: "Success", httpCode: 200 };

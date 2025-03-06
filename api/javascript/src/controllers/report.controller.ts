@@ -105,7 +105,6 @@ export const postPerformanceReportController = async (req: Request & { user?: Us
         }
         res.status(result.httpCode).json({ error: result.error });
     } catch (error) {
-        console.log(error)
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };

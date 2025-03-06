@@ -161,7 +161,7 @@ export const toggleReport = async (user_id: string, report_id: string) => {
         report.is_open = !report.is_open;
         report.investigator = user._id;
 
-        report.save({ session });
+        await report.save({ session });
 
         await session.commitTransaction();
         session.endSession();
