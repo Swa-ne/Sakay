@@ -38,8 +38,6 @@ class ReportRepoImpl extends ReportRepo {
         throw Exception(response_body['message']);
       }
     } catch (e) {
-      print('resresr $e');
-
       return false;
     }
   }
@@ -61,7 +59,6 @@ class ReportRepoImpl extends ReportRepo {
         report.toJson(),
       ),
     );
-    print('resresr 42423423432${response.body}');
     final response_body = json.decode(response.body);
 
     if (response.statusCode == 200) {

@@ -50,9 +50,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         emit(ReportLoading());
 
         try {
-          print("issetn runinfskindfas");
           final isSent = await _reportRepo.postPerformanceReport(event.report);
-          print("issetn $isSent");
 
           if (isSent) {
             emit(SaveReportSuccess());
@@ -60,8 +58,6 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
             emit(const SaveReportError("Failed to send performance report."));
           }
         } catch (e) {
-          print("issetn $e");
-
           emit(const SaveReportError("Internet Connection Error"));
         } finally {
           _isSending = false;
@@ -106,7 +102,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           if (isSent) {
             emit(ToggleReportSuccess());
           } else {
-            emit(const ToggleReportError("Failed to send notification."));
+            emit(const ToggleReportError("Failed to update announcement."));
           }
         } catch (e) {
           emit(const ToggleReportError("Internet Connection Error"));
