@@ -1,4 +1,4 @@
-import { ObjectId, Schema, startSession } from "mongoose";
+import { Types, startSession } from "mongoose";
 import { File } from "../models/utils/file.model";
 import { categoryFile, deleteFile, bucket } from "../middlewares/save.config";
 import { Announcement } from "../models/announcement.model";
@@ -9,7 +9,7 @@ export const saveAnnouncement = async (user_id: string, headline: string, conten
     session.startTransaction();
 
     try {
-        let saved_files: ObjectId[] = []
+        let saved_files: Types.ObjectId[] = []
         if (files && files.length > 0) {
             for (const file of files) {
                 const fileHash = getFileHash(file.buffer);
@@ -68,7 +68,6 @@ export const getAllAnnouncements = async (page: string, user_type: string) => {
             .populate("edited_by")
             .skip((parseInt(page) - 1) * 30)
             .limit(30);
-        console.log(user_type)
         return { message: announcements, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
@@ -90,12 +89,12 @@ export const editAnnouncement = async (
     user_id: string,
     headline: string,
     content: string,
+    audience: string,
     files: Express.Multer.File[] | undefined,
     existing_file_ids: string[]
 ) => {
     const session = await startSession();
     session.startTransaction();
-
     try {
         const existing_announcement = await Announcement.findById(announcement_id).populate('files');
 
@@ -103,7 +102,6 @@ export const editAnnouncement = async (
             return { error: "Announcement not found", httpCode: 404 };
         }
 
-        // Get all stored files
         const storedFiles = existing_announcement.files.map((file: any) => ({
             id: file._id.toString(),
             name: file.file_name,
@@ -111,7 +109,7 @@ export const editAnnouncement = async (
             hash: file.file_hash,
         }));
 
-        let saved_files: ObjectId[] = existing_file_ids.map(id => new Schema.Types.ObjectId(id));
+        let saved_files: Types.ObjectId[] = existing_file_ids.map(id => new Types.ObjectId(id));
 
         if (files && files.length > 0) {
             for (const file of files) {
@@ -119,7 +117,7 @@ export const editAnnouncement = async (
                 const existingFile = storedFiles.find(f => f.hash === fileHash);
 
                 if (existingFile) {
-                    saved_files.push(new Schema.Types.ObjectId(existingFile.id));
+                    saved_files.push(new Types.ObjectId(existingFile.id));
                 } else {
                     const fileName = `files/${Date.now()}-${file.originalname}`;
                     const fileRef = bucket.file(fileName);
@@ -130,7 +128,6 @@ export const editAnnouncement = async (
 
                     const download_url = `${process.env.DOWNLOAD_URL}${bucket.name}/${fileName}`;
 
-                    // Save new file in DB
                     const new_file = await new File({
                         file_name: file.originalname,
                         file_type: file.mimetype,
@@ -157,6 +154,7 @@ export const editAnnouncement = async (
             edited_by: user_id,
             headline,
             content,
+            audience,
             files: saved_files
         });
 

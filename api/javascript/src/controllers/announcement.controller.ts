@@ -52,7 +52,6 @@ export const getAllAnnouncementsController = async (req: Request, res: Response)
         const { page = 1, user_type } = req.params;
         const result = await getAllAnnouncements(page as string, user_type as string);
 
-        console.log("runningn sdfa", result)
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
             return;
@@ -80,7 +79,7 @@ export const editAnnouncementController = async (req: Request & { user?: UserTyp
     try {
         const { announcement_id } = req.params;
         const user = req.user;
-        const { headline, content, existing_files } = req.body;
+        const { headline, content, audience, existing_files } = req.body;
 
         if (!announcement_id) {
             res.status(404).json({ error: "Announcement not found" });
@@ -115,7 +114,7 @@ export const editAnnouncementController = async (req: Request & { user?: UserTyp
 
         const files = req.files as Express.Multer.File[];
 
-        const result = await editAnnouncement(announcement_id, user_id, headline, content, files, JSON.parse(existing_files));
+        const result = await editAnnouncement(announcement_id, user_id, headline, content, audience, files, JSON.parse(existing_files));
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });
             return
