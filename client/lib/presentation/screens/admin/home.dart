@@ -16,7 +16,7 @@ import 'package:sakay_app/presentation/screens/admin/admin_inbox.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_map.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_announcement.dart';
 import 'package:sakay_app/presentation/screens/admin/admin_report.dart';
-import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
+// import 'package:sakay_app/presentation/screens/admin/admin_surveillance.dart';
 import 'package:sakay_app/presentation/screens/common/profile.dart';
 
 class Home extends StatefulWidget {
@@ -70,8 +70,8 @@ class _HomeState extends State<Home> with Tracker {
   Widget build(BuildContext context) {
     final pages = [
       AdminMap(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
-      AdminSurveillance(
-          openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
+      // AdminSurveillance(
+      //     openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       AdminDriverAssign(
           openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
       AdminReports(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
@@ -129,10 +129,10 @@ class _HomeState extends State<Home> with Tracker {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    ...List.generate(7, (index) {
+                    ...List.generate(6, (index) {
                       List<String> titles = [
                         "Map",
-                        "Surveillance",
+                        // "Surveillance",
                         "Management",
                         "Report",
                         "Announcements",
@@ -141,7 +141,7 @@ class _HomeState extends State<Home> with Tracker {
                       ];
                       List<IconData> icons = [
                         Icons.map,
-                        Icons.camera,
+                        // Icons.camera,
                         Icons.directions_bus,
                         Icons.bar_chart,
                         Icons.campaign,
