@@ -147,12 +147,12 @@ class GetInboxesError extends ChatState {
 }
 
 class IsReadInboxSuccess extends ChatState {
-  final bool isRead;
+  final String chat_id;
 
-  const IsReadInboxSuccess(this.isRead);
+  const IsReadInboxSuccess(this.chat_id);
 
   @override
-  List<Object> get props => [isRead];
+  List<Object> get props => [chat_id];
 }
 
 class IsReadInboxError extends ChatState {

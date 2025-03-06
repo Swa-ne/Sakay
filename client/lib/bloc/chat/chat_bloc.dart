@@ -134,7 +134,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(ChatLoading());
           final isRead = await _chatRepo.IsReadInboxes(event.chat_id);
           if (isRead) {
-            emit(IsReadInboxSuccess(isRead));
+            emit(IsReadInboxSuccess(event.chat_id));
           } else {
             emit(const IsReadInboxError("Internet Connection Error"));
           }
