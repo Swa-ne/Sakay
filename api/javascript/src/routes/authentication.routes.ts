@@ -33,6 +33,6 @@ router.post("/reset-password", authenticateToken, postResetPasswordController);
 
 router.get("/current-user", authenticateToken, getCurrentUserController);
 
-router.get('/fetch-file', authenticateToken, getFile);
+router.get('/fetch-file', getFile); //TODO: add access token
 
 export default router;
