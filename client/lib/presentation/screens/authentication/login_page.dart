@@ -17,6 +17,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
+  bool _isPasswordVisible = false;
+
   late AuthBloc _authBloc;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
@@ -75,26 +77,36 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           child: Stack(
             children: [
               Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Image.asset(
-                  'assets/driver.png',
-                  height: 260,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const Positioned(
-                top: 185,
-                left: 30,
-                child: CircleAvatar(
-                  radius: 60.0,
-                  backgroundImage: AssetImage('assets/sakaylogo.png'),
+                top: MediaQuery.of(context).size.height * .10,
+                left: MediaQuery.of(context).size.width * .1,
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image(
+                      image: AssetImage('assets/bus.png'),
+                      width: 100,
+                      height: 100,
+                    ),
+                    Text(
+                      'Sign in',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
+                    ),
+                    Text(
+                      "Let's get you started!",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 220.0),
+                    horizontal: 30.0, vertical: 170.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -115,6 +127,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       decoration: InputDecoration(
                         labelText: 'Email or phone number',
+                        labelStyle: const TextStyle(fontSize: 13),
                         prefixIcon: const Icon(
                           Icons.email,
                           color: Color(0xFF00A2FF),
@@ -133,6 +146,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     // Password Field
                     TextField(
                       controller: _passwordController,
+                      cursorColor: const Color(0xFF00A2FF),
                       onChanged: (text) {
                         if (_debouncePassword?.isActive ?? false)
                           _debouncePassword?.cancel();
@@ -144,16 +158,27 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           });
                         });
                       },
-                      obscureText: true,
+                      obscureText: !_isPasswordVisible,
+                      cursorErrorColor: const Color(0xFF00A2FF),
                       decoration: InputDecoration(
                         labelText: 'Password',
+                        labelStyle: const TextStyle(fontSize: 13),
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFF00A2FF),
                         ),
-                        suffixIcon: const Icon(
-                          Icons.visibility,
-                          color: Color(0xFF00A2FF),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: const Color(0xFF00A2FF),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
                         ),
                         border: const OutlineInputBorder(),
                         focusedBorder: const OutlineInputBorder(
@@ -223,7 +248,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         padding: const EdgeInsets.symmetric(
                             vertical: 15.0, horizontal: 150.0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
                       child: const Text(
@@ -249,24 +274,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         ),
                       ],
                     ),
-
-                    // Google Sign-In Button
-                    // const SizedBox(height: 20.0),
-                    // ElevatedButton.icon(
-                    //   onPressed: () {},
-                    //   icon: Image.asset('assets/google_icon.png', height: 24.0),
-                    //   label: const Text('Sign in with Google'),
-                    //   style: ElevatedButton.styleFrom(
-                    //     foregroundColor: Colors.black,
-                    //     backgroundColor: Colors.white,
-                    //     padding: const EdgeInsets.symmetric(
-                    //         vertical: 12.0, horizontal: 30.0),
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(8.0),
-                    //       side: const BorderSide(color: Colors.grey),
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

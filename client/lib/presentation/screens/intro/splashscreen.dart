@@ -79,11 +79,10 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/sakaylogo.png',
-              height: 400.0,
+              'assets/bus.png',
+              height: 150.0,
             ),
             const SizedBox(height: 20.0),
-            const CircularProgressIndicator(color: Color(0xFF00A2FF)),
           ],
         ),
       ),
