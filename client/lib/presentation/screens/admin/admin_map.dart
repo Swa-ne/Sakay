@@ -175,20 +175,29 @@ class _MapState extends State<AdminMap> {
           ),
           Positioned(
             top: 40,
-            left: 10,
-            child: Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                );
-              },
+            left: 15,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu,
+                        color: Colors.black, size: 24),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  );
+                },
+              ),
             ),
           ),
           Positioned(
-            top: 50,
+            top: 40,
             left: 70,
             right: 20,
             child: Container(

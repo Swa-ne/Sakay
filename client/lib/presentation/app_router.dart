@@ -24,7 +24,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => NotificationPop(),
+      builder: (context, state) => const AdminMap(),
     ),
     GoRoute(
       path: '/onboarding',
