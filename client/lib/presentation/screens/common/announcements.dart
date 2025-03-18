@@ -50,7 +50,6 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           final announcement = widget.announcements[index];
                           return GestureDetector(
                             onTap: () {
-                              // Navigate to AnnouncementDetailScreen
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -65,8 +64,11 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEEEEEE),
+                                color: Colors
+                                    .transparent,
                                 borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color: Colors.grey),
                               ),
                               child: Row(
                                 children: [
@@ -81,8 +83,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                                         Text(
                                           announcement.headline,
                                           style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         Text(
                                           announcement.content,

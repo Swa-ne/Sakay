@@ -97,12 +97,14 @@ class AProfilePageState extends State<ProfilePage> {
                     ),
                   )
                 : const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Center(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         'Profile',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),

@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> with Tracker {
                           message,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 14, color: Colors.black87),
+                              fontSize: 13, color: Colors.black87),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
@@ -300,7 +300,7 @@ class _HomePageState extends State<HomePage> with Tracker {
             ),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 30,
             left: 20,
             right: 20,
             child: Container(
