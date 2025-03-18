@@ -129,11 +129,12 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.black, size: 24),
+            Icon(icon, color: Colors.black, size: 20),
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.normal),
             ),
           ],
         ),
@@ -141,11 +142,12 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey, width: 2),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(5, (index) {
               return IconButton(
                 icon: Icon(
@@ -207,7 +209,9 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
           appBar: AppBar(
             title: const Text('Performance Report',
                 style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)),
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20)),
             backgroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.black),
             elevation: 0,
@@ -223,11 +227,11 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                       const Row(
                         children: [
                           Icon(Icons.directions_bus,
-                              size: 24, color: Colors.black),
+                              size: 20, color: Colors.black),
                           SizedBox(width: 8),
                           Text('Vehicle Unit',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                                  fontSize: 13, fontWeight: FontWeight.normal)),
                         ],
                       ),
                       const SizedBox(width: 12),
@@ -235,8 +239,9 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: Colors.grey),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<BusModel>(
@@ -263,7 +268,7 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -298,7 +303,7 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                             ),
                           ),
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -312,10 +317,10 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
                   const Row(
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 24),
+                      Icon(Icons.star, color: Colors.amber, size: 20),
                       SizedBox(width: 8),
                       Text(
                         "Tell us about your experience with the driver",
@@ -339,7 +344,7 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                       Text(
                         "Leave a review about the driver",
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 13, fontWeight: FontWeight.normal),
                       ),
                     ],
                   ),
@@ -349,11 +354,23 @@ class _PerformanceReportPageState extends State<PerformanceReportPage>
                     maxLines: 5,
                     decoration: InputDecoration(
                       hintText: "Write your review here...",
+                      hintStyle: const TextStyle(fontSize: 13),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: Colors.transparent,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 2),
                       ),
                     ),
                   ),

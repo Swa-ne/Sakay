@@ -222,7 +222,9 @@ class _IncidentReportPageState extends State<IncidentReportPage>
             backgroundColor: Colors.white,
             title: const Text('Incident Report',
                 style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)),
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20)),
             iconTheme: const IconThemeData(color: Colors.black),
             elevation: 0,
           ),
@@ -248,11 +250,11 @@ class _IncidentReportPageState extends State<IncidentReportPage>
                     const Row(
                       children: [
                         Icon(Icons.directions_bus,
-                            size: 24, color: Colors.black),
+                            size: 20, color: Colors.black),
                         SizedBox(width: 8),
                         Text('Vehicle Unit',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
+                                fontSize: 13, fontWeight: FontWeight.normal)),
                       ],
                     ),
                     const SizedBox(width: 12),
@@ -260,8 +262,9 @@ class _IncidentReportPageState extends State<IncidentReportPage>
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<BusModel>(
@@ -288,7 +291,7 @@ class _IncidentReportPageState extends State<IncidentReportPage>
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 _buildTextField(
                   'Place of Incident:',
                   _placeOfIncidentController,
@@ -322,14 +325,14 @@ class _IncidentReportPageState extends State<IncidentReportPage>
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 _buildParagraphField(
                   'Brief Discussion of Event:',
                   _briefDiscussionController,
                   discussionError,
                   Icons.edit,
                 ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 170),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -383,9 +386,11 @@ class _IncidentReportPageState extends State<IncidentReportPage>
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.black),
+            Icon(icon, color: Colors.black, size: 20),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(label,
+                style: const TextStyle(
+                    fontWeight: FontWeight.normal, fontSize: 13)),
           ],
         ),
         const SizedBox(height: 5),
@@ -403,12 +408,11 @@ class _IncidentReportPageState extends State<IncidentReportPage>
             }
           },
           decoration: InputDecoration(
-            filled: true,
+            filled: false,
             errorText: error,
-            fillColor: Colors.grey[200],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
+              borderSide: const BorderSide(color: Colors.grey),
             ),
           ),
           style: const TextStyle(fontSize: 16),
@@ -429,9 +433,11 @@ class _IncidentReportPageState extends State<IncidentReportPage>
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.black),
+            Icon(icon, color: Colors.black, size: 20),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(label,
+                style: const TextStyle(
+                    fontWeight: FontWeight.normal, fontSize: 13)),
           ],
         ),
         const SizedBox(height: 5),
@@ -450,12 +456,12 @@ class _IncidentReportPageState extends State<IncidentReportPage>
             }
           },
           decoration: InputDecoration(
-            filled: true,
+            filled: false,
             errorText: error,
-            fillColor: Colors.grey[200],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
+              borderSide:
+                  const BorderSide(color: Colors.grey), // Added grey outline
             ),
           ),
           style: const TextStyle(fontSize: 16),
@@ -472,21 +478,23 @@ class _IncidentReportPageState extends State<IncidentReportPage>
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.black),
+            Icon(icon, color: Colors.black, size: 20),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(label,
+                style: const TextStyle(
+                    fontWeight: FontWeight.normal, fontSize: 13)),
           ],
         ),
         const SizedBox(height: 5),
         GestureDetector(
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey),
             ),
-            child: Text(value, style: const TextStyle(fontSize: 16)),
+            child: Text(value, style: const TextStyle(fontSize: 15)),
           ),
         ),
         if (error != null) ...[

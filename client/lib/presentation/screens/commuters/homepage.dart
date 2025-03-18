@@ -247,6 +247,7 @@ class _HomePageState extends State<HomePage> with Tracker {
                       controller: _searchController,
                       decoration: const InputDecoration(
                         hintText: 'Search for a location...',
+                        hintStyle: TextStyle(fontSize: 13),
                         border: InputBorder.none,
                       ),
                     ),
@@ -361,10 +362,10 @@ class _HomePageState extends State<HomePage> with Tracker {
                       width: 35,
                       height: 35,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
                         color: isTrackerOn
                             ? const Color(0xFFFF0000)
                             : const Color(0xFF00A1F8),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                       child: const Icon(
                         Icons.location_on,
@@ -459,11 +460,9 @@ void _showReportDialog(BuildContext context) {
                     ],
                   ),
                   const SizedBox(height: 10),
-
-                  // Incident Report Option
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.of(context).pop();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -474,8 +473,8 @@ void _showReportDialog(BuildContext context) {
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey),
                       ),
                       child: const Row(
                         children: [
@@ -493,7 +492,7 @@ void _showReportDialog(BuildContext context) {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  "Send reports about events and actions occurred",
+                                  "Send reports about events occurred",
                                   style: TextStyle(
                                       fontSize: 8, color: Colors.black),
                                 ),
@@ -506,7 +505,7 @@ void _showReportDialog(BuildContext context) {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -520,8 +519,8 @@ void _showReportDialog(BuildContext context) {
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey),
                       ),
                       child: const Row(
                         children: [

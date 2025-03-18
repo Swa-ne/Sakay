@@ -81,10 +81,19 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
+                radius: 35,
                 backgroundImage: AssetImage("assets/bus.png"),
+                backgroundColor: Colors.transparent,
               ),
               SizedBox(width: 10),
-              Text("Sakay", style: TextStyle(color: Colors.black)),
+              Text(
+                "Sakay", 
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold
+                )
+              ),
             ],
           ),
         ),
@@ -159,7 +168,7 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                         filled: true,
                         fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
                         ),
                       ),
