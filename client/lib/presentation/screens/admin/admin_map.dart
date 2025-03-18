@@ -30,24 +30,32 @@ class _MapState extends State<AdminMap> {
           ),
           Positioned(
             top: 40,
-            left: 10,
-            child: Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-                  onPressed: () {
-                    widget.openDrawer();
-                  },
-                );
-              },
+            left: 15,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu,
+                        color: Colors.black, size: 24),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  );
+                },
+              ),
             ),
           ),
           Positioned(
-            top: 50,
+            top: 40,
             left: 70,
             right: 20,
             child: Container(
-              width: 250,
               height: 40,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -57,15 +65,16 @@ class _MapState extends State<AdminMap> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: const TextField(
                 decoration: InputDecoration(
                   hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
                   border: InputBorder.none,
+                  contentPadding: EdgeInsets.only(top: 2),
                   prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
                 ),
               ),

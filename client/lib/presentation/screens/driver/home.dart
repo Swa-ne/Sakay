@@ -141,7 +141,7 @@ class _HomeState extends State<Home> with Tracker {
     }
 
     final pages = [
-      const HomePage(),
+      const DriverHomePage(), // HomePage
       InboxScreen(
         messages: messages,
         scrollInboxController: _scrollMessageController,

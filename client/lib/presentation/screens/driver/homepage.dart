@@ -4,14 +4,14 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class DriverHomePage extends StatefulWidget {
+  const DriverHomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _DriverHomePageState createState() => _DriverHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _DriverHomePageState extends State<DriverHomePage> {
   late TrackerBloc _trackerBloc;
   bool isTrackerOn = false;
 
@@ -42,36 +42,29 @@ class _HomePageState extends State<HomePage> {
             top: 50,
             left: 20,
             right: 20,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                        border: InputBorder.none,
-                        prefixIcon:
-                            Icon(Icons.search, color: Colors.grey, size: 22),
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                    ),
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: const TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.only(top: 2),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
                 ),
-              ],
+              ),
             ),
           ),
           Positioned(
@@ -135,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                       width: 35,
                       height: 35,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(5),
                         color: isTrackerOn
                             ? const Color(0xFFFF0000)
                             : const Color(0xFF00A1F8),
