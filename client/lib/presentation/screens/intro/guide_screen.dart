@@ -90,7 +90,7 @@ class _GuideScreenState extends State<GuideScreen> {
                         _slides[index]['description']!,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 16.0,
+                          fontSize: 13.0,
                           color: Colors.grey,
                         ),
                       ),
@@ -131,7 +131,7 @@ class _GuideScreenState extends State<GuideScreen> {
                 ),
                 child: Text(
                   _slides[_currentIndex]['buttonText']!,
-                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
+                  style: const TextStyle(fontSize: 13.0, color: Colors.white),
                 ),
               ),
             ),
