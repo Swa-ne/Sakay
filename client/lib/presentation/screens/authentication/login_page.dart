@@ -78,15 +78,19 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
             children: [
               Positioned(
                 top: MediaQuery.of(context).size.height * .10,
-                left: MediaQuery.of(context).size.width * .1,
+                left: 20,
+                child: const Image(
+                  image: AssetImage('assets/bus.png'),
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+              Positioned(
+                top: MediaQuery.of(context).size.height * .22,
+                left: 30,
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image(
-                      image: AssetImage('assets/bus.png'),
-                      width: 100,
-                      height: 100,
-                    ),
                     Text(
                       'Sign in',
                       style: TextStyle(
@@ -104,6 +108,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                   ],
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 30.0, vertical: 170.0),
@@ -128,7 +133,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       decoration: InputDecoration(
                         labelText: 'Email or phone number',
-                        labelStyle: const TextStyle(fontSize: 13, color: Colors.black),
+                        labelStyle:
+                            const TextStyle(fontSize: 13, color: Colors.black),
                         prefixIcon: const Icon(
                           Icons.email,
                           color: Color(0xFF00A2FF),
@@ -142,7 +148,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         errorText: emailError,
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 10.0),
 
                     // Password Field
                     TextField(
@@ -163,7 +169,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       cursorErrorColor: const Color(0xFF00A2FF),
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        labelStyle: const TextStyle(fontSize: 13, color: Colors.black),
+                        labelStyle:
+                            const TextStyle(fontSize: 13, color: Colors.black),
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFF00A2FF),
@@ -189,8 +196,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         errorText: passwordError,
                       ),
                     ),
-                    const SizedBox(height: 10.0),
-
+                    const SizedBox(height: 5.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -217,8 +223,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10.0),
-
+                    const SizedBox(height: 5.0),
                     ElevatedButton(
                       onPressed: () {
                         String? isValidEmail =
@@ -246,31 +251,42 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00A2FF),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15.0, horizontal: 150.0),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 15.0,
+                          horizontal: 140.0,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Login',
-                        style: TextStyle(fontSize: 15.0, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 10.0),
+
+                    const SizedBox(height: 5.0),
 
                     // Register Link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Don\'t have an account yet?'),
+                        const Text('Don\'t have an account yet?',
+                            style: TextStyle(fontSize: 13)),
                         TextButton(
                           onPressed: () {
                             context.go('/signup');
                           },
                           child: const Text(
                             'Register',
-                            style: TextStyle(color: Color(0xFF00A2FF)),
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Color(
+                                  0xFF00A2FF,
+                                )),
                           ),
                         ),
                       ],
