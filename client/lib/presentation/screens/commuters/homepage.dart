@@ -300,7 +300,7 @@ class _HomePageState extends State<HomePage> with Tracker {
             ),
           ),
           Positioned(
-            bottom: 10,
+            bottom: 15,
             left: 20,
             right: 20,
             child: Container(
