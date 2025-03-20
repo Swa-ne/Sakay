@@ -230,9 +230,13 @@ class _HomeState extends State<Home> with Tracker {
             onTap: _onItemTapped,
             backgroundColor: Colors.white,
             selectedItemColor: const Color(0xFF00A2FF),
-            unselectedItemColor: const Color(0xFF00A2FF),
+            unselectedItemColor: Colors.grey,
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
+            selectedLabelStyle:
+                const TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+            unselectedLabelStyle:
+                const TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
               BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
