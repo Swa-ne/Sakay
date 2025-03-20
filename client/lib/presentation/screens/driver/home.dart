@@ -141,7 +141,7 @@ class _HomeState extends State<Home> with Tracker {
     }
 
     final pages = [
-      const Home(), // DriverHomePage
+      const DriverHomePage(), // DriverHomePage
       InboxScreen(
         messages: messages,
         scrollInboxController: _scrollMessageController,
@@ -228,14 +228,13 @@ class _HomeState extends State<Home> with Tracker {
             setState(() => isLoadingMessage = false);
           }
         },
-        child: Scaffold( // made some changes but didn't take effect
+        child: Scaffold( // made some changes but didn't take effect // (it did made some changes LoL)
           body: pages[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             backgroundColor: Colors.white,
-            selectedItemColor:
-                Colors.grey,
+            selectedItemColor: const Color(0xFF00A2FF),
             unselectedItemColor:
                 Colors.grey,
             showUnselectedLabels: true,

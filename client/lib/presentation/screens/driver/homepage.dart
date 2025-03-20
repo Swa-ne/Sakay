@@ -68,7 +68,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             ),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 10,
             left: 20,
             right: 20,
             child: Container(
