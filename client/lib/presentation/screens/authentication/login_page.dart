@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     // Email Field
                     TextField(
                       controller: _emailController,
+                      cursorColor: const Color(0xFF00A2FF),
                       onChanged: (text) {
                         if (_debounceEmail?.isActive ?? false)
                           _debounceEmail?.cancel();
@@ -127,7 +128,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       decoration: InputDecoration(
                         labelText: 'Email or phone number',
-                        labelStyle: const TextStyle(fontSize: 13),
+                        labelStyle: const TextStyle(fontSize: 13, color: Colors.black),
                         prefixIcon: const Icon(
                           Icons.email,
                           color: Color(0xFF00A2FF),
@@ -162,7 +163,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       cursorErrorColor: const Color(0xFF00A2FF),
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        labelStyle: const TextStyle(fontSize: 13),
+                        labelStyle: const TextStyle(fontSize: 13, color: Colors.black),
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFF00A2FF),

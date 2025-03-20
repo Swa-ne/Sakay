@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:lottie/lottie.dart';
 
 class GuideScreen extends StatefulWidget {
   const GuideScreen({super.key});
@@ -15,21 +16,21 @@ class _GuideScreenState extends State<GuideScreen> {
 
   final List<Map<String, String>> _slides = [
     {
-      'image': 'assets/guidescreen1.png',
+      'image': 'assets/animations/introducing.json',
       'title': 'INTRODUCING',
       'description':
           'Sakay is a real-time bus tracking system designed to improve public transportation along the Lingayen-Dagupan route. Using advanced GPS technology, it provides accurate updates on vehicle locations, estimated arrival times, and proximity alerts for a more convenient travel experience.',
       'buttonText': 'Next'
     },
     {
-      'image': 'assets/guidescreen2.png',
+      'image': 'assets/animations/keyfeatures.json',
       'title': 'KEY FEATURES',
       'description':
           'Sakay reduces waiting times, enhances commuting efficiency, and provides drivers with route optimization insights. It also promotes sustainable transportation by encouraging public transport use and reducing congestion.',
       'buttonText': 'Next'
     },
     {
-      'image': 'assets/guidescreen3.png',
+      'image': 'assets/animations/benefits.json',
       'title': 'BENEFITS',
       'description':
           'Sakay offers real-time vehicle tracking, accurate arrival estimates, and proximity alerts, all presented through an easy-to-navigate, user-friendly interface.',
@@ -70,9 +71,10 @@ class _GuideScreenState extends State<GuideScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
+                      Lottie.asset(
                         _slides[index]['image']!,
-                        height: 250.0,
+                        height: 230.0,
+                        alignment: Alignment.center,
                         width: double.infinity,
                         fit: BoxFit.contain,
                       ),
