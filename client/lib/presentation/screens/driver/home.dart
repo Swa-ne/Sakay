@@ -236,7 +236,7 @@ class _HomeState extends State<Home> {
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             backgroundColor: Colors.white,
-            selectedItemColor: Colors.grey,
+            selectedItemColor: const Color(0xFF00A2FF),
             unselectedItemColor: Colors.grey,
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,

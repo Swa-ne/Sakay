@@ -68,7 +68,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             ),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 15,
             left: 20,
             right: 20,
             child: Container(
@@ -81,7 +81,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ],
               ),
               child: Row(
@@ -104,7 +104,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             'Phinma University of Pangasinan',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold),
-                          )
+                          ),
                         ],
                       ),
                       SizedBox(height: 2),
@@ -115,8 +115,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
                     ],
                   ),
                   const Spacer(),
-                  TextButton(
-                    onPressed: () async {
+                  InkWell(
+                    onTap: () async {
                       _trackerBloc.add(isTrackerOn
                           ? StopTrackMyVehicleEvent()
                           : StartTrackMyVehicleEvent());
@@ -124,14 +124,17 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
+                    borderRadius:
+                        BorderRadius.circular(50),
                     child: Container(
                       width: 35,
                       height: 35,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
                         color: isTrackerOn
                             ? const Color(0xFFFF0000)
                             : const Color(0xFF00A1F8),
+                        borderRadius:
+                            BorderRadius.circular(3),
                       ),
                       child: const Icon(
                         Icons.drive_eta,

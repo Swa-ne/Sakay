@@ -355,7 +355,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Positioned(
-            bottom: 30,
+            bottom: 15,
             left: 20,
             right: 20,
             child: Container(
