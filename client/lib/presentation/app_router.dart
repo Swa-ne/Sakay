@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/data/models/sign_up.dart';
 import 'package:sakay_app/presentation/screens/authentication/email_code.dart';
 import 'package:sakay_app/presentation/screens/authentication/login_page.dart';
@@ -7,15 +6,11 @@ import 'package:sakay_app/presentation/screens/authentication/phone_verification
 import 'package:sakay_app/presentation/screens/authentication/register_firstpage.dart';
 import 'package:sakay_app/presentation/screens/authentication/register_page.dart';
 import 'package:sakay_app/presentation/screens/authentication/usertype.dart';
-import 'package:sakay_app/presentation/screens/common/announcement_main.dart';
 import 'package:sakay_app/presentation/screens/common/connection_error.dart';
-import 'package:sakay_app/presentation/screens/common/inbox.dart';
 import 'package:sakay_app/presentation/screens/commuters/home.dart'
     as CommuterHome;
-import 'package:sakay_app/presentation/screens/commuters/homepage.dart';
 import 'package:sakay_app/presentation/screens/driver/home.dart' as DriverHome;
 import 'package:sakay_app/presentation/screens/admin/home.dart' as AdminHome;
-import 'package:sakay_app/presentation/screens/driver/homepage.dart';
 import 'package:sakay_app/presentation/screens/intro/guide_screen.dart';
 import 'package:sakay_app/presentation/screens/intro/splashscreen.dart';
 
