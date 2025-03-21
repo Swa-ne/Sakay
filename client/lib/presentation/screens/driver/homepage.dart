@@ -38,35 +38,35 @@ class _DriverHomePageState extends State<DriverHomePage> {
               ),
             ),
           ),
-          Positioned(
-            top: 50,
-            left: 20,
-            right: 20,
-            child: Container(
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 2),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   top: 50,
+          //   left: 20,
+          //   right: 20,
+          //   child: Container(
+          //     height: 40,
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: BorderRadius.circular(5),
+          //       border: Border.all(color: Colors.grey.shade300),
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: Colors.black.withOpacity(0.1),
+          //           blurRadius: 4,
+          //           offset: const Offset(0, 2),
+          //         ),
+          //       ],
+          //     ),
+          //     child: const TextField(
+          //       decoration: InputDecoration(
+          //         hintText: 'Search...',
+          //         hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+          //         border: InputBorder.none,
+          //         contentPadding: EdgeInsets.only(top: 2),
+          //         prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Positioned(
             bottom: 15,
             left: 20,
@@ -124,8 +124,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
-                    borderRadius:
-                        BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(50),
                     child: Container(
                       width: 35,
                       height: 35,
@@ -133,8 +132,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         color: isTrackerOn
                             ? const Color(0xFFFF0000)
                             : const Color(0xFF00A1F8),
-                        borderRadius:
-                            BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                       child: const Icon(
                         Icons.drive_eta,
