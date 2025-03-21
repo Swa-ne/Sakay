@@ -35,9 +35,13 @@ dependencies:
     google_sign_in: ^5.3.0
     google_maps_flutter: ^2.11.0
     google_fonts: ^6.1.0
+    # flutter_polyline_points: ^1.0.0
     file_picker: ^9.0.1
+    flutter_map: ^7.0.2
+    mapbox_maps_flutter: ^2.0.0
     flutter_dotenv: ^5.2.1
     permission_handler: ^11.3.1
+    flutter_polyline_points: ^2.1.0
     geolocator: ^13.0.2
     equatable: ^2.0.7
     location: ^8.0.0
@@ -53,6 +57,8 @@ dependencies:
     cached_video_player_plus: ^3.0.3
     url_launcher: ^6.3.1
     photo_view: ^0.15.0
+    google_maps_flutter_android: ^2.15.0
+    google_maps_flutter_platform_interface: ^2.11.1
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
 
