@@ -15,9 +15,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with Tracker {
+class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final TokenControllerImpl _tokenController = TokenControllerImpl();
+  final Tracker tracker = Tracker();
+
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _isSearching = false;
 
   late TrackerBloc _trackerBloc;
   OverlayEntry? _hintOverlay;
@@ -225,46 +229,97 @@ class _HomePageState extends State<HomePage> with Tracker {
             top: 50,
             left: 16,
             right: 70,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Search for a location...',
-                        hintStyle: TextStyle(fontSize: 13),
-                        border: InputBorder.none,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5,
+                        offset: Offset(0, 2),
                       ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Search for a location...',
+                            hintStyle: TextStyle(fontSize: 13),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (query) async {
+                            if (query.isNotEmpty) {
+                              var result = await tracker.searchLocations(query);
+                              setState(() {
+                                _searchResults = result;
+                                _isSearching = true;
+                              });
+                            } else {
+                              setState(() {
+                                _searchResults = [];
+                                _isSearching = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.blue),
+                        onPressed: () {
+                          final query = _searchController.text;
+                          if (query.isNotEmpty) {
+                            tracker.handleSearchAndRoute(query);
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //       content: Text('Searching for "$query"...')),
+                            // );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                if (_isSearching && _searchResults.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 5,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final location = _searchResults[index];
+                        return ListTile(
+                          title: Text(location['name']),
+                          onTap: () {
+                            _searchController.text = location['name'];
+                            setState(() {
+                              _isSearching = false;
+                            });
+                          },
+                        );
+                      },
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.blue),
-                    onPressed: () {
-                      final query = _searchController.text;
-                      if (query.isNotEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Searching for "$query"...')),
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
           Positioned(

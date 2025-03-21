@@ -26,10 +26,11 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with Tracker {
+class _HomeState extends State<Home> {
   late TrackerBloc _trackerBloc;
   late AnnouncementBloc _announcementBloc;
   late ChatBloc _chatBloc;
+  final Tracker tracker = Tracker();
 
   final TokenControllerImpl _tokenController = TokenControllerImpl();
 
@@ -141,7 +142,7 @@ class _HomeState extends State<Home> with Tracker {
     }
 
     final pages = [
-      const Home(), // DriverHomePage
+      const DriverHomePage(),
       InboxScreen(
         messages: messages,
         scrollInboxController: _scrollMessageController,
@@ -228,24 +229,21 @@ class _HomeState extends State<Home> with Tracker {
             setState(() => isLoadingMessage = false);
           }
         },
-        child: Scaffold( // made some changes but didn't take effect
+        child: Scaffold(
+          // made some changes but didn't take effect
           body: pages[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             backgroundColor: Colors.white,
-            selectedItemColor:
-                Colors.grey,
-            unselectedItemColor:
-                Colors.grey,
+            selectedItemColor: Colors.grey,
+            unselectedItemColor: Colors.grey,
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
-            selectedLabelStyle: const TextStyle(
-                fontSize: 10,
-                color: Colors.grey),
-            unselectedLabelStyle: const TextStyle(
-                fontSize: 10,
-                color: Colors.grey),
+            selectedLabelStyle:
+                const TextStyle(fontSize: 10, color: Colors.grey),
+            unselectedLabelStyle:
+                const TextStyle(fontSize: 10, color: Colors.grey),
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.map),

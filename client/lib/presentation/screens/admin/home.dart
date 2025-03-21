@@ -26,11 +26,12 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with Tracker {
+class _HomeState extends State<Home> {
   late TrackerBloc _trackerBloc;
   late AnnouncementBloc _announcementBloc;
   late ChatBloc _chatBloc;
   final TokenControllerImpl _tokenController = TokenControllerImpl();
+  final Tracker tracker = Tracker();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String fullName = "";

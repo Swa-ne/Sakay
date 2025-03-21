@@ -20,9 +20,9 @@ abstract class TrackingSocketController {
   void disconnect();
 }
 
-class TrackingSocketControllerImpl extends TrackingSocketController
-    with Tracker {
+class TrackingSocketControllerImpl extends TrackingSocketController {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
+  final Tracker tracker = Tracker();
 
   static final TrackingSocketControllerImpl _singleton =
       TrackingSocketControllerImpl._internal();
@@ -60,23 +60,29 @@ class TrackingSocketControllerImpl extends TrackingSocketController
 
     socket.on('update-map', (data) async {
       Location busLoc = Location.fromJson(data['location']);
-      if (!Tracker.busses.containsKey(data['user'])) {
+      if (!tracker.busses.containsKey(data['user'])) {
         if (!pendingCreations.contains(data['user'])) {
           pendingCreations.add(data['user']);
-          await createOneBus(data['user'], busLoc.longitude, busLoc.latitude);
+          await tracker.createOneBus(
+            data['user'],
+            busLoc.longitude,
+            busLoc.latitude,
+            busLoc.speed,
+          );
           pendingCreations.remove(data['user']);
         }
       } else {
-        await updateOneBus(
+        await tracker.updateOneBus(
           data['user'],
           busLoc.longitude,
           busLoc.latitude,
+          busLoc.speed,
         );
       }
     });
 
     socket.on('track-my-vehicle-stop', (data) async {
-      await removeOneBus(data['user']);
+      await tracker.removeOneBus(data['user']);
     });
 
     socket.onDisconnect((_) {
@@ -92,15 +98,15 @@ class TrackingSocketControllerImpl extends TrackingSocketController
   Future<void> connectDriver() async {
     socket.on('update-map-driver', (data) async {
       Location personLoc = Location.fromJson(data['location']);
-      if (!Tracker.people.containsKey(data['user'])) {
+      if (!tracker.people.containsKey(data['user'])) {
         if (!pendingCreations.contains(data['user'])) {
           pendingCreations.add(data['user']);
-          await createOnePerson(
+          await tracker.createOnePerson(
               data['user'], personLoc.longitude, personLoc.latitude);
           pendingCreations.remove(data['user']);
         }
       } else {
-        await updateOnePerson(
+        await tracker.updateOnePerson(
           data['user'],
           personLoc.longitude,
           personLoc.latitude,
@@ -109,15 +115,15 @@ class TrackingSocketControllerImpl extends TrackingSocketController
     });
 
     socket.on('track-me-stop', (data) async {
-      await removeOnePerson(data['user']);
+      await tracker.removeOnePerson(data['user']);
     });
   }
 
   @override
   void trackMyVehicle() {
-    showMyLocation();
+    tracker.showMyLocation();
     _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      Location loc = await getLocationandSpeed();
+      Location loc = await tracker.getLocationandSpeed();
 
       socket.emit('track-my-vehicle', loc.toJson());
     });
@@ -125,7 +131,7 @@ class TrackingSocketControllerImpl extends TrackingSocketController
 
   @override
   void stopTrackMyVehicle() {
-    hideMyLocation();
+    tracker.hideMyLocation();
     socket.emit('pause-track-my-vehicle');
     _locationTimer?.cancel();
     _locationTimer = null;
@@ -133,9 +139,9 @@ class TrackingSocketControllerImpl extends TrackingSocketController
 
   @override
   void trackMe() {
-    showMyLocation();
+    tracker.showMyLocation();
     _locationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      Location loc = await getLocationandSpeed();
+      Location loc = await tracker.getLocationandSpeed();
 
       socket.emit('track-me', loc.toJson());
     });
@@ -143,7 +149,7 @@ class TrackingSocketControllerImpl extends TrackingSocketController
 
   @override
   void stopTrackMe() {
-    hideMyLocation();
+    tracker.hideMyLocation();
     socket.emit('pause-track-me');
     _locationTimer?.cancel();
     _locationTimer = null;
