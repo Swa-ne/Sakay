@@ -41,11 +41,8 @@ class _MapState extends State<AdminMap> {
               child: Builder(
                 builder: (context) {
                   return IconButton(
-                    icon: const Icon(Icons.menu,
-                        color: Colors.black, size: 24),
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
+                    icon: const Icon(Icons.menu, color: Colors.black, size: 24),
+                    onPressed: widget.openDrawer,
                   );
                 },
               ),
