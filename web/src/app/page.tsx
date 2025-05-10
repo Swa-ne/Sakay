@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
-import Home from './home/page';
 import Login from './auth/page';
+import Home from './(protected)/home/page';
 
 export default async function Page() {
     const isLoggedIn = Boolean((await cookies()).get('token')?.value);
