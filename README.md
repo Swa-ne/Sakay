@@ -123,6 +123,24 @@ The project follows the **Waterfall methodology**, ensuring a structured and seq
     flask run
     ```
 
+### Setting up and Running the Next.js Web Application
+
+1. **Install Node.js** from [Node.js official site](https://nodejs.org/).
+2. **Navigate to the Next.js directory** (replace `web` with your actual folder name if different):
+    ```bash
+    cd web
+    ```
+3. **Install dependencies**:
+    ```bash
+    npm install
+    ```
+4. **Set up environment variables** by creating a `.env` file and adding necessary configurations. To obtain the required environment variables, message the owner of the repository.
+5. **Start the development server**:
+    ```bash
+    npm run dev
+    ```
+6. **Open your browser** and go to `http://localhost:3000` to view the application.
+
 ## Contributors
 
 -   [Stephen Paul B. Bautista](https://github.com/Swa-ne) - Full-stack Developer & Team Manager
