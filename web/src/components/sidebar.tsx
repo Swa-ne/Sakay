@@ -17,7 +17,7 @@ export default function Sidebar() {
     const [isLogoutHovered, setIsLogoutHovered] = useState(false);
 
     const url_details = [
-        { name: 'Surveilance', icon: <SurveilanceIcon />, hoverIcon: <SurveilanceIcon color='white' />, route: 'surveilance' },
+        { name: 'Surveilance', icon: <SurveilanceIcon />, hoverIcon: <SurveilanceIcon color='white' />, route: '' },
         { name: 'Maps', icon: <MapsIcon />, hoverIcon: <MapsIcon color='white' />, route: 'maps' },
         { name: 'Reports', icon: <ReportsIcon />, hoverIcon: <ReportsIcon color='white' />, route: 'reports' },
         { name: 'User Verification', icon: <UserVerificationIcon />, hoverIcon: <UserVerificationIcon color='white' />, route: 'user_verification' },
