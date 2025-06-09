@@ -5,7 +5,6 @@ import ReportsIcon from './icons/reportsIcon';
 import UserVerificationIcon from './icons/userVerificationIcon';
 import InboxIcon from './icons/inboxIcon';
 import ManageAccountsIcon from './icons/manageAccountsIcon';
-import RegisteredUnitsIcon from './icons/registeredUnitsIcon';
 import SidebarLink from './sidebarLink';
 import Image from 'next/image';
 import LogoutIcon from './icons/logoutIcon';
@@ -20,8 +19,7 @@ export default function Sidebar() {
         { name: 'Reports', icon: <ReportsIcon />, hoverIcon: <ReportsIcon color='white' />, route: 'reports' },
         { name: 'User Verification', icon: <UserVerificationIcon />, hoverIcon: <UserVerificationIcon color='white' />, route: 'user_verification' },
         { name: 'Inbox', icon: <InboxIcon />, hoverIcon: <InboxIcon color='white' />, route: 'inbox' },
-        { name: 'Manage Accounts', icon: <ManageAccountsIcon />, hoverIcon: <ManageAccountsIcon color='white' />, route: 'manage_accounts' },
-        { name: 'Registered Units', icon: <RegisteredUnitsIcon />, hoverIcon: <RegisteredUnitsIcon color='white' />, route: 'registered_units' },
+        { name: 'Accounts & Units', icon: <ManageAccountsIcon />, hoverIcon: <ManageAccountsIcon color='white' />, route: 'account_and_units' },
     ];
 
     return (
