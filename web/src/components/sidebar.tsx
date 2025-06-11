@@ -9,6 +9,7 @@ import SidebarLink from './sidebarLink';
 import Image from 'next/image';
 import LogoutIcon from './icons/logoutIcon';
 import Link from 'next/link';
+import { Megaphone } from 'lucide-react';
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
@@ -16,10 +17,11 @@ export default function Sidebar() {
 
     const url_details = [
         { name: 'Surveilance', icon: <SurveilanceIcon />, hoverIcon: <SurveilanceIcon color='white' />, route: '' },
-        { name: 'Reports', icon: <ReportsIcon />, hoverIcon: <ReportsIcon color='white' />, route: 'reports' },
-        { name: 'User Verification', icon: <UserVerificationIcon />, hoverIcon: <UserVerificationIcon color='white' />, route: 'user_verification' },
-        { name: 'Inbox', icon: <InboxIcon />, hoverIcon: <InboxIcon color='white' />, route: 'inbox' },
         { name: 'Accounts & Units', icon: <ManageAccountsIcon />, hoverIcon: <ManageAccountsIcon color='white' />, route: 'account_and_units' },
+        { name: 'Reports', icon: <ReportsIcon />, hoverIcon: <ReportsIcon color='white' />, route: 'reports' },
+        { name: 'Announcements', icon: <Megaphone className='text-primary' />, hoverIcon: <Megaphone color='white' />, route: 'announcements' },
+        // { name: 'User Verification', icon: <UserVerificationIcon />, hoverIcon: <UserVerificationIcon color='white' />, route: 'user_verification' },
+        { name: 'Inbox', icon: <InboxIcon />, hoverIcon: <InboxIcon color='white' />, route: 'inbox' },
     ];
 
     return (
