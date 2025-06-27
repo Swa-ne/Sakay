@@ -10,10 +10,22 @@ import Image from 'next/image';
 import LogoutIcon from './icons/logoutIcon';
 import Link from 'next/link';
 import { Megaphone } from 'lucide-react';
+import { useAuthenticated } from '@/hooks/useAuthenticated';
+import LoadingPage from './pages/loading.page';
+import { redirect } from 'next/navigation';
+import NotSupportedPage from './pages/not.supported.page';
+import { logout } from '@/service/auth';
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const [isLogoutHovered, setIsLogoutHovered] = useState(false);
+
+    const { isAuthenticated, userType } = useAuthenticated();
+    if (isAuthenticated === null) return <LoadingPage />;
+    if (!isAuthenticated) {
+        redirect('/');
+    }
+    if (userType !== 'ADMIN') return <NotSupportedPage />;
 
     const url_details = [
         { name: 'Surveilance', icon: <SurveilanceIcon />, hoverIcon: <SurveilanceIcon color='white' />, route: '' },
@@ -23,6 +35,15 @@ export default function Sidebar() {
         // { name: 'User Verification', icon: <UserVerificationIcon />, hoverIcon: <UserVerificationIcon color='white' />, route: 'user_verification' },
         { name: 'Inbox', icon: <InboxIcon />, hoverIcon: <InboxIcon color='white' />, route: 'inbox' },
     ];
+
+    const handleLogout = async () => {
+        if ((await logout()) === 'Success') {
+            window.location.reload();
+            redirect('/');
+        } else {
+            // TODO: add a component that says Connection Timeout or something
+        }
+    };
 
     return (
         <div className={`h-screen text-text transition-all duration-300 border-r-1 border-primary ${collapsed ? 'w-20' : 'w-72'} flex justify-between flex-col`}>
@@ -51,7 +72,7 @@ export default function Sidebar() {
             </div>
 
             <div className='w-full px-5 py-1 mb-3'>
-                <div className={`w-[95%] h-10 rounded-md flex items-center hover:bg-primary hover:text-background transition-all duration-200 ${collapsed ? 'justify-center' : 'justify-start px-3 space-x-4'}`} onMouseEnter={() => setIsLogoutHovered(true)} onMouseLeave={() => setIsLogoutHovered(false)}>
+                <div onClick={handleLogout} className={`w-[95%] h-10 rounded-md flex items-center hover:bg-primary hover:text-background transition-all duration-200 ${collapsed ? 'justify-center' : 'justify-start px-3 space-x-4'}`} onMouseEnter={() => setIsLogoutHovered(true)} onMouseLeave={() => setIsLogoutHovered(false)}>
                     <span className={`flex items-center justify-center w-7 h-7`}>
                         <LogoutIcon color={isLogoutHovered ? 'white' : '#00A2FF'} />
                     </span>
