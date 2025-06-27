@@ -1,8 +1,26 @@
-import { cookies } from 'next/headers';
-import Login from './auth/page';
-import Home from './(protected)/home/page';
+'use client';
 
-export default async function Page() {
-    const isLoggedIn = Boolean((await cookies()).get('token')?.value);
-    return isLoggedIn ? <Home /> : <Login />;
+import Home from '@/components/pages/home.page';
+import Login from '@/components/pages/login.page';
+import ProtectedLayout from '@/app/(protected)/layout';
+import NotSupportedPage from '@/components/pages/not.supported.page';
+import { useAuthenticated } from '@/hooks/useAuthenticated';
+import LoadingPage from '@/components/pages/loading.page';
+
+export default function Page() {
+    const { isAuthenticated, userType } = useAuthenticated();
+
+    if (isAuthenticated === null) return <LoadingPage />;
+
+    return isAuthenticated ? (
+        userType == 'ADMIN' ? (
+            <ProtectedLayout>
+                <Home />
+            </ProtectedLayout>
+        ) : (
+            <NotSupportedPage />
+        )
+    ) : (
+        <Login />
+    );
 }
