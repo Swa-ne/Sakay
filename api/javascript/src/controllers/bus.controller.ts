@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { assignUserToBus, deleteBus, getBus, getBusses, getBussesAndAllDrivers, getDriver, getDrivers, postBus, putBus, removeAssignUserToBus } from '../services/bus.services';
+import { assignUserToBus, deleteBus, getBus, getBusses, getBussesAndAllDrivers, postBus, putBus, removeAssignUserToBus } from '../services/bus.services';
 import { UserType } from '../middlewares/token.authentication';
 
 export const postBusController = async (req: Request, res: Response) => {
@@ -24,7 +24,8 @@ export const postBusController = async (req: Request, res: Response) => {
 };
 export const getBussesController = async (req: Request, res: Response) => {
     try {
-        const bus = await getBusses();
+        const { page = 1 } = req.query
+        const bus = await getBusses(page as string);
         if (bus.httpCode === 200) {
             res.status(bus.httpCode).json({ message: bus.message });
             return;
@@ -108,38 +109,6 @@ export const deleteBusController = async (req: Request, res: Response) => {
         }
 
         res.status(result.httpCode).json({ error: result.error });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-export const getDriversController = async (req: Request, res: Response) => {
-    try {
-        const drivers = await getDrivers();
-        if (drivers.httpCode === 200) {
-            res.status(drivers.httpCode).json({ message: drivers.message });
-            return;
-        }
-
-        res.status(drivers.httpCode).json({ error: drivers.error });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-export const getDriverController = async (req: Request, res: Response) => {
-    try {
-        const { user_id } = req.params;
-        if (!user_id) {
-            res.status(404).json({ error: 'Driver not found' });
-            return;
-        }
-
-        const driver = await getDriver(user_id);
-        if (driver.httpCode === 200) {
-            res.status(driver.httpCode).json({ message: driver.message });
-            return;
-        }
-
-        res.status(driver.httpCode).json({ error: driver.error });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
