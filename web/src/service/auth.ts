@@ -31,10 +31,11 @@ export const login = async (user: LoginUserModel) => {
 }
 
 export const authenticateToken = async () => {
+    let response
     try {
 
         const { access_token, setAll } = useAuthStore.getState();
-        const response = await api.get(`${ROUTE}/current-user`, {
+        response = await api.get(`${ROUTE}/current-user`, {
             headers: {
                 "Authorization": access_token
             }
@@ -60,6 +61,33 @@ export const authenticateToken = async () => {
         } else {
             return 'No internet connection';
         }
+    } catch (error: unknown) {
+        console.log(response)
+        const axiosError = error as AxiosError<{ error: string }>;
+        const errMsg = axiosError.response?.data?.error || 'Unknown error';
+        return errMsg;
+    }
+}
+
+export const logout = async () => {
+    try {
+
+        const { access_token } = useAuthStore.getState();
+
+        const response = await api.delete(
+            `${ROUTE}/logout`, {
+            headers: {
+                "Authorization": access_token
+            }
+        });
+
+        const data = response.data;
+        if (data === "User logged Out") {
+            useAuthStore.getState().reset();
+            return "Success";
+        }
+
+        return "Failed";
     } catch (error: unknown) {
         const axiosError = error as AxiosError<{ error: string }>;
         const errMsg = axiosError.response?.data?.error || 'Unknown error';
