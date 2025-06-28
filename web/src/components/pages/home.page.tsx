@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import UnitDetails from '@/components/unitDetails';
 import UnitsContainer from '@/components/unitsContainer';
 
-export default function Home() {
+export default function HomePage() {
     return (
         <div className='p-5 w-full h-screen flex space-x-5'>
             <div className='w-1/3 bg-background rounded-2xl p-5 overflow-y-auto'>
