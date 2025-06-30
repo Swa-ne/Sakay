@@ -29,7 +29,8 @@ export const getBusses = async (page: string) => {
 
     try {
         const busses = await Bus.find()
-            .skip((parseInt(page) - 1) * 15)
+            .sort({ createdAt: -1 })
+            .skip((parseInt(page) - 1) * 30)
             .limit(30)
             .session(session);
 
