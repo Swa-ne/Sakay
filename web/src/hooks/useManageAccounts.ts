@@ -1,7 +1,8 @@
 
 import { getAllBusses } from '@/service/bus';
 import { getAllUsers } from '@/service/users';
-import { Account, Unit } from '@/types';
+import useManageStore from '@/stores/manage.store';
+import { Unit } from '@/types';
 import { useEffect, useState } from 'react';
 
 interface fetchUser {
@@ -24,14 +25,17 @@ const useManageAccounts = () => {
     const [unitPage, setUnitPage] = useState<number>(1)
 
 
-    const [units, setUnits] = useState<Unit[]>([]);
-    const [accounts, setAccounts] = useState<Account[]>([]);
+    const { accounts, units, setAccounts, setUnits } = useManageStore.getState();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     const assignDriverToUnit = (accountId: number, unitId?: number) => {
-        setAccounts((prev) => prev.map((acc) => (acc.id === accountId ? { ...acc, assignedUnitId: unitId } : acc)));
+        setAccounts(
+            accounts.map((acc) =>
+                acc.id === accountId ? { ...acc, assignedUnitId: unitId } : acc
+            )
+        );
     };
 
     const fetchBusses = async (currentPage: number) => {
@@ -63,7 +67,6 @@ const useManageAccounts = () => {
             setAccounts([]);
             setError(users);
         } else {
-            console.log(users)
             const updatedUsers = users.map((user: fetchUser) => ({
                 id: user._id,
                 name: `${user.first_name} ${user.last_name}`,
