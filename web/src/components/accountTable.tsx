@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
-import { Account, Unit } from '@/app/(protected)/account_and_units/page';
+import { Account, Unit } from '@/types';
 
 export function AccountTable({ filteredAccounts, units, assignDriverToUnit }: { filteredAccounts: Account[]; units: Unit[]; assignDriverToUnit: (userId: number, unitId?: number) => void }) {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -48,9 +48,9 @@ export function AccountTable({ filteredAccounts, units, assignDriverToUnit }: { 
                                 </TableCell>
                                 <TableCell className='font-medium'>{acc.name}</TableCell>
                                 <TableCell className='italic text-muted-foreground'>{acc.role}</TableCell>
-                                <TableCell className='text-sm text-muted-foreground'>{acc.role === 'driver' ? (acc.assignedUnitId ? units.find((u) => u.id === acc.assignedUnitId)?.name || 'Unknown' : 'None') : '-'}</TableCell>
+                                <TableCell className='text-sm text-muted-foreground'>{acc.role === 'DRIVER' ? (acc.assignedUnitId ? units.find((u) => u.id === acc.assignedUnitId)?.name || 'Unknown' : 'None') : '-'}</TableCell>
                                 <TableCell>
-                                    {acc.role === 'driver' ? (
+                                    {acc.role === 'DRIVER' ? (
                                         <select value={acc.assignedUnitId || ''} onChange={(e) => assignDriverToUnit(acc.id, Number(e.target.value) || undefined)} className='border rounded px-2 py-1 bg-background text-foreground'>
                                             <option value=''>Unassigned</option>
                                             {units.map((unit) => (

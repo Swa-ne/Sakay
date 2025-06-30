@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
-import { Account, Unit } from '@/app/(protected)/account_and_units/page';
+import { Account, Unit } from '@/types';
 
 export function UnitsTable({ units, drivers }: { units: Unit[]; drivers: Account[] }) {
     const [selectedUnitIds, setSelectedUnitIds] = useState<number[]>([]);
@@ -48,7 +48,13 @@ export function UnitsTable({ units, drivers }: { units: Unit[]; drivers: Account
                                 <TableCell className='font-medium'>{unit.name}</TableCell>
                                 <TableCell>{unit.bus_number || '-'}</TableCell>
                                 <TableCell>{unit.plate_number || '-'}</TableCell>
-                                <TableCell>{unit.assignedDriverId ? drivers.find((d) => d.id === unit.assignedDriverId)?.name || 'Unknown' : 'None'}</TableCell>
+                                <TableCell>
+                                    {unit.assignedDriverId
+                                        ? drivers.find((d) => {
+                                              return d.id === unit.assignedDriverId;
+                                          })?.name || 'Unknown'
+                                        : 'None'}
+                                </TableCell>
                             </TableRow>
                         ))
                     )}
