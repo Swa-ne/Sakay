@@ -57,7 +57,7 @@ export const checkEveryInputForLogin = async (user_identifier: string, password:
 };
 
 export const checkPhoneNumberValidity = (phone_number: string) => {
-    const regex = /^(09|\+639)\d{9}$/;
+    const regex = /^(9|09|\+639)\d{9}$/;
     return regex.test(phone_number);
 };
 
