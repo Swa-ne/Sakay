@@ -8,7 +8,8 @@ export const getUsers = async (page: string) => {
 
     try {
         const users = await User.find()
-            .skip((parseInt(page) - 1) * 15)
+            .sort({ createdAt: -1 })
+            .skip((parseInt(page) - 1) * 30)
             .limit(30)
             .session(session);
 
