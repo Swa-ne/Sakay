@@ -71,7 +71,10 @@ export const checkPhoneNumberValidityController = async (req: Request, res: Resp
 
 export const signupUserController = async (req: Request, res: Response) => {
     try {
-        const { first_name, last_name, phone_number, password_hash, confirmation_password, birthday, user_type }: CustomRequestBody = req.body;
+        const { first_name, last_name, phone_number, password_hash, confirmation_password, birthday }: CustomRequestBody = req.body;
+        const originalUrl = req.originalUrl
+        const user_type = originalUrl === "/user/create-driver" ? "DRIVER" : originalUrl === "/authentication/signup" ? "COMMUTER" : "ADMIN"
+
         let email_address: string = req.body.email_address;
         if (!email_address && !phone_number) {
             res.status(404).json({ error: "Email address or phone number not found" });
@@ -110,18 +113,25 @@ export const signupUserController = async (req: Request, res: Response) => {
                 res.status(500).json({ error: data.error });
                 return;
             }
-            res
-                .status(200)
-                .cookie(
-                    "refresh_token",
-                    data.refresh_token,
-                    {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'none',
-                    }
-                )
-                .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, user_type: data.user_type, first_name: data.first_name, last_name: data.last_name, email: data.email, profile: data.profile });
+            if (user_type === "COMMUTER") {
+
+                res
+                    .status(200)
+                    .cookie(
+                        "refresh_token",
+                        data.refresh_token,
+                        {
+                            httpOnly: true,
+                            secure: true,
+                            sameSite: 'none',
+                        }
+                    )
+                    .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, user_type: data.user_type, first_name: data.first_name, last_name: data.last_name, email: data.email, profile: data.profile });
+            } else {
+                res
+                    .status(200)
+                    .json({ message: "Success", user_id: data.user_id, user_type: data.user_type, first_name: data.first_name, last_name: data.last_name, email: data.email, profile: data.profile });
+            }
             return;
         }
 
