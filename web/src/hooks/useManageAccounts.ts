@@ -16,7 +16,7 @@ interface fetchBus {
     _id: string
     bus_number: string
     plate_number: string
-    today_driver: fetchUser
+    today_driver?: fetchUser
 }
 
 const useManageAccounts = () => {
@@ -52,7 +52,7 @@ const useManageAccounts = () => {
                 name: `${bus.bus_number} - ${bus.plate_number}`,
                 bus_number: bus.bus_number,
                 plate_number: bus.plate_number,
-                assignedDriverId: bus.today_driver._id,
+                assignedDriverId: bus.today_driver ? bus.today_driver._id : null,
             }));
             setUnits(updatedBusses);
         }
