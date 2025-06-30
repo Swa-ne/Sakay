@@ -12,11 +12,11 @@ export const BusSchema = z.object({
 
 export const UserSchema = z
     .object({
-        email: z
+        email_address: z
             .string()
             .min(1, 'Email is required')
             .email('Enter a valid email address'),
-        password: z
+        password_hash: z
             .string()
             .min(8, 'Password must be at least 8 characters long')
             .refine((val) => /[A-Z]/.test(val), {
@@ -31,7 +31,7 @@ export const UserSchema = z
             .refine((val) => /[^a-zA-Z0-9]/.test(val), {
                 message: 'At least one special character is required',
             }),
-        confirm_password: z.string().min(1, 'Confirm password is required'),
+        confirmation_password: z.string().min(1, 'Confirm password is required'),
         first_name: z.string().min(1, 'First name is required'),
         middle_name: z.string(),
         last_name: z.string().min(1, 'Last name is required'),
@@ -49,7 +49,7 @@ export const UserSchema = z
                 message: 'You must be at least 18 years old',
             }),
     })
-    .refine((data) => data.password === data.confirm_password, {
+    .refine((data) => data.password_hash === data.confirmation_password, {
         message: "Passwords don't match",
         path: ['confirm_password'],
     });
