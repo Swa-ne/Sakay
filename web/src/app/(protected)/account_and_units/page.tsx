@@ -12,11 +12,13 @@ import { Role } from '@/types';
 import useManageAccounts from '@/hooks/useManageAccounts';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import AddDriverModal from '@/components/addDriverModal';
+import AddUnitModal from '@/components/addUnitModal';
 
 const ManageAccount = () => {
     const { accounts, units, assignDriverToUnit } = useManageAccounts();
 
-    const [openDriverModal, setOpenDriverModal] = React.useState(false);
+    const [openDriverModal, setOpenDriverModal] = useState(false);
+    const [openUnitModal, setOpenUnitModal] = useState(false);
 
     const tabs = [{ name: 'Accounts' }, { name: 'Units' }];
 
@@ -67,9 +69,16 @@ const ManageAccount = () => {
                     <TabsContent value='Units' className='overflow-y-auto'>
                         <div className='flex justify-between items-center mb-4'>
                             <h3 className='text-xl font-semibold mb-3'>Units List</h3>
-                            <Button className='text-background px-4 py-5'>
-                                Add Unit <Plus />
-                            </Button>
+
+                            <Dialog open={openUnitModal} onOpenChange={setOpenUnitModal}>
+                                <DialogTrigger asChild>
+                                    <Button className='text-background px-4 py-5'>
+                                        Add Unit <Plus />
+                                    </Button>
+                                </DialogTrigger>
+
+                                <AddUnitModal setOpen={setOpenUnitModal} />
+                            </Dialog>
                         </div>
                         <UnitsTable units={units} drivers={accounts} />
                     </TabsContent>
