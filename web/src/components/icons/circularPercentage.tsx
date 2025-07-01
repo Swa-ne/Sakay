@@ -1,17 +1,22 @@
-interface CircularPercentage {
+interface CircularPercentageProps {
     percent: number;
+    size?: number;
+    strokeWidth?: number;
 }
-const CircularPercentage = ({ percent }: CircularPercentage) => {
+
+const CircularPercentage = ({ percent, size = 80, strokeWidth = 8 }: CircularPercentageProps) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (percent / 100) * circumference;
+
     return (
-        <>
-            <svg className='w-32 h-32 transform -rotate-90' viewBox='0 0 120 120'>
-                <circle cx='60' cy='60' r='50' stroke='#e5e7eb' strokeWidth='8' fill='none' />
-                <circle cx='60' cy='60' r='50' stroke='#10b981' strokeWidth='8' fill='none' strokeDasharray={`${percent * 3.14159} ${(100 - percent) * 3.14159}`} strokeLinecap='round' />
+        <div className='relative inline-flex items-center justify-center'>
+            <svg className='transform -rotate-90' width={size} height={size}>
+                <circle cx={size / 2} cy={size / 2} r={radius} stroke='currentColor' strokeWidth={strokeWidth} fill='transparent' className='text-gray-200' />
+                <circle cx={size / 2} cy={size / 2} r={radius} stroke='currentColor' strokeWidth={strokeWidth} fill='transparent' strokeDasharray={circumference} strokeDashoffset={offset} className='text-green-500 transition-all duration-300 ease-in-out' strokeLinecap='round' />
             </svg>
-            <div className='absolute inset-0 flex items-center justify-center'>
-                <span className='text-2xl font-bold text-gray-900'>{percent}%</span>
-            </div>
-        </>
+            <span className='absolute text-2xl font-bold text-gray-900'>{percent}%</span>
+        </div>
     );
 };
 
