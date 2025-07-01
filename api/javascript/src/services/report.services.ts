@@ -2,6 +2,7 @@ import { ObjectId, Schema, startSession } from "mongoose";
 import { Report } from "../models/report.model";
 import { User } from "../models/authentication/user.model";
 import { Bus } from "../models/bus.model";
+import { startOfWeek, subWeeks } from "date-fns";
 
 export const postIncidentReport = async (bus_id: string, user_id: string, description: string, place_of_incident: string, time_of_incident: string, date_of_incident: string) => {
     const session = await startSession();
@@ -169,6 +170,49 @@ export const toggleReport = async (user_id: string, report_id: string) => {
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+};
+export const getReportStats = async () => {
+    try {
+        const now = new Date();
+        const startOfThisWeek = startOfWeek(now, { weekStartsOn: 1 });
+        const startOfLastWeek = subWeeks(startOfThisWeek, 1);
+        const endOfLastWeek = startOfThisWeek;
+
+        const [
+            openNow,
+            openLastWeek,
+            closedNow,
+            closedLastWeek,
+            assignedNow,
+            assignedLastWeek,
+            unassignedNow,
+            unassignedLastWeek
+        ] = await Promise.all([
+            Report.countDocuments({ is_open: true }),
+            Report.countDocuments({ is_open: true, createdAt: { $gte: startOfLastWeek, $lt: endOfLastWeek } }),
+
+            Report.countDocuments({ is_open: false }),
+            Report.countDocuments({ is_open: false, createdAt: { $gte: startOfLastWeek, $lt: endOfLastWeek } }),
+
+            Report.countDocuments({ investigator: { $exists: true } }),
+            Report.countDocuments({ investigator: { $exists: true }, createdAt: { $gte: startOfLastWeek, $lt: endOfLastWeek } }),
+
+            Report.countDocuments({ investigator: { $exists: false } }),
+            Report.countDocuments({ investigator: { $exists: false }, createdAt: { $gte: startOfLastWeek, $lt: endOfLastWeek } }),
+        ]);
+
+        return {
+            message: {
+                open: { count: openNow, change: openNow - openLastWeek },
+                closed: { count: closedNow, change: closedNow - closedLastWeek },
+                assigned: { count: assignedNow, change: assignedNow - assignedLastWeek },
+                unassigned: { count: unassignedNow, change: unassignedNow - unassignedLastWeek },
+            },
+            httpCode: 200,
+        };
+    } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 };

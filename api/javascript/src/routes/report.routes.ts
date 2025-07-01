@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { authenticateToken } from "../middlewares/token.authentication"
-import { getAllReportsController, getReportController, postIncidentReportController, postPerformanceReportController, toggleReportController } from "../controllers/report.controller";
+import { getAllReportsController, getReportController, getReportStatsController, postIncidentReportController, postPerformanceReportController, toggleReportController } from "../controllers/report.controller";
 
 
 const router = Router()
@@ -12,5 +12,6 @@ router.post("/create-performance-report", postPerformanceReportController);
 router.get("/get-all-report/:page", getAllReportsController);
 router.get("/get-report/:report_id", getReportController);
 router.put("/toggle-report/:report_id", toggleReportController);
+router.get("/get-stats-report", getReportStatsController);
 
 export default router
