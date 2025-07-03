@@ -163,13 +163,14 @@ class BusRepoImpl extends BusRepo {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
-      var response =
-          await http.get(Uri.parse("$_apiUrl/get-drivers"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      });
+      var response = await http.get(
+          Uri.parse("${dotenv.env['API_URL']}/user/get-drivers"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': access_token,
+            'Cookie': 'refresh_token=$refresh_token',
+          });
       final response_body = json.decode(response.body);
       if (response.statusCode == 200) {
         List<UserModel> driversList = (response_body['message'] as List)
@@ -189,7 +190,7 @@ class BusRepoImpl extends BusRepo {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
     var response = await http.get(
-      Uri.parse("$_apiUrl/get-driver/$user_id"),
+      Uri.parse("${dotenv.env['API_URL']}/user/get-driver/$user_id"),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
