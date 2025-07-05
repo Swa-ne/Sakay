@@ -47,9 +47,21 @@ export const saveAnnouncementController = async (req: Request & { user?: UserTyp
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-export const getAllAnnouncementsController = async (req: Request, res: Response) => {
+export const getAllAnnouncementsController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
-        const { page = 1, user_type } = req.params;
+        const user = req.user;
+
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+        const { user_type } = user;
+        if (!user_type) {
+            res.status(400).json({ error: 'User Type not provided' });
+            return;
+        }
+
+        const { page = 1 } = req.params;
         const result = await getAllAnnouncements(page as string, user_type as string);
 
         if (result.httpCode === 200) {

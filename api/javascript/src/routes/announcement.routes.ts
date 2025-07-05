@@ -9,7 +9,7 @@ const router = Router()
 router.use(authenticateToken);
 
 router.post("/save-announcement", uploadFiles.array('file'), saveAnnouncementController);
-router.get("/get-all-announcements/:user_type/:page", getAllAnnouncementsController);
+router.get("/get-all-announcements/:page", getAllAnnouncementsController);
 router.get("/get-announcement/:announcement_id", getAnnouncementController);
 router.put("/edit-announcement/:announcement_id", uploadFiles.array('file'), editAnnouncementController);
 router.delete("/delete-announcement/:announcement_id", deleteAnnouncementController);
