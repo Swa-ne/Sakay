@@ -6,6 +6,7 @@ export interface fetchUser {
     first_name: string
     last_name: string
     user_type: string
+    email: string
     assigned_bus_id: string
     phone_number: string
     profile_picture_url: string
@@ -15,6 +16,9 @@ export interface fetchBus {
     bus_number: string
     plate_number: string
     today_driver?: fetchUser
+    current_driver?: fetchUser[]
+    speed?: number
+    milage?: number
 }
 export interface Account {
     id: string;
@@ -64,4 +68,45 @@ export interface FetchReportStats {
     closed: ReportStatItem;
     assigned: ReportStatItem;
     unassigned: ReportStatItem;
+}
+
+export interface Announcement {
+    _id: string,
+    posted_by: fetchUser,
+    edited_by?: fetchUser | null,
+    headline: string,
+    content: string,
+    audience: "EVERYONE" | "DRIVER" | "COMMUTER",
+    files: string[] | File[],
+    createdAt?: string,
+    updatedAt?: string,
+}
+
+export interface File {
+    _id: string;
+    file_name: string;
+    file_type: string;
+    file_size: number;
+    file_category: "MEDIA" | "DOCUMENT";
+    file_url: string;
+    file_hash: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export interface Message {
+    _id?: string;
+    message: string;
+    sender_id: string;
+    chat_id: string;
+    is_read: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Inbox {
+    _id: string;
+    user_id: fetchUser;
+    is_active: boolean;
+    last_message: Message;
 }
