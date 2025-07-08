@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Account, Unit } from '@/types';
 
 export function UnitsTable({ units, drivers }: { units: Unit[]; drivers: Account[] }) {
-    const [selectedUnitIds, setSelectedUnitIds] = useState<number[]>([]);
+    const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
 
-    const toggleUnit = (id: number) => {
+    const toggleUnit = (id: string) => {
         setSelectedUnitIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
     };
 
