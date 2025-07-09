@@ -266,7 +266,7 @@ class _DisplayPerformanceReportPageState
                             color: Colors.grey, size: 25),
                         const SizedBox(width: 8),
                         Text(
-                          'Report Generated: ${timeAgo(widget.report.created_at.toString())}',
+                          'Report Generated: ${timeAgo(widget.report.createdAt.toString())}',
                           style:
                               const TextStyle(color: Colors.grey, fontSize: 13),
                         ),

@@ -68,8 +68,8 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
         sender: user_id,
         chat_id: widget.chat_id,
         is_read: false,
-        created_at: DateTime.now().toIso8601String(),
-        updated_at: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       ));
     }
   }
@@ -118,8 +118,8 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                   sender: user_id,
                   chat_id: widget.chat_id,
                   is_read: false,
-                  created_at: DateTime.now().toString(),
-                  updated_at: DateTime.now().toString(),
+                  createdAt: DateTime.now().toString(),
+                  updatedAt: DateTime.now().toString(),
                 ),
               );
               messageController.clear();
@@ -147,14 +147,14 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                 itemBuilder: (context, index) {
                   bool isMe = user_id == messages[index].sender;
                   String formattedTime =
-                      formatDateTime(messages[index].created_at);
+                      formatDateTime(messages[index].createdAt);
 
                   bool showTimeSeparator = false;
                   if (index < messages.length - 1) {
                     DateTime currentMessageTime =
-                        DateTime.parse(messages[index].created_at);
+                        DateTime.parse(messages[index].createdAt);
                     DateTime previousMessageTime =
-                        DateTime.parse(messages[index + 1].created_at);
+                        DateTime.parse(messages[index + 1].createdAt);
 
                     if (currentMessageTime
                             .difference(previousMessageTime)
@@ -174,7 +174,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Center(
                             child: Text(
-                              formatDate(messages[index].created_at),
+                              formatDate(messages[index].createdAt),
                               style: TextStyle(
                                   color: Colors.grey[600], fontSize: 12),
                             ),

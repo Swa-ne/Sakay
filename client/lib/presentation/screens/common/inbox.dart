@@ -64,8 +64,8 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
               sender: widget.user_id,
               chat_id: widget.chat_id,
               is_read: false,
-              created_at: DateTime.now().toString(),
-              updated_at: DateTime.now().toString(),
+              createdAt: DateTime.now().toString(),
+              updatedAt: DateTime.now().toString(),
             ),
           );
           setState(() {
@@ -86,14 +86,11 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                 backgroundColor: Colors.transparent,
               ),
               SizedBox(width: 10),
-              Text(
-                "Sakay", 
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold
-                )
-              ),
+              Text("Sakay",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -107,15 +104,15 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                 itemBuilder: (context, index) {
                   bool isMe = widget.user_id == widget.messages[index].sender;
                   String formattedTime =
-                      formatDateTime(widget.messages[index].created_at);
+                      formatDateTime(widget.messages[index].createdAt);
 
                   bool showTimeSeparator = false;
 
                   if (index < widget.messages.length - 1) {
                     DateTime currentMessageTime =
-                        DateTime.parse(widget.messages[index].created_at);
+                        DateTime.parse(widget.messages[index].createdAt);
                     DateTime previousMessageTime =
-                        DateTime.parse(widget.messages[index + 1].created_at);
+                        DateTime.parse(widget.messages[index + 1].createdAt);
 
                     if (currentMessageTime
                             .difference(previousMessageTime)
@@ -135,7 +132,7 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Center(
                             child: Text(
-                              formatDate(widget.messages[index].created_at),
+                              formatDate(widget.messages[index].createdAt),
                               style: TextStyle(
                                   color: Colors.grey[600], fontSize: 12),
                             ),

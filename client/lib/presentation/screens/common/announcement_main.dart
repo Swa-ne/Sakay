@@ -134,7 +134,7 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            formatToDate(_currentAnnouncement.created_at!),
+                            formatToDate(_currentAnnouncement.createdAt!),
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -348,7 +348,7 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen>
                 headline: updatedAnnouncement.headline,
                 content: updatedAnnouncement.content,
                 audience: updatedAnnouncement.audience,
-                updated_at: updatedAnnouncement.updated_at,
+                updatedAt: updatedAnnouncement.updatedAt,
                 files: updatedAnnouncement.files,
               );
               _currentAnnouncement = newAnnouncement;

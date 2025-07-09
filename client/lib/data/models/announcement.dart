@@ -10,8 +10,8 @@ class AnnouncementsModel extends Equatable {
   final String content;
   final String audience;
   final List<FileModel>? files;
-  final String? created_at;
-  final String? updated_at;
+  final String? createdAt;
+  final String? updatedAt;
 
   const AnnouncementsModel({
     this.id,
@@ -21,8 +21,8 @@ class AnnouncementsModel extends Equatable {
     required this.content,
     required this.audience,
     this.files,
-    this.created_at,
-    this.updated_at,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory AnnouncementsModel.fromJson(Map<String, dynamic> json) {
@@ -40,8 +40,8 @@ class AnnouncementsModel extends Equatable {
       files: (json['files'] as List)
           .map((json) => FileModel.fromJson(json))
           .toList(),
-      created_at: json['createdAt'] ?? "",
-      updated_at: json['updatedAt'] ?? "",
+      createdAt: json['createdAt'] ?? "",
+      updatedAt: json['updatedAt'] ?? "",
     );
   }
   Map<String, dynamic> toJson() {
@@ -53,8 +53,8 @@ class AnnouncementsModel extends Equatable {
       'content': content,
       'audience': audience,
       'files': files,
-      'createdAt': created_at,
-      'updatedAt': updated_at,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -66,8 +66,8 @@ class AnnouncementsModel extends Equatable {
     String? content,
     String? audience,
     List<FileModel>? files,
-    String? created_at,
-    String? updated_at,
+    String? createdAt,
+    String? updatedAt,
   }) {
     return AnnouncementsModel(
       id: id ?? this.id,
@@ -77,8 +77,8 @@ class AnnouncementsModel extends Equatable {
       content: content ?? this.content,
       audience: audience ?? this.audience,
       files: files ?? this.files,
-      created_at: created_at ?? this.created_at,
-      updated_at: updated_at ?? this.updated_at,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

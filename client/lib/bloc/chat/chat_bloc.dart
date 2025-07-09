@@ -106,8 +106,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             sender: event.sender_id,
             chat_id: event.chat_id,
             is_read: false,
-            created_at: DateTime.now().toString(),
-            updated_at: DateTime.now().toString(),
+            createdAt: DateTime.now().toString(),
+            updatedAt: DateTime.now().toString(),
           );
           emit(OnReceiveMessageSuccess(message, event.user));
         } catch (e) {

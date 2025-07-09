@@ -24,7 +24,7 @@ class _ReportTileState extends State<ReportTile> with Convertion {
     super.initState();
     _timeAgoStream = Stream.periodic(
       const Duration(minutes: 1),
-      (_) => timeAgo(widget.report.created_at.toString()),
+      (_) => timeAgo(widget.report.createdAt.toString()),
     ).asBroadcastStream();
   }
 
@@ -73,7 +73,7 @@ class _ReportTileState extends State<ReportTile> with Convertion {
               const SizedBox(width: 8),
               StreamBuilder<String>(
                 stream: _timeAgoStream,
-                initialData: timeAgo(widget.report.created_at.toString()),
+                initialData: timeAgo(widget.report.createdAt.toString()),
                 builder: (context, snapshot) {
                   return Text(
                     snapshot.data ?? '',

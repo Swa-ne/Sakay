@@ -131,7 +131,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
                   children: [
                     Text(
                       formatDateTime(
-                        inbox.last_message.created_at,
+                        inbox.last_message.createdAt,
                       ),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),

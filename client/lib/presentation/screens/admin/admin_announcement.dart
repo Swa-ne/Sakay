@@ -248,7 +248,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                 audience: _selectedAudience,
                 posted_by: _myUserModel,
                 files: convertFilesToFileModels(files),
-                created_at: DateTime.now().toIso8601String(),
+                createdAt: DateTime.now().toIso8601String(),
               ),
             );
             _headlineController.clear();

@@ -18,8 +18,8 @@ class ReportModel extends Equatable {
   final int? service_rate;
   final int? reliability_rate;
   final bool is_open;
-  final DateTime? created_at;
-  final DateTime? updated_at;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const ReportModel({
     this.id,
@@ -37,8 +37,8 @@ class ReportModel extends Equatable {
     this.service_rate,
     this.reliability_rate,
     required this.is_open,
-    this.created_at,
-    this.updated_at,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
@@ -63,9 +63,9 @@ class ReportModel extends Equatable {
       service_rate: (json['service_rate'] as num?)?.toInt(),
       reliability_rate: (json['reliability_rate'] as num?)?.toInt(),
       is_open: json['is_open'],
-      created_at:
+      createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updated_at:
+      updatedAt:
           json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
@@ -87,8 +87,8 @@ class ReportModel extends Equatable {
       'service_rate': service_rate,
       'reliability_rate': reliability_rate,
       'is_open': is_open,
-      'createdAt': created_at?.toIso8601String(),
-      'updatedAt': updated_at?.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -108,8 +108,8 @@ class ReportModel extends Equatable {
     int? service_rate,
     int? reliability_rate,
     bool? is_open,
-    DateTime? created_at,
-    DateTime? updated_at,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return ReportModel(
       id: id ?? this.id,
@@ -127,8 +127,8 @@ class ReportModel extends Equatable {
       service_rate: service_rate ?? this.service_rate,
       reliability_rate: reliability_rate ?? this.reliability_rate,
       is_open: is_open ?? this.is_open,
-      created_at: created_at ?? this.created_at,
-      updated_at: updated_at ?? this.updated_at,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

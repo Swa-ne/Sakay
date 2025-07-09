@@ -362,7 +362,7 @@ class _EditAnnouncementDialogState extends State<EditAnnouncementDialog>
                                   content: _contentController.text,
                                   audience: _audience,
                                   files: latestFiles,
-                                  updated_at: DateTime.now().toIso8601String(),
+                                  updatedAt: DateTime.now().toIso8601String(),
                                 );
                                 final existing_file_ids = _filesModel
                                     .map((file) => file.id)
