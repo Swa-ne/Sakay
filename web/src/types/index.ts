@@ -100,8 +100,8 @@ export interface Message {
     sender_id: string;
     chat_id: string;
     is_read: boolean;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Inbox {
