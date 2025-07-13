@@ -7,6 +7,10 @@ interface ReportStore {
 
     setReports: (update: Report[] | ((prev: Report[]) => Report[])) => void
     setReportStats: (update: (FetchReportStats | null) | ((prev: (FetchReportStats | null)) => (FetchReportStats | null))) => void
+
+    onToggleReport: (report: Report) => void
+    onAdminReport: (report: Report) => void
+    onAdminToggleReport: (report: Report) => void
 }
 
 const useReportStore = create<ReportStore>((set) => ({
@@ -39,6 +43,31 @@ const useReportStore = create<ReportStore>((set) => ({
         set((state) => ({
             reportStats: typeof update === 'function' ? update(state.reportStats) : update,
         })),
+
+    onToggleReport: (report) =>
+        set((state) => ({
+            reports: state.reports.map((r) =>
+                r._id === report._id ? report : r
+            ),
+        })),
+
+    onAdminReport: (report) =>
+        set((state) => ({
+            reports: [report, ...state.reports],
+        })),
+
+    onAdminToggleReport: (report) =>
+        set((state) => ({
+            reports: state.reports.map((r) =>
+                r._id === report._id ? report : r
+            ),
+        })),
 }));
 
 export default useReportStore;
+
+export const reportActions = {
+    onToggleReport: useReportStore.getState().onToggleReport,
+    onAdminReport: useReportStore.getState().onAdminReport,
+    onAdminToggleReport: useReportStore.getState().onAdminToggleReport,
+};
