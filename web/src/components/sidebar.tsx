@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import SurveilanceIcon from './icons/surveilanceIcon';
 import ReportsIcon from './icons/reportsIcon';
-import UserVerificationIcon from './icons/userVerificationIcon';
+// import UserVerificationIcon from './icons/userVerificationIcon';
 import InboxIcon from './icons/inboxIcon';
 import ManageAccountsIcon from './icons/manageAccountsIcon';
 import SidebarLink from './sidebarLink';
