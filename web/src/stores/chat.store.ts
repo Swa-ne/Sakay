@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Message } from '@/types';
+import useInboxStore from './inbox.store';
 
 
 interface ChatState {
@@ -32,8 +33,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             },
         });
     },
-    onReceiveMessage: (msg) => {
-        console.log("hello")
+    onReceiveMessage: async (msg) => {
         const current = get().messages[msg.chat_id] || [];
         set({
             messages: {
@@ -41,6 +41,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 [msg.chat_id]: [msg, ...current],
             },
         });
+
+        await useInboxStore.getState().onReceiveNewMessage(msg);
     },
     reset: () => set({ messages: {} }),
 }));
