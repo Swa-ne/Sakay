@@ -99,7 +99,7 @@ export interface Message {
     message: string;
     sender_id: string;
     chat_id: string;
-    is_read: boolean;
+    isRead: boolean;
     createdAt: string;
     updatedAt: string;
 }

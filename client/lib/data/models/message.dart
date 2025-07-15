@@ -5,7 +5,7 @@ class MessageModel extends Equatable {
   final String message;
   final String sender;
   final String chat_id;
-  final bool is_read;
+  final bool isRead;
   final String createdAt;
   final String updatedAt;
 
@@ -14,7 +14,7 @@ class MessageModel extends Equatable {
     required this.message,
     required this.sender,
     required this.chat_id,
-    required this.is_read,
+    required this.isRead,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -25,7 +25,7 @@ class MessageModel extends Equatable {
       message: json['message'] ?? '',
       sender: json['sender_id'] ?? '',
       chat_id: json['chat_id'] ?? '',
-      is_read: json['isRead'] ?? false,
+      isRead: json['isRead'] ?? false,
       createdAt: json['createdAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
     );
@@ -37,7 +37,7 @@ class MessageModel extends Equatable {
       'message': message,
       'sender': sender,
       'chat_id': chat_id,
-      'isRead': is_read,
+      'isRead': isRead,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -49,7 +49,7 @@ class MessageModel extends Equatable {
     String? message,
     String? sender,
     String? chat_id,
-    bool? is_read,
+    bool? isRead,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -58,12 +58,12 @@ class MessageModel extends Equatable {
       message: message ?? this.message,
       sender: sender ?? this.sender,
       chat_id: chat_id ?? this.chat_id,
-      is_read: is_read ?? this.is_read,
+      isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   @override
-  List<Object> get props => [message, sender, chat_id, is_read];
+  List<Object> get props => [message, sender, chat_id, isRead];
 }

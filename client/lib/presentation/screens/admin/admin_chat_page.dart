@@ -67,7 +67,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
         message: message,
         sender: user_id,
         chat_id: widget.chat_id,
-        is_read: false,
+        isRead: false,
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       ));
@@ -117,7 +117,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                   message: messageController.text,
                   sender: user_id,
                   chat_id: widget.chat_id,
-                  is_read: false,
+                  isRead: false,
                   createdAt: DateTime.now().toString(),
                   updatedAt: DateTime.now().toString(),
                 ),

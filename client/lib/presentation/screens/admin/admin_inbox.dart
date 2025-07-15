@@ -88,9 +88,9 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
             itemCount: inboxes.length,
             itemBuilder: (context, index) {
               final inbox = inboxes[index];
-              final is_read = inbox.last_message.sender == user_id
+              final isRead = inbox.last_message.sender == user_id
                   ? true
-                  : inbox.last_message.is_read;
+                  : inbox.last_message.isRead;
               return ListTile(
                 leading: CachedNetworkImage(
                   imageUrl: inbox.user_id.profile,
@@ -112,7 +112,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: !is_read ? Colors.blue : Colors.black,
+                    color: !isRead ? Colors.blue : Colors.black,
                   ),
                 ),
                 subtitle: Text(
@@ -122,8 +122,8 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontWeight: !is_read ? FontWeight.bold : FontWeight.normal,
-                    color: !is_read ? Colors.black : Colors.grey,
+                    fontWeight: !isRead ? FontWeight.bold : FontWeight.normal,
+                    color: !isRead ? Colors.black : Colors.grey,
                   ),
                 ),
                 trailing: Row(
@@ -135,7 +135,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
                       ),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
-                    if (!is_read)
+                    if (!isRead)
                       const Padding(
                         padding: EdgeInsets.only(left: 8.0),
                         child: Icon(Icons.circle, color: Colors.blue, size: 10),
@@ -177,7 +177,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
             if (index != -1) {
               final updatedInbox = inboxes[index].copyWith(
                 last_message:
-                    inboxes[index].last_message.copyWith(is_read: true),
+                    inboxes[index].last_message.copyWith(isRead: true),
               );
               inboxes[index] = updatedInbox;
             }

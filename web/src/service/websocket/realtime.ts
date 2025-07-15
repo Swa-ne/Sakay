@@ -45,7 +45,7 @@ export const connectSocket = async () => {
             chat_id: message.chat_id,
             message: message.message,
             sender_id: message.sender_id,
-            is_read: false,
+            isRead: false,
             createdAt: new Date().toString(),
             updatedAt: new Date().toString(),
         });
@@ -92,7 +92,7 @@ export const connectAdminSocketEvents = () => {
             chat_id: message.chat_id,
             message: message.message,
             sender_id: message.sender_id,
-            is_read: false,
+            isRead: false,
             createdAt: new Date().toString(),
             updatedAt: new Date().toString(),
         });
