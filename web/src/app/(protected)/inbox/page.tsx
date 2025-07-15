@@ -8,32 +8,22 @@ import { Input } from '@/components/ui/input';
 import useInbox from '@/hooks/useInbox';
 import { useAuthStore } from '@/stores';
 import { timeAgo } from '@/utils/date.util';
+import { Inbox as InboxType } from '@/types';
 
 const Inbox = () => {
+    const messageRef = useRef<HTMLDivElement>(null);
+    const inboxRef = useRef<HTMLDivElement>(null);
+
     const { user_id } = useAuthStore();
-    const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, setMessagePage, setInboxPage } = useInbox();
+    const [currentUser, setCurrentUser] = useState<InboxType>();
+    const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, setMessagePage, setInboxPage } = useInbox(messageRef);
 
     const [activeTab, setActiveTab] = useState('All');
     const tabs = ['All', 'Unread'];
 
-    const messageRef = useRef<HTMLDivElement>(null);
-    const inboxRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        const container = messageRef.current;
-        if (!container) return;
-        const handleScroll = () => {
-            const isAtTop = container.scrollHeight + container.scrollTop - container.clientHeight <= 5;
-            if (isAtTop) {
-                setMessagePage((prev) => prev + 1);
-            }
-        };
-
-        container.addEventListener('scroll', handleScroll);
-
-        return () => {
-            container.removeEventListener('scroll', handleScroll);
-        };
-    }, [setMessagePage]);
+        setCurrentUser(inboxes.find((inbox) => inbox._id === chatID));
+    }, [inboxes, chatID]);
 
     useEffect(() => {
         const container = inboxRef.current;
@@ -41,9 +31,9 @@ const Inbox = () => {
 
         const handleInboxScroll = () => {
             const scrollThreshold = 100;
-            const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= scrollThreshold;
+            const isNearTop = container.scrollHeight - container.scrollTop - container.clientHeight <= scrollThreshold;
 
-            if (isNearBottom) {
+            if (isNearTop) {
                 setInboxPage((prev) => prev + 1);
             }
         };
@@ -92,10 +82,12 @@ const Inbox = () => {
                                 </Avatar>
                                 <div className='flex-1 min-w-0'>
                                     <div className='flex items-center justify-between mb-1'>
-                                        <div className='font-medium text-text truncate'>{inbox.user_id.first_name}</div>
+                                        <div className='font-medium text-text truncate'>
+                                            {inbox.user_id.first_name} {inbox.user_id.last_name}
+                                        </div>
                                         <div className='text-xs text-gray-500 flex items-center gap-1'>
                                             {timeAgo(inbox.last_message.createdAt)}
-                                            {!inbox.last_message.is_read && (
+                                            {inbox.last_message.sender_id !== user_id && !inbox.last_message.isRead && (
                                                 <Badge variant='secondary' className='text-xs bg-green-100 text-green-800'>
                                                     New
                                                 </Badge>
@@ -114,7 +106,7 @@ const Inbox = () => {
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-3'>
                             <Avatar className='w-10 h-10'>
-                                <AvatarImage src={inboxes.find((inbox) => inbox._id === chatID)?.user_id.profile_picture_url || '/placeholder.svg'} />
+                                <AvatarImage src={currentUser?.user_id.profile_picture_url || '/placeholder.svg'} />
                                 <AvatarFallback>
                                     {inboxes
                                         .find((inbox) => inbox._id === chatID)
@@ -124,8 +116,10 @@ const Inbox = () => {
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <div className='font-medium text-text'>{inboxes.find((inbox) => inbox._id === chatID)?.user_id.first_name}</div>
-                                <div className='text-sm text-gray-500'>{inboxes.find((inbox) => inbox._id === chatID)?.user_id.email}</div>
+                                <div className='font-medium text-text'>
+                                    {currentUser?.user_id.first_name} {currentUser?.user_id.last_name}
+                                </div>
+                                <div className='text-sm text-gray-500'>{currentUser?.user_id.email}</div>
                             </div>
                         </div>
                     </div>
