@@ -39,9 +39,11 @@ export const getFile = async (req: Request, res: Response): Promise<any> => {
             return res.status(404).send('File not found.');
         }
 
-        const downloadURL = await getDownloadURL(file);
-
-        res.redirect(downloadURL);
+        const [signedUrl] = await file.getSignedUrl({
+            action: 'read',
+            expires: Date.now() + 60 * 60 * 1000,
+        });
+        res.redirect(signedUrl);
     } catch (error) {
         console.error('Error fetching file:', error);
         res.status(500).send('Internal Server Error');
