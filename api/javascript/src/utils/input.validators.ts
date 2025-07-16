@@ -81,12 +81,18 @@ export const validateRequiredFields = (fields: Record<string, any>, fieldLabels:
 };
 
 export const validateHeadlineLength = (headline: string) => {
-    const wordCount = headline.trim().split(/\s+/).length;
+    const trimmed = headline.trim();
+    if (!trimmed) return false;
+
+    const wordCount = trimmed.split(/\s+/).length;
     return wordCount >= 1 && wordCount <= 15;
 };
 
 export const validateContentLength = (content: string) => {
-    const wordCount = content.trim().split(/\s+/).length;
+    const trimmed = content.trim();
+    if (!trimmed) return false;
+
+    const wordCount = trimmed.trim().split(/\s+/).length;
     return wordCount >= 2 && wordCount <= 250;
 };
 
