@@ -22,7 +22,7 @@ const AnnouncementsLayouts = ({ children }: { children: ReactNode }) => {
                         <Dialog open={openAnnouncementModal} onOpenChange={setOpenAnnouncementModal}>
                             <DialogTrigger asChild>
                                 <Button className='text-background px-4 py-5'>
-                                    Add Driver <Plus />
+                                    Post Announcement <Plus />
                                 </Button>
                             </DialogTrigger>
                             <AddAnnouncementModal setOpen={setOpenAnnouncementModal} />
