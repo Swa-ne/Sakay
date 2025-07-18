@@ -4,6 +4,7 @@ import { Announcement } from '@/types';
 interface AnnouncementStore {
     announcements: Announcement[]
     setAnnouncements: (update: Announcement[] | ((prev: Announcement[]) => Announcement[])) => void
+    appendAnnouncements: (announcement: Announcement[]) => void;
     onReceiveAnnouncement: (announcement: Announcement) => void
     onUpdateAnnouncement: (announcement: Announcement) => void
 }
@@ -14,6 +15,13 @@ const useAnnouncementStore = create<AnnouncementStore>((set) => ({
         set((state) => ({
             announcements: typeof update === 'function' ? update(state.announcements) : update,
         })),
+
+    appendAnnouncements: (announcement) => {
+        set((state) => ({
+            announcements: [...state.announcements, ...announcement],
+        }));
+    },
+
     onReceiveAnnouncement: (announcement) =>
         set((state) => ({
             announcements: [announcement, ...state.announcements],
