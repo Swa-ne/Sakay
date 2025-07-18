@@ -78,7 +78,7 @@ export interface Announcement {
     content: string,
     audience: "EVERYONE" | "DRIVER" | "COMMUTER",
     files: (string | File)[],
-    existing_files: string[],
+    existing_files?: string[],
     createdAt?: string,
     updatedAt?: string,
 }
