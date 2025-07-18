@@ -35,7 +35,7 @@ const Report = () => {
                     </div>
                 </div>
             </div>
-
+            {/* TODO: change it to something like "Choose a Report" or something */}
             <div className='space-y-3 mb-8'>
                 <h2 className='text-2xl font-semibold mb-2'>No Reports Yet</h2>
                 <p className='text-sm leading-relaxed px-2'>{"We'll generate your first report as soon as you have enough data to analyze"}</p>

@@ -1,56 +1,92 @@
+'use client';
+
+import { ReactNode } from 'react';
 import IncidentReport from '@/components/icons/incidentReport';
 import PerformanceReport from '@/components/icons/performanceReport';
-import ReportStatistics from '@/components/reportStatistics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ReportStatistics from '@/components/reportStatistics';
+import { Card, CardContent } from '@/components/ui/card';
+import useReports from '@/hooks/useReports';
+import { TypesOfReport } from '@/types';
+import { timeAgo } from '@/utils/date.util';
+import LoadingPage from '@/components/pages/loading.page';
+import Link from 'next/link';
 
-export default function ReportsLayout({ children }: { children: React.ReactNode }) {
+export default function ReportsLayout({ children }: { children: ReactNode }) {
+    const { reports, loading, error } = useReports();
+
     const tabs = [
-        {
-            name: 'All',
-        },
-        {
-            name: 'Incident Reports',
-            icon: <IncidentReport />,
-        },
-        {
-            name: 'Performance Reports',
-            icon: <PerformanceReport />,
-        },
+        { name: 'All', value: 'all', icon: null },
+        { name: 'Incident Reports', value: 'INCIDENT', icon: <IncidentReport /> },
+        { name: 'Performance Reports', value: 'PERFORMANCE', icon: <PerformanceReport /> },
     ];
 
+    // const [filterReport, setFilterReport] = useState<TypesOfReport | 'all'>('all');
+
+    const filteredReports = (type: TypesOfReport | 'all') => reports.filter((report) => (type === 'all' ? true : report.type_of_report === type));
+
+    if (loading) return <LoadingPage />;
+
+    if (error) {
+        // TODO: show a something
+    }
+
     return (
-        <div className='flex flex-col min-h-screen w-full p-5 space-y-2 overflow-hidden'>
-            <div className='p-5 w-full bg-background rounded-t-2xl'>
-                <h1 className='text-4xl font-bold mb-2'>Reports Statistics</h1>
-                <ReportStatistics />
-            </div>
+        <div className='flex flex-col h-screen w-full p-3 md:p-5 space-y-4 overflow-hidden bg-gray-50'>
+            <Card className='p-1 w-full shadow-sm'>
+                <CardContent className='p-2 md:p-4'>
+                    <div className='flex flex-col md:flex-row md:items-center md:justify-between mb-4'>
+                        <div>
+                            <h1 className='text-2xl md:text-4xl font-bold mb-2 text-gray-900'>Reports Statistics</h1>
+                            <p className='text-sm text-gray-600'>Monitor and track all your reports in real-time</p>
+                        </div>
+                    </div>
+                    <ReportStatistics />
+                </CardContent>
+            </Card>
 
-            <div className='w-full flex-grow flex flex-row space-x-3 overflow-hidden h-0'>
-                <div className='w-1/2 bg-background rounded-b-2xl p-5 overflow-y-auto h-full'>
-                    <Tabs defaultValue={tabs[0].name} className='w-full'>
-                        <TabsList className='p-0 bg-background justify-start border-b rounded-none space-x-2 mb-3'>
+            <div className='flex-1 flex flex-col lg:flex-row gap-4 overflow-hidden'>
+                <Card className='w-full lg:w-1/2 shadow-sm'>
+                    <CardContent className='p-2 md:p-4 h-full overflow-y-auto flex flex-col'>
+                        <Tabs defaultValue='all' className='w-full flex-1 flex flex-col'>
+                            <TabsList className='grid w-full grid-cols-3 mb-4 bg-gray-100'>
+                                {tabs.map((tab) => (
+                                    <TabsTrigger key={tab.value} value={tab.value} className='text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm'>
+                                        <div className='flex items-center space-x-1'>
+                                            {tab.icon}
+                                            <span className='hidden sm:inline'>{tab.name}</span>
+                                        </div>
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+
                             {tabs.map((tab) => (
-                                <TabsTrigger key={tab.name} value={tab.name} className='rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-primary'>
-                                    <code className='text-lg'>{tab.name}</code>
-                                </TabsTrigger>
+                                <TabsContent key={tab.value} value={tab.value} className='flex-1'>
+                                    <div className='space-y-3'>
+                                        {filteredReports(tab.value as TypesOfReport | 'all').map((report) => (
+                                            <Link href={`/reports/${report.type_of_report.toLocaleLowerCase()}/${report._id}`} key={report.description} className='flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors'>
+                                                <div className='flex items-center space-x-3'>
+                                                    <div className='text-gray-400'>{report.type_of_report === 'INCIDENT' ? <IncidentReport /> : report.type_of_report === 'PERFORMANCE' ? <PerformanceReport /> : null}</div>
+                                                    <div>
+                                                        <p className='font-medium text-sm'>{report.driver ? `${report.driver.first_name} ${report.driver.last_name}` : `${report.bus.bus_number} - ${report.bus.plate_number}`}</p>
+                                                        <p className='text-xs text-gray-500 truncate w-2/3'>{report.description}</p>
+                                                    </div>
+                                                </div>
+                                                {report.createdAt && <span className='text-xs text-gray-400'>{timeAgo(report.createdAt)}</span>}
+                                            </Link>
+                                        ))}
+
+                                        {filteredReports(tab.value as TypesOfReport | 'all').length === 0 && <p className='text-sm text-gray-400 text-center italic'>No reports found.</p>}
+                                    </div>
+                                </TabsContent>
                             ))}
-                        </TabsList>
+                        </Tabs>
+                    </CardContent>
+                </Card>
 
-                        {tabs.map((tab) => (
-                            <TabsContent key={tab.name} value={tab.name}>
-                                <div className='h-12 flex items-center justify-between border gap-2 rounded-md pl-3 pr-1.5 cursor-pointer'>
-                                    <label className='w-2/3 space-x-2 flex items-center hover:underline cursor-pointer'>
-                                        {tab.icon}
-                                        <b>Unit ABC</b> - See report details
-                                    </label>
-                                    <span>2:25 PM</span>
-                                </div>
-                            </TabsContent>
-                        ))}
-                    </Tabs>
-                </div>
-
-                <div className='w-1/2 bg-background rounded-b-2xl overflow-hidden relative h-full p-5'>{children}</div>
+                <Card className='w-full lg:w-1/2 shadow-sm'>
+                    <CardContent className='p-2 md:p-4 h-full overflow-y-auto'>{children}</CardContent>
+                </Card>
             </div>
         </div>
     );
