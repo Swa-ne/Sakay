@@ -77,11 +77,17 @@ export interface Announcement {
     headline: string,
     content: string,
     audience: "EVERYONE" | "DRIVER" | "COMMUTER",
-    files: string[] | File[],
+    files: (string | File)[],
+    existing_files: string[],
     createdAt?: string,
     updatedAt?: string,
 }
-
+export interface AnnoucementLocal {
+    headline: string;
+    content: string;
+    audience: 'EVERYONE' | 'DRIVER' | 'COMMUTER';
+    existing_files?: string[];
+}
 export interface File {
     _id: string;
     file_name: string;
