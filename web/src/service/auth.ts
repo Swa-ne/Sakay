@@ -12,17 +12,21 @@ export const login = async (user: LoginUserModel) => {
         );
 
         const data = response.data;
-        useAuthStore.getState().setAll({
-            access_token: data.access_token,
-            user_id: data.user_id,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            profile: data.profile,
-            user_type: data.user_type,
-        });
+        if (data.message === "Success") {
 
-        return "Success";
+            useAuthStore.getState().setAll({
+                access_token: data.access_token,
+                user_id: data.user_id,
+                first_name: data.first_name,
+                last_name: data.last_name,
+                email: data.email,
+                profile: data.profile,
+                user_type: data.user_type,
+            });
+
+            return "Success";
+        }
+        return data.error
     } catch (error: unknown) {
         const axiosError = error as AxiosError<{ error: string }>;
         const errMsg = axiosError.response?.data?.error || 'Unknown error';
@@ -62,7 +66,6 @@ export const authenticateToken = async () => {
             return 'No internet connection';
         }
     } catch (error: unknown) {
-        console.log(response)
         const axiosError = error as AxiosError<{ error: string }>;
         const errMsg = axiosError.response?.data?.error || 'Unknown error';
         return errMsg;
