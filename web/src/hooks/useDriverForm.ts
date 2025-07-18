@@ -64,7 +64,6 @@ const useDriverForm = () => {
         e.preventDefault();
         if (validateForm()) {
             const user = await postDriver(userFrom);
-            console.log(user)
             if (typeof user === "object") {
                 setAccounts((prevState) => [user, ...prevState,])
                 setOpen(false);
@@ -79,7 +78,7 @@ const useDriverForm = () => {
                     birthday: '',
                 });
             } else {
-                console.log(user)
+                console.error("Internal Server Error")
             }
         }
     };

@@ -78,6 +78,7 @@ export const connectSocket = async () => {
     });
 
     socket.on('disconnect', () => {
+        // TODO: show something like not connected to server or something.
         console.log('Disconnected from realtime socket');
     });
 

@@ -45,7 +45,6 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString(),
             });
-            console.log(messages[chatID]);
             setMessageInput('');
         } else {
             console.error('Failed to send message:', result);

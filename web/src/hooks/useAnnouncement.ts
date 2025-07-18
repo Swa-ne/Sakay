@@ -128,7 +128,7 @@ const useAnnouncement = () => {
                     audience: "EVERYONE",
                 });
             } else {
-                console.log(announcement)
+                console.error("Error submiting the announcement.")
             }
             setFiles([])
         }

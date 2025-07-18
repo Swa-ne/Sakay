@@ -24,7 +24,6 @@ export const saveMessage = async (message: string, chat_id: string, receiver_id:
         return false;
     } catch (error) {
         const err = error as AxiosError<{ message: string }>;
-        console.log(error)
         const errMsg = err.response?.data?.message || 'Unknown error';
         return errMsg;
     }

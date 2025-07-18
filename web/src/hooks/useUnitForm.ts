@@ -55,7 +55,7 @@ const useDriverForm = () => {
                     plate_number: "",
                 });
             } else {
-                console.log(unit)
+                console.error("Internal Server Error")
             }
         }
     };

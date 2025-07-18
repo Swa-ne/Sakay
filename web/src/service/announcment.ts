@@ -79,7 +79,6 @@ export const editAnnouncement = async (announcement_id: string, formData: FormDa
         const data = response.data;
         return data.message === "Success";
     } catch (error: unknown) {
-        console.log(error)
         const axiosError = error as AxiosError<{ error: string }>;
         const errMsg = axiosError.response?.data?.error || 'Unknown error';
         return errMsg;
