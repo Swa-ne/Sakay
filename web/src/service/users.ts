@@ -58,6 +58,8 @@ export const postDriver = async (driver: UserModel) => {
             name: `${data.first_name} ${data.last_name}`,
             role: data.user_type,
             assignedUnitId: data.assigned_bus_id,
+            phone_number: driver.phone_number,
+            profile_picture_url: data.profile
         }
         return user;
     } catch (error: unknown) {
