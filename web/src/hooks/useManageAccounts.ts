@@ -1,44 +1,48 @@
 
-import { getAllBusses } from '@/service/bus';
+import { assignUserToBus, getAllBusses, unassignDriverToBus } from '@/service/bus';
 import { getAllUsers } from '@/service/users';
 import useManageStore from '@/stores/manage.store';
-import { Unit } from '@/types';
-import { useEffect, useState } from 'react';
+import { fetchBus, fetchUser, Unit } from '@/types';
+import { useCallback, useEffect, useState } from 'react';
 
-interface fetchUser {
-    _id: string
-    first_name: string
-    last_name: string
-    user_type: string
-    assigned_bus_id: string
-}
-interface fetchBus {
-    _id: string
-    bus_number: string
-    plate_number: string
-    today_driver?: fetchUser
-}
+
 
 const useManageAccounts = () => {
-    // TODO: fetched the cached data
     const [userPage, setUserPage] = useState<number>(1)
     const [unitPage, setUnitPage] = useState<number>(1)
 
 
-    const { accounts, units, setAccounts, setUnits } = useManageStore.getState();
+    const accounts = useManageStore((state) => state.accounts);
+    const units = useManageStore((state) => state.units);
+    const setAccounts = useManageStore((state) => state.setAccounts);
+    const setUnits = useManageStore((state) => state.setUnits);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const assignDriverToUnit = (accountId: number, unitId?: number) => {
-        setAccounts(
-            accounts.map((acc) =>
-                acc.id === accountId ? { ...acc, assignedUnitId: unitId } : acc
-            )
-        );
+    const assignDriverToUnit = async (accountId: string, unitId?: string) => {
+        let success = false;
+        if (unitId) {
+            const res = await assignUserToBus(unitId, accountId)
+            if (res === "Success") {
+                success = true
+            }
+        } else {
+            const res = await unassignDriverToBus(accountId)
+            if (res === "Success") {
+                success = true
+            }
+        }
+        if (success) {
+            setAccounts((prev) =>
+                prev.map((acc) =>
+                    acc.id === accountId ? { ...acc, assignedUnitId: unitId } : acc
+                )
+            );
+        }
     };
 
-    const fetchBusses = async (currentPage: number) => {
+    const fetchBusses = useCallback(async (currentPage: number) => {
         setLoading(true);
         setError(null);
 
@@ -57,8 +61,9 @@ const useManageAccounts = () => {
             setUnits(updatedBusses);
         }
         setLoading(false);
-    };
-    const fetchUsers = async (currentPage: number) => {
+    }, [setUnits]);
+
+    const fetchUsers = useCallback(async (currentPage: number) => {
         setLoading(true);
         setError(null);
 
@@ -72,18 +77,21 @@ const useManageAccounts = () => {
                 name: `${user.first_name} ${user.last_name}`,
                 role: user.user_type,
                 assignedUnitId: user.assigned_bus_id,
+                phone_number: user.phone_number,
+                profile_picture_url: user.profile_picture_url
             }));
             setAccounts(updatedUsers);
         }
         setLoading(false);
-    };
+    }, [setAccounts]);
+
     useEffect(() => {
         fetchUsers(userPage)
-    }, [userPage])
+    }, [userPage, fetchUsers])
 
     useEffect(() => {
         fetchBusses(unitPage)
-    }, [unitPage])
+    }, [unitPage, fetchBusses])
 
     return { accounts, units, userPage, unitPage, loading, error, setAccounts, setUnits, setUserPage, setUnitPage, assignDriverToUnit };
 }
