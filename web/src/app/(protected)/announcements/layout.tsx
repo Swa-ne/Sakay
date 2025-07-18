@@ -7,15 +7,35 @@ import useAnnouncement from '@/hooks/useAnnouncement';
 import { timeAgo } from '@/utils/date.util';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 const AnnouncementsLayouts = ({ children }: { children: ReactNode }) => {
-    const { announcements } = useAnnouncement();
+    const announcementRef = useRef<HTMLDivElement>(null);
+
+    const { announcements, setAnnouncementPage } = useAnnouncement();
     const [openAnnouncementModal, setOpenAnnouncementModal] = useState(false);
+
+    useEffect(() => {
+        const container = announcementRef.current;
+        if (!container) return;
+        const handleScroll = () => {
+            const isAtTop = container.scrollHeight - container.scrollTop - container.clientHeight <= 100;
+            if (isAtTop) {
+                setAnnouncementPage((prev) => prev + 1);
+            }
+        };
+
+        container.addEventListener('scroll', handleScroll);
+
+        return () => {
+            container.removeEventListener('scroll', handleScroll);
+        };
+    }, [setAnnouncementPage]);
+
     return (
         <div className='flex flex-col min-h-screen w-full p-5 space-y-2 overflow-hidden'>
             <div className='w-full flex-grow flex flex-row space-x-3 overflow-hidden h-0'>
-                <div className='w-1/2 bg-background rounded-2xl p-5 overflow-y-auto h-full'>
+                <div ref={announcementRef} className='w-1/2 bg-background rounded-2xl p-5 overflow-y-auto h-full'>
                     <div className='w-full flex justify-between items-center mb-5'>
                         <h1 className='text-4xl font-bold'>Annoncements</h1>
 
