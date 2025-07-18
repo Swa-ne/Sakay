@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import useAnnouncement from '@/hooks/useAnnouncement';
 import { Textarea } from './ui/textarea';
 import { ImageIcon, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface AddAnnouncementModalProps {
     setOpen: (bool: boolean) => void;
@@ -33,9 +34,25 @@ const AddAnnouncementModal = ({ setOpen }: AddAnnouncementModalProps) => {
                             <Textarea id='content' value={announcementForm.content} onChange={(e) => handleInputChange('content', e.target.value)} className={`min-h-[120px] resize-none ${errors.content ? 'border-red-500' : ''}`} rows={5} placeholder='Enter your announcement content...' />
                             {errors.content && <p className='text-sm text-red-500'>{errors.content}</p>}
                         </div>
-                        <div className='space-y-2'>
-                            <Label htmlFor='file'>Upload File</Label>
-                            <Input id='file' type='file' multiple onChange={(e) => setFiles(Array.from(e.target.files || []))} accept='image/*,.pdf,.doc,.docx' />
+                        <div className='flex justify-between space-x-1 space-y-1'>
+                            <div className='max-w-1/3 space-y-2'>
+                                <Label htmlFor='audience'>Target Audience *</Label>
+                                <Select value={announcementForm.audience} onValueChange={(value: 'EVERYONE' | 'DRIVER' | 'COMMUTER') => handleInputChange('audience', value)}>
+                                    <SelectTrigger className={errors.audience ? 'border-destructive' : ''}>
+                                        <SelectValue placeholder='Select target audience' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='EVERYONE'>Everyone</SelectItem>
+                                        <SelectItem value='DRIVER'>Drivers</SelectItem>
+                                        <SelectItem value='COMMUTER'>Commuters</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {errors.audience && <p className='text-sm text-destructive'>{errors.audience}</p>}
+                            </div>
+                            <div className='max-w-2/3 space-y-2'>
+                                <Label htmlFor='file'>Upload File</Label>
+                                <Input id='file' type='file' multiple onChange={(e) => setFiles(Array.from(e.target.files || []))} accept='image/*,.pdf,.doc,.docx' />
+                            </div>
                         </div>
                     </div>
 
