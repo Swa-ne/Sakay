@@ -12,6 +12,7 @@ import chatRoutes from "./routes/chat.routes";
 import announcementRoutes from "./routes/announcement.routes";
 import reportRoutes from "./routes/report.routes";
 import busRoutes from "./routes/bus.routes";
+import usersRoutes from "./routes/user.routes";
 
 import { app, server } from './socket';
 
@@ -66,6 +67,7 @@ app.use("/chat", chatRoutes)
 app.use("/announcement", announcementRoutes)
 app.use("/report", reportRoutes)
 app.use("/bus", busRoutes)
+app.use("/user", usersRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
