@@ -46,7 +46,6 @@ class TrackingSocketControllerImpl extends TrackingSocketController {
   Future<void> connect() async {
     socket = IO.io(_apiUrl, <String, dynamic>{
       'transports': ['websocket'],
-      'autoConnect': false,
       'auth': {
         'token': await _tokenController.getAccessToken(),
       }
