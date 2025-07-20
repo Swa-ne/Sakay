@@ -1,7 +1,7 @@
 'use client';
-import { useContext, useRef } from 'react';
+import { Dispatch, SetStateAction, useRef } from 'react';
 import { GoogleMap, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
-// import { MapContext } from './MapContext';
+import { BusInformation } from '@/types';
 
 const containerStyle = {
     width: '100%',
@@ -26,17 +26,18 @@ const mapOptions = {
         },
     ],
 };
-const Map = () => {
+
+interface MapProps {
+    busses: Map<string, BusInformation>;
+    polylines: never[];
+    setMap: Dispatch<SetStateAction<google.maps.Map | null>>;
+}
+const Map = ({ busses, polylines, setMap }: MapProps) => {
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
     });
-    //   const {
-    //     markers,
-    //     polylines,
-    //     showMyLocation,
-    //   } = useContext(MapContext);
 
-    // const mapRef = useRef(null);
+    const mapRef = useRef<google.maps.Map>(null);
 
     if (!isLoaded) return <div>Loading...</div>;
 
@@ -49,22 +50,25 @@ const Map = () => {
                 ...mapOptions,
                 mapTypeId: 'roadmap',
             }}
-            //   onLoad={map => (mapRef.current = map)}
+            onLoad={(map) => {
+                mapRef.current = map;
+                setMap(mapRef.current);
+            }}
         >
-            {/* {Array.from(markers).map((marker, index) => (
-        <Marker key={index} position={marker} />
-      ))}
-      {Array.from(polylines).map((polyline, index) => (
-        <Polyline key={index} path={polyline} />
-      ))}
-      {showMyLocation && (
-        <Marker
-          position={center} // You can use geolocation API for real user position
-          icon={{
-            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-          }}
-        />
-      )} */}
+            {Array.from(busses.values()).map((bus) => (
+                <Marker
+                    key={bus._id}
+                    position={{ lng: bus.longitude, lat: bus.latitude }}
+                    icon={{
+                        url: '/icon/bus_icon.png',
+                        scaledSize: new window.google.maps.Size(40, 40),
+                    }}
+                    title={`Speed: ${bus.speed.toFixed(2)} km/hr`}
+                />
+            ))}
+            {Array.from(polylines).map((polyline, index) => (
+                <Polyline key={index} path={polyline} />
+            ))}
         </GoogleMap>
     );
 };

@@ -3,8 +3,12 @@ import Map from '@/components/map';
 import { Input } from '@/components/ui/input';
 import UnitDetails from '@/components/unitDetails';
 import UnitsContainer from '@/components/unitsContainer';
+import useTracker from '@/hooks/useTracker';
+import { useState } from 'react';
 
 export default function HomePage() {
+    const [map, setMap] = useState<google.maps.Map | null>(null);
+    const { busses, polylines } = useTracker(map);
     return (
         <div className='p-5 w-full h-screen flex space-x-5'>
             <div className='w-1/3 bg-background rounded-2xl p-5 overflow-y-auto'>
@@ -16,16 +20,14 @@ export default function HomePage() {
                     </div>
                 </div>
                 <div className='space-y-2 pt-2'>
-                    {Array(22)
-                        .fill(null)
-                        .map((_, i) => (
-                            <UnitsContainer key={i} />
-                        ))}
+                    {Array.from(busses.entries()).map(([busId, bus]) => (
+                        <UnitsContainer key={busId} bus={bus} />
+                    ))}
                 </div>
             </div>
             <div className='w-2/3 h-full bg-background rounded-2xl overflow-hidden relative'>
-                <Map />
-                <UnitDetails status={1} />
+                <Map busses={busses} polylines={polylines} setMap={setMap} />
+                {/* <UnitDetails status={1} /> */}
             </div>
         </div>
     );
