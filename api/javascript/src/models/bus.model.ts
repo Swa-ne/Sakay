@@ -4,6 +4,8 @@ export interface BusSchemaInterface extends Document {
     _id: ObjectId,
     bus_number: string,
     plate_number: string,
+    milage: number,
+    travel_time: number,
     createdAt?: Date,
     updatedAt?: Date,
 }
@@ -16,6 +18,14 @@ const BusSchema: Schema = new Schema({
     plate_number: {
         type: String,
         required: true,
+    },
+    milage: {
+        type: Number,
+        default: 0
+    },
+    travel_time: {
+        type: Number,
+        default: 0
     },
 }, {
     timestamps: true,
