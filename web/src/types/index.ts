@@ -116,3 +116,22 @@ export interface Inbox {
     is_active: boolean;
     last_message: Message;
 }
+
+export interface BusInformation {
+    _id?: string;
+    bus_number?: string;
+    plate_number?: string;
+    location?: string;
+    latitude: number;
+    longitude: number;
+    speed: number;
+    milage?: number;
+    travel_time?: number;
+    is_used: boolean;
+    timestamp?: string;
+    assignedDriverId?: string | null;
+}
+export interface LatLngLiteral {
+    lat: number;
+    lng: number;
+}
