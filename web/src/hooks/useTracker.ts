@@ -26,7 +26,6 @@ const useTracker = (map: google.maps.Map | null = null) => {
 
     const createOneBus = useCallback((bus: BusInformation, position: LatLngLiteral) => {
         if (!map) return;
-        console.log("created")
         setBusses((prev) => {
             const updated = new Map(prev);
             if (bus._id) {
@@ -51,7 +50,6 @@ const useTracker = (map: google.maps.Map | null = null) => {
         setLoading(true);
         setError(null);
         const fetchBusses = await getAllBussesAndDriver()
-        console.log(fetchBusses)
         if (fetchBusses !== "Internal Server Error") {
             fetchBusses.map((bus: BusInformation) => createOneBus(bus, TERMINAL_POINT))
         }

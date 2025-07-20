@@ -20,8 +20,6 @@ const useReports = () => {
     const fetchReport = useCallback(async (id: string) => {
         setLoading(true);
         setError(null);
-        console.log(reports)
-
         const cached = reports.find((r) => r._id === id);
 
         if (cached) {
