@@ -25,6 +25,28 @@ export const getAllBusses = async (page: number) => {
         return errMsg;
     }
 }
+export const getAllBussesAndDriver = async () => {
+    const { access_token } = useAuthStore.getState();
+    try {
+        const response = await api.get(
+            `${ROUTE}/get-busses-and-all-drivers`,
+            {
+                headers: {
+                    "Authorization": access_token
+                }
+            }
+        );
+        if (response.status === 200) {
+            const data = response.data;
+            return data.message;
+        }
+        return "Internal Server Error"
+    } catch (error: unknown) {
+        const axiosError = error as AxiosError<{ error: string }>;
+        const errMsg = axiosError.response?.data?.error || 'Unknown error';
+        return errMsg;
+    }
+}
 export const getBus = async (bus_id: string) => {
     const { access_token } = useAuthStore.getState();
     try {
