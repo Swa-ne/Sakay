@@ -1,4 +1,4 @@
-import { Mail } from 'lucide-react';
+import { Mail, TimerReset } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './ui/button';
 
@@ -41,9 +41,7 @@ const UnitDetails = ({ status }: UnitDetailsProps) => {
                             2 km
                         </div>
                         <div className='w-1/2 h-10 flex items-center bg-gray-100 text-gray-800 px-2 py-1 rounded-sm text-lg justify-center self-stretch'>
-                            <svg className='w-8 h-8 mr-1' fill='currentColor' viewBox='0 0 20 20'>
-                                <path d='M10 2a8 8 0 100 16 8 8 0 000-16zm.5 4a.5.5 0 00-1 0v5a.5.5 0 00.276.447l3 1.5a.5.5 0 00.448-.894L10.5 10.2V6z' />
-                            </svg>
+                            <TimerReset width={20} height={20} />
                             2h 36m
                         </div>
                     </div>
