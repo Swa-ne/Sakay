@@ -24,7 +24,6 @@ class AProfilePageState extends State<ProfilePage> {
   String _selectedMapPreference = 'default';
   int? selectedLocation;
   double soundVolume1 = 0.5;
-
   String fullName = "";
   String profile = "";
 
@@ -32,7 +31,6 @@ class AProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _authBloc = BlocProvider.of<AuthBloc>(context);
-
     initializeAsync();
   }
 
@@ -40,7 +38,6 @@ class AProfilePageState extends State<ProfilePage> {
     String firstName = await _tokenController.getFirstName();
     String lastName = await _tokenController.getLastName();
     String profileUrl = await _tokenController.getProfile();
-
     setState(() {
       fullName = "$firstName $lastName";
       profile = profileUrl;
@@ -230,9 +227,6 @@ class AProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 10.0),
               _buildSettingsOption(Icons.account_circle, 'Account',
                   'Manage your personal account information'),
-              // const SizedBox(height: 10),
-              // _buildSettingsOption(Icons.campaign, 'Saved Locations',
-              //     'Easily access your most frequented destinations'),
               const SizedBox(height: 10),
               _buildSettingsOption(Icons.edit, 'Language Preference',
                   'Select the language that best fits your needs'),
@@ -241,6 +235,9 @@ class AProfilePageState extends State<ProfilePage> {
                   Icons.car_rental_sharp,
                   'Theme Customization',
                   'Adjust the app\'s appearance to suit your style'),
+              const SizedBox(height: 10),
+              _buildSettingsOption(Icons.description, 'Terms and Conditions',
+                  'View the terms and conditions of using Sakay'),
               const SizedBox(height: 10),
               _buildSettingsOption(Icons.info, 'About',
                   'Explore Sakay\'s features and meet the developers'),
@@ -299,7 +296,6 @@ class AProfilePageState extends State<ProfilePage> {
       child: InkWell(
         onTap: () {
           print('Tapped: $title');
-
           if (title == 'Account') {
             showModalBottomSheet(
               context: context,
@@ -309,40 +305,11 @@ class AProfilePageState extends State<ProfilePage> {
               ),
               builder: (context) => _accountPage(context),
             );
-          }
-          // else if (title == 'Saved Locations') {
-          //   showDialog(
-          //     context: context,
-          //     builder: (context) {
-          //       int? selectedLocation;
-
-          //       return StatefulBuilder(
-          //         builder: (context, setState) {
-          //           void toggleSelection(int value) {
-          //             setState(() {
-          //               selectedLocation =
-          //                   (selectedLocation == value) ? null : value;
-          //             });
-          //           }
-
-          //           return Dialog(
-          //             shape: RoundedRectangleBorder(
-          //               borderRadius: BorderRadius.circular(10),
-          //             ),
-          //             child: savedLocationsPage(
-          //                 context, selectedLocation, toggleSelection),
-          //           );
-          //         },
-          //       );
-          //     },
-          //   );
-          // }
-          else if (title == 'Language Preference') {
+          } else if (title == 'Language Preference') {
             showDialog(
               context: context,
               builder: (context) {
                 String? selectedLanguage;
-
                 return StatefulBuilder(
                   builder: (context, setState) {
                     void toggleLanguage(String language) {
@@ -351,7 +318,6 @@ class AProfilePageState extends State<ProfilePage> {
                             (selectedLanguage == language) ? null : language;
                       });
                     }
-
                     return Dialog(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -376,7 +342,6 @@ class AProfilePageState extends State<ProfilePage> {
                     int vibrationIntensity = 3;
                     double soundVolume1 = 0.5;
                     double soundVolume2 = 0.5;
-
                     return Dialog(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
@@ -401,6 +366,12 @@ class AProfilePageState extends State<ProfilePage> {
                   },
                 );
               },
+            );
+          } else if (title == 'Terms and Conditions') {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => _TermsAndConditionsDialog(),
             );
           } else if (title == 'About') {
             showDialog(
@@ -508,7 +479,6 @@ class AProfilePageState extends State<ProfilePage> {
 // account
   Widget _accountPage(BuildContext context) {
     bool _isPasswordVisible = false;
-
     return StatefulBuilder(
       builder: (context, setState) {
         return Container(
@@ -819,114 +789,6 @@ class AProfilePageState extends State<ProfilePage> {
     );
   }
 
-// ----------------------------------------------------------------
-
-// saved location page
-  // Widget savedLocationsPage(BuildContext context, int? selectedLocation,
-  //     void Function(int) toggleSelection) {
-  //   return Container(
-  //     height: 550,
-  //     decoration: const BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.all(Radius.circular(5)),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(15),
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               const Row(
-  //                 children: [
-  //                   Icon(Icons.location_on, color: Colors.black, size: 18),
-  //                   SizedBox(width: 6),
-  //                   Text(
-  //                     'Saved Locations',
-  //                     style:
-  //                         TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const Divider(thickness: 1, color: Colors.grey),
-  //               const SizedBox(height: 10),
-  //               Row(
-  //                 children: [
-  //                   Expanded(
-  //                     child: TextField(
-  //                       decoration: InputDecoration(
-  //                         constraints: const BoxConstraints(maxHeight: 32),
-  //                         prefixIcon: const Icon(Icons.search, size: 18),
-  //                         hintText: 'Search saved locations',
-  //                         hintStyle: const TextStyle(
-  //                             fontSize: 10,
-  //                             fontWeight: FontWeight.normal,
-  //                             color: Colors.grey),
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(5),
-  //                           borderSide: const BorderSide(color: Colors.grey),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         Expanded(
-  //           child: ListView(
-  //             children: [
-  //               _buildLocationTile(
-  //                   1,
-  //                   'CSI Lucao',
-  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
-  //                   selectedLocation,
-  //                   toggleSelection),
-  //               _buildLocationTile(
-  //                   2,
-  //                   'King Fisher',
-  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
-  //                   selectedLocation,
-  //                   toggleSelection),
-  //               _buildLocationTile(
-  //                   3,
-  //                   'Lingayen',
-  //                   '28CF+CH5, Dagupan - Binmaley Rd.',
-  //                   selectedLocation,
-  //                   toggleSelection),
-  //             ],
-  //           ),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.only(top: 10, right: 15, bottom: 10),
-  //           child: Align(
-  //             alignment: Alignment.bottomRight,
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               children: [
-  //                 IconButton(
-  //                   icon: const Icon(Icons.add, color: Colors.blue, size: 20),
-  //                   onPressed: () {
-  //                     // Add function
-  //                   },
-  //                 ),
-  //                 IconButton(
-  //                   icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-  //                   onPressed: () {
-  //                     // Delete function
-  //                   },
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _buildLocationTile(int value, String title, String subtitle,
       int? selectedLocation, void Function(int) toggleSelection) {
     return ListTile(
@@ -940,8 +802,6 @@ class AProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-// ----------------------------------------------------------------
 
 // language preference
   Widget _languagePreferencePage(BuildContext context, String? selectedLanguage,
@@ -1024,8 +884,6 @@ class AProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-// ----------------------------------------------------------------
 
 // theme customization
   Widget _themeCustomizationPage(
@@ -1211,8 +1069,6 @@ class AProfilePageState extends State<ProfilePage> {
     );
   }
 
-//----------------------------------------------------------------
-
 // about page
   Widget _aboutPage(BuildContext context) {
     return Container(
@@ -1351,6 +1207,190 @@ class AProfilePageState extends State<ProfilePage> {
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// terms and conditions dialog
+class _TermsAndConditionsDialog extends StatefulWidget {
+  @override
+  State<_TermsAndConditionsDialog> createState() => _TermsAndConditionsDialogState();
+}
+
+class _TermsAndConditionsDialogState extends State<_TermsAndConditionsDialog> {
+  bool _isAgreed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.8,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '📄 Terms and Conditions',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  icon: const Icon(Icons.close),
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // Container with Border and ScrollView
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'By agreeing to these Terms and Conditions, you acknowledge and accept the following:',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSection(
+                        '1. Usage of Sakay',
+                        'Sakay is a free public transportation companion app that provides real-time vehicle tracking, ETA notifications, and route optimization for commuters and drivers along the Lingayen-Dagupan route. The app is intended for UPang students, daily commuters, PWDs, and registered drivers.',
+                      ),
+                      _buildSection(
+                        '2. Account & Access',
+                        'Users are required to create an account using a valid email address and password. Drivers and commuters have separate access and features based on their account type.',
+                      ),
+                      _buildSection(
+                        '3. Data Collection',
+                        'By using Sakay, you consent to the collection and secure storage of your email address and password for account authentication and communication purposes. We do not sell or share your information with third parties.',
+                      ),
+                      _buildSection(
+                        '4. Announcements & Communication',
+                        'Admins may post important announcements which are visible to users through the app. These may include service updates, route adjustments, or general notices relevant to the Sakay system.',
+                      ),
+                      _buildSection(
+                        '5. Service Availability',
+                        'While we aim to provide real-time, accurate vehicle data, Sakay does not guarantee uninterrupted access or flawless performance. GPS or internet issues may affect real-time tracking at times.',
+                      ),
+                      _buildSection(
+                        '6. Acceptable Use',
+                        'Users must not attempt to disrupt the service, misuse data, or impersonate others. Abuse or suspicious activity may result in account restriction.',
+                      ),
+                      _buildSection(
+                        '7. Changes to Terms',
+                        'We may update these Terms and Conditions as the service evolves. Users will be notified of significant changes through the app.',
+                      ),
+                      _buildSection(
+                        '8. Contact & Support',
+                        'For questions, feedback, or issues, please reach out through our admin portal or the official Sakay website.',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Checkbox(
+                  value: _isAgreed,
+                  activeColor: const Color(0xFF00A2FF),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _isAgreed = value ?? false;
+                    });
+                  },
+                ),
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 12.0),
+                    child: Text(
+                      'By agreeing to these terms and conditions',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isAgreed 
+                  ? () => Navigator.of(context).pop(true)
+                  : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isAgreed 
+                    ? const Color(0xFF00A2FF) 
+                    : Colors.grey[300],
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: Text(
+                  'Continue',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: _isAgreed ? Colors.white : Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            content,
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
