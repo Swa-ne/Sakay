@@ -21,6 +21,7 @@ const ManageAccount = () => {
     const [filterRole, setFilterRole] = useState<Role | 'all'>('all');
     const [accountsPage, setAccountsPage] = useState(1);
     const [unitsPage, setUnitsPage] = useState(1);
+    const [showSidebar, setShowSidebar] = useState(false);
     const itemsPerPage = 15;
 
     const filteredAccounts = accounts.filter((acc) => 
@@ -86,8 +87,8 @@ const ManageAccount = () => {
         }
 
         return (
-            <div className="flex justify-center mt-10 w-full"> {/* Increased margin-top and full width */}
-                <div className="flex items-center gap-1"> {/* Container for buttons */}
+            <div className="flex justify-center mt-10 w-full">
+                <div className="flex items-center gap-1">
                     <Button
                         variant="outline"
                         size="sm"
@@ -128,85 +129,97 @@ const ManageAccount = () => {
     };
 
     return (
-        <div className="p-4 md:p-5 w-full min-h-screen flex flex-col lg:flex-row gap-4 md:gap-5">
-            {/* Left Panel (Statistics) - Full width on mobile, 1/4 on desktop */}
-            <div className="w-full lg:w-1/4 rounded-2xl p-4 md:p-5 space-y-4 bg-background">
-                <h2 className="text-xl md:text-2xl font-semibold">Account & Units Overview</h2>
-                <StatisticCards accounts={accounts} units={units} />
+        <div className="p-4 md:p-5 w-full min-h-screen">
+            {/* Mobile Sidebar Toggle */}
+            <div className="lg:hidden mb-4">
+                <Button 
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    className="w-full"
+                >
+                    {showSidebar ? 'Hide Overview' : 'Show Overview'}
+                </Button>
             </div>
 
-            {/* Right Panel (Tabs) - Full width on mobile, 3/4 on desktop */}
-            <div className="w-full lg:w-3/4 bg-background rounded-2xl p-4 md:p-5 flex flex-col">
-                <Tabs defaultValue={tabs[0].name} className="w-full flex flex-col flex-grow">
-                    <TabsList className="p-0 bg-background justify-start border-b rounded-none space-x-2 mb-3 overflow-x-auto">
-                        {tabs.map((tab) => (
-                            <TabsTrigger 
-                                key={tab.name} 
-                                value={tab.name} 
-                                className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-primary whitespace-nowrap"
-                            >
-                                <code className="text-sm md:text-lg">{tab.name}</code>
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
+            <div className="flex flex-col lg:flex-row gap-4 md:gap-5">
+                {/* Left Panel (Statistics) - Hidden on mobile unless toggled */}
+                <div className={`${showSidebar ? 'block' : 'hidden'} lg:block w-full lg:w-1/4 rounded-2xl p-4 md:p-5 space-y-4 bg-background`}>
+                    <h2 className="text-xl md:text-2xl font-semibold">Account & Units Overview</h2>
+                    <StatisticCards accounts={accounts} units={units} />
+                </div>
 
-                    {/* Accounts Tab */}
-                    <TabsContent value="Accounts" className="flex flex-col flex-grow">
-                        <div className="flex flex-col sm:flex-row sm:space-x-3 sm:items-center justify-between mb-4 gap-2">
-                            <div className="flex flex-wrap gap-2">
-                                {['all', 'COMMUTER', 'DRIVER', 'ADMIN'].map((r) => (
-                                    <Button 
-                                        key={r} 
-                                        onClick={() => {
-                                            setFilterRole(r as Role | 'all');
-                                            setAccountsPage(1); // Reset to first page when filter changes
-                                        }} 
-                                        className={`px-3 py-2 md:px-4 md:py-3 rounded text-sm md:text-base ${
-                                            filterRole === r ? 'bg-primary text-white' : 'bg-gray-200'
-                                        }`}
-                                    >
-                                        {r.charAt(0).toUpperCase() + r.slice(1)}
-                                    </Button>
-                                ))}
+                {/* Right Panel (Tabs) - Always visible */}
+                <div className="w-full lg:w-3/4 bg-background rounded-2xl p-4 md:p-5">
+                    <Tabs defaultValue={tabs[0].name} className="w-full">
+                        <TabsList className="p-0 bg-background justify-start border-b rounded-none space-x-2 mb-3">
+                            {tabs.map((tab) => (
+                                <TabsTrigger 
+                                    key={tab.name} 
+                                    value={tab.name} 
+                                    className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-primary"
+                                >
+                                    <code className="text-sm md:text-lg">{tab.name}</code>
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+
+                        {/* Accounts Tab */}
+                        <TabsContent value="Accounts">
+                            <div className="flex flex-col sm:flex-row sm:space-x-3 sm:items-center justify-between mb-4 gap-2">
+                                <div className="flex flex-wrap gap-2">
+                                    {['all', 'COMMUTER', 'DRIVER', 'ADMIN'].map((r) => (
+                                        <Button 
+                                            key={r} 
+                                            onClick={() => {
+                                                setFilterRole(r as Role | 'all');
+                                                setAccountsPage(1);
+                                            }} 
+                                            className={`px-3 py-2 md:px-4 md:py-3 rounded text-sm md:text-base ${
+                                                filterRole === r ? 'bg-primary text-white' : 'bg-gray-200'
+                                            }`}
+                                        >
+                                            {r.charAt(0).toUpperCase() + r.slice(1)}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <Dialog open={openDriverModal} onOpenChange={setOpenDriverModal}>
+                                    <DialogTrigger asChild>
+                                        <Button className="text-background px-3 py-2 md:px-4 md:py-3 text-sm md:text-base">
+                                            Add Driver <Plus className="w-4 h-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <AddDriverModal setOpen={setOpenDriverModal} />
+                                </Dialog>
                             </div>
-                            <Dialog open={openDriverModal} onOpenChange={setOpenDriverModal}>
-                                <DialogTrigger asChild>
-                                    <Button className="text-background px-3 py-2 md:px-4 md:py-3 text-sm md:text-base">
-                                        Add Driver <Plus className="w-4 h-4" />
-                                    </Button>
-                                </DialogTrigger>
-                                <AddDriverModal setOpen={setOpenDriverModal} />
-                            </Dialog>
-                        </div>
-                        <div className="flex-grow overflow-x-auto">
-                            <AccountTable 
-                                filteredAccounts={paginatedAccounts} 
-                                units={units} 
-                                assignDriverToUnit={assignDriverToUnit} 
-                            />
-                        </div>
-                        {renderPagination(accountsPage, totalAccountPages, setAccountsPage)}
-                    </TabsContent>
+                            <div className="w-full overflow-x-auto">
+                                <AccountTable 
+                                    filteredAccounts={paginatedAccounts} 
+                                    units={units} 
+                                    assignDriverToUnit={assignDriverToUnit} 
+                                />
+                            </div>
+                            {renderPagination(accountsPage, totalAccountPages, setAccountsPage)}
+                        </TabsContent>
 
-                    {/* Units Tab */}
-                    <TabsContent value="Units" className="flex flex-col flex-grow">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
-                            <h3 className="text-lg md:text-xl font-semibold">Units List</h3>
-                            <Dialog open={openUnitModal} onOpenChange={setOpenUnitModal}>
-                                <DialogTrigger asChild>
-                                    <Button className="text-background px-3 py-2 md:px-4 md:py-3 text-sm md:text-base">
-                                        Add Unit <Plus className="w-4 h-4" />
-                                    </Button>
-                                </DialogTrigger>
-                                <AddUnitModal setOpen={setOpenUnitModal} />
-                            </Dialog>
-                        </div>
-                        <div className="flex-grow overflow-x-auto">
-                            <UnitsTable units={paginatedUnits} drivers={accounts} />
-                        </div>
-                        {renderPagination(unitsPage, totalUnitPages, setUnitsPage)}
-                    </TabsContent>
-                </Tabs>
+                        {/* Units Tab */}
+                        <TabsContent value="Units">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                                <h3 className="text-lg md:text-xl font-semibold">Units List</h3>
+                                <Dialog open={openUnitModal} onOpenChange={setOpenUnitModal}>
+                                    <DialogTrigger asChild>
+                                        <Button className="text-background px-3 py-2 md:px-4 md:py-3 text-sm md:text-base">
+                                            Add Unit <Plus className="w-4 h-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <AddUnitModal setOpen={setOpenUnitModal} />
+                                </Dialog>
+                            </div>
+                            <div className="w-full overflow-x-auto">
+                                <UnitsTable units={paginatedUnits} drivers={accounts} />
+                            </div>
+                            {renderPagination(unitsPage, totalUnitPages, setUnitsPage)}
+                        </TabsContent>
+                    </Tabs>
+                </div>
             </div>
         </div>
     );
