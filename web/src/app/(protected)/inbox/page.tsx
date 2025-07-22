@@ -13,6 +13,7 @@ import { Inbox as InboxType } from '@/types';
 const Inbox = () => {
     const messageRef = useRef<HTMLDivElement>(null);
     const inboxRef = useRef<HTMLDivElement>(null);
+    const [showChat, setShowChat] = useState(false); // Mobile state for chat view
 
     const { user_id } = useAuthStore();
     const [currentUser, setCurrentUser] = useState<InboxType>();
@@ -43,46 +44,49 @@ const Inbox = () => {
     }, [setInboxPage]);
 
     return (
-        <div className='p-5 w-full h-screen flex space-x-5'>
-            <div className='w-1/3 bg-background rounded-2xl p-5 overflow-y-auto'>
-                <div className='w-full flex justify-between items-center'>
-                    <h1 className='text-4xl font-bold mb-2'>Inbox</h1>
-                    {/* <div className='flex items-center gap-2'>
-                        <Button variant='ghost' size='icon'>
-                            <Filter className='w-4 h-4' />
-                        </Button>
-                        <Button variant='ghost' size='icon'>
-                            <Search className='w-4 h-4' />
-                        </Button>
-                        <Button size='icon' className='bg-primary hover:opacity-90'>
-                            <Plus className='w-4 h-4' />
-                        </Button>
-                    </div> */}
+        <div className='p-2 md:p-5 w-full h-screen flex flex-col lg:flex-row gap-2 md:gap-5'>
+            {/* Inbox List - Hidden on mobile when chat is open */}
+            <div className={`${showChat ? 'hidden lg:flex' : 'flex'} lg:w-1/3 w-full bg-background rounded-xl md:rounded-2xl p-3 md:p-5 overflow-y-auto flex-col`}>
+                <div className='w-full flex justify-between items-center mb-2 md:mb-3'>
+                    <h1 className='text-2xl md:text-3xl font-bold'>Inbox</h1>
                 </div>
-                <div className='flex gap-1'>
+                
+                {/* Tabs - Responsive sizing */}
+                <div className='flex gap-1 mb-2 md:mb-3'>
                     {tabs.map((tab) => (
-                        <Button key={tab} variant={activeTab === tab ? 'secondary' : 'ghost'} size='sm' onClick={() => setActiveTab(tab)} className='text-xs'>
+                        <Button 
+                            key={tab} 
+                            variant={activeTab === tab ? 'secondary' : 'ghost'} 
+                            size='sm' 
+                            onClick={() => setActiveTab(tab)} 
+                            className='text-xs md:text-sm'
+                        >
                             {tab}
                         </Button>
                     ))}
                 </div>
-                <div ref={inboxRef} className='mt-3 flex-1 overflow-y-auto'>
+                
+                {/* Inbox Items */}
+                <div ref={inboxRef} className='flex-1 overflow-y-auto'>
                     {inboxes.map((inbox) => (
                         <div
                             key={inbox._id}
-                            className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${chatID === inbox._id ? 'bg-blue-50 border-l-4 border-l-primary opacity-90' : ''}`}
+                            className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
+                                chatID === inbox._id ? 'bg-blue-50 border-l-2 md:border-l-4 border-l-primary' : ''
+                            }`}
                             onClick={() => {
                                 setChatID(inbox._id);
                                 setMessagePage(1);
+                                setShowChat(true); // Show chat on mobile
                             }}
                         >
-                            <div className='flex items-start gap-3'>
-                                <Avatar className='w-10 h-10'>
+                            <div className='flex items-start gap-2 md:gap-3'>
+                                <Avatar className='w-8 h-8 md:w-10 md:h-10'>
                                     <AvatarImage src={inbox.user_id.profile_picture_url || '/placeholder.svg'} />
                                 </Avatar>
                                 <div className='flex-1 min-w-0'>
                                     <div className='flex items-center justify-between mb-1'>
-                                        <div className='font-medium text-text truncate'>
+                                        <div className='font-medium text-sm md:text-base text-text truncate'>
                                             {inbox.user_id.first_name} {inbox.user_id.last_name}
                                         </div>
                                         <div className='text-xs text-gray-500 flex items-center gap-1'>
@@ -94,37 +98,52 @@ const Inbox = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className='text-sm text-gray-500 truncate'>{inbox.last_message.message}</div>
+                                    <div className='text-xs md:text-sm text-gray-500 truncate'>{inbox.last_message.message}</div>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
-            <div className='w-2/3 h-full flex flex-col bg-background rounded-2xl overflow-hidden relative'>
-                <div className='p-4 border-b border-gray-200'>
-                    <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-3'>
-                            <Avatar className='w-10 h-10'>
-                                <AvatarImage src={currentUser?.user_id.profile_picture_url || '/placeholder.svg'} />
-                                <AvatarFallback>
-                                    {inboxes
-                                        .find((inbox) => inbox._id === chatID)
-                                        ?.user_id.first_name?.split(' ')
-                                        .map((n) => n[0])
-                                        .join('')}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <div className='font-medium text-text'>
-                                    {currentUser?.user_id.first_name} {currentUser?.user_id.last_name}
-                                </div>
-                                <div className='text-sm text-gray-500'>{currentUser?.user_id.email}</div>
+
+            {/* Chat Area - Hidden on mobile when not selected */}
+            <div className={`${!showChat ? 'hidden lg:flex' : 'flex'} lg:w-2/3 w-full h-full flex-col bg-background rounded-xl md:rounded-2xl overflow-hidden relative`}>
+                {/* Chat Header with Back Button for mobile */}
+                <div className='p-3 md:p-4 border-b border-gray-200 flex items-center justify-between'>
+                    <div className='flex items-center gap-2 md:gap-3'>
+                        <Button 
+                            variant='ghost' 
+                            size='icon' 
+                            className='lg:hidden'
+                            onClick={() => setShowChat(false)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m12 19-7-7 7-7"/>
+                                <path d="M19 12H5"/>
+                            </svg>
+                        </Button>
+                        <Avatar className='w-8 h-8 md:w-10 md:h-10'>
+                            <AvatarImage src={currentUser?.user_id.profile_picture_url || '/placeholder.svg'} />
+                            <AvatarFallback>
+                                {currentUser?.user_id.first_name?.split(' ')
+                                    .map((n) => n[0])
+                                    .join('')}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <div className='font-medium text-sm md:text-base text-text'>
+                                {currentUser?.user_id.first_name} {currentUser?.user_id.last_name}
                             </div>
+                            <div className='text-xs md:text-sm text-gray-500'>{currentUser?.user_id.email}</div>
                         </div>
                     </div>
                 </div>
-                <div ref={messageRef} className='flex-1 overflow-y-auto p-4 flex flex-col-reverse space-y-reverse space-y-4'>
+
+                {/* Messages Area */}
+                <div 
+                    ref={messageRef} 
+                    className='flex-1 overflow-y-auto p-2 md:p-4 flex flex-col-reverse space-y-reverse space-y-2 md:space-y-4'
+                >
                     {messages[chatID] &&
                         messages[chatID].map((msg, index) => {
                             const isOwn = msg.sender_id === user_id;
@@ -151,22 +170,26 @@ const Inbox = () => {
                             }
 
                             return (
-                                <div key={msg._id || `${index}-message-${msg.chat_id}-${msg.createdAt}`} className='flex flex-col space-y-2'>
-                                    {showTimeSeparator && <div className='text-center text-xs text-gray-500 py-2'>{formattedSeparator}</div>}
+                                <div key={msg._id || `${index}-message-${msg.chat_id}-${msg.createdAt}`} className='flex flex-col space-y-1 md:space-y-2'>
+                                    {showTimeSeparator && <div className='text-center text-xs text-gray-500 py-1 md:py-2'>{formattedSeparator}</div>}
                                     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`flex items-start space-x-1 max-w-md ${isOwn ? 'order-2' : 'order-1'}`}>
+                                        <div className={`flex items-start space-x-1 max-w-xs md:max-w-md ${isOwn ? 'order-2' : 'order-1'}`}>
                                             {!isOwn && (
-                                                <div className='flex items-center gap-2 mb-2'>
-                                                    <Avatar className='w-10 h-10'>
+                                                <div className='flex items-center gap-2 mb-1 md:mb-2'>
+                                                    <Avatar className='w-6 h-6 md:w-10 md:h-10'>
                                                         <AvatarImage src='/placeholder.svg?height=24&width=24' />
                                                     </Avatar>
                                                 </div>
                                             )}
                                             <div>
-                                                <div className={`p-3 ${isOwn ? 'bg-primary text-white rounded-b-lg rounded-tl-lg' : 'bg-gray-100 text-text rounded-b-lg rounded-tr-lg'}`}>
-                                                    <p className='text-sm'>{msg.message}</p>
+                                                <div className={`p-2 md:p-3 text-xs md:text-sm ${
+                                                    isOwn 
+                                                        ? 'bg-primary text-white rounded-b-lg rounded-tl-lg' 
+                                                        : 'bg-gray-100 text-text rounded-b-lg rounded-tr-lg'
+                                                }`}>
+                                                    <p>{msg.message}</p>
                                                 </div>
-                                                <div className='text-xs text-gray-500 mt-1'>{formattedTime}</div>
+                                                <div className='text-xs text-gray-500 mt-0.5 md:mt-1'>{formattedTime}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -174,19 +197,14 @@ const Inbox = () => {
                             );
                         })}
                 </div>
-                {/* <div className='px-4 pb-2'>
-                    <div className='bg-gray-50 rounded-lg p-3'>
-                        <div className='text-xs text-gray-600 mb-2'>💡 Suggested Reply:</div>
-                        <div className='text-sm text-gray-700 mb-2'>Hi Jane, thanks for following up! I&aposve just checked with our finance team and expect their feedback by tomorrow. I&apos;ll get back to you as soon as I have their input. Appreciate your patience!</div>
-                        <div className='text-xs text-gray-600 mb-2'>📅 Schedule a reminder to follow up if no reply from finance by 5 PM tomorrow.</div>
-                    </div>
-                </div> */}
-                <div className='p-4 border-t border-gray-200'>
+
+                {/* Message Input */}
+                <div className='p-2 md:p-4 border-t border-gray-200'>
                     <div className='flex items-end gap-2'>
                         <div className='flex-1'>
                             <Input
                                 placeholder='Write a message...'
-                                className='border-gray-300'
+                                className='border-gray-300 text-sm md:text-base'
                                 value={messageInput}
                                 onChange={(e) => setMessageInput(e.target.value)}
                                 onKeyDown={(e) => {
@@ -197,7 +215,11 @@ const Inbox = () => {
                                 }}
                             />
                         </div>
-                        <Button className='bg-primary text-background hover:opacity-80' onClick={handleSendMessage}>
+                        <Button 
+                            size='sm' 
+                            className='bg-primary text-background hover:opacity-80 h-9 md:h-10'
+                            onClick={handleSendMessage}
+                        >
                             <Send className='w-4 h-4' />
                         </Button>
                     </div>
