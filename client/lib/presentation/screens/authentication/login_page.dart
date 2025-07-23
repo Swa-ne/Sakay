@@ -241,24 +241,21 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00A2FF),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 15.0,
-                          horizontal: 140.0,
-                        ),
+                        minimumSize:
+                            const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(50.0),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Login',
                         style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
                     ),
                     const SizedBox(height: 5.0),
-                    // Register Link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
