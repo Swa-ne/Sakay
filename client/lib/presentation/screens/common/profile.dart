@@ -1311,58 +1311,61 @@ class _TermsAndConditionsDialogState extends State<_TermsAndConditionsDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Checkbox(
-                  value: _isAgreed,
-                  activeColor: const Color(0xFF00A2FF),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isAgreed = value ?? false;
-                    });
-                  },
-                ),
-                const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 12.0),
-                    child: Text(
-                      'By agreeing to these terms and conditions',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isAgreed 
-                  ? () => Navigator.of(context).pop(true)
-                  : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isAgreed 
-                    ? const Color(0xFF00A2FF) 
-                    : Colors.grey[300],
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                child: Text(
-                  'Continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _isAgreed ? Colors.white : Colors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
+
+            // commented out the checkbox and button section
+            
+            // Row(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Checkbox(
+            //       value: _isAgreed,
+            //       activeColor: const Color(0xFF00A2FF),
+            //       onChanged: (bool? value) {
+            //         setState(() {
+            //           _isAgreed = value ?? false;
+            //         });
+            //       },
+            //     ),
+            //     const Expanded(
+            //       child: Padding(
+            //         padding: EdgeInsets.only(top: 12.0),
+            //         child: Text(
+            //           'By agreeing to these terms and conditions',
+            //           style: TextStyle(
+            //             fontSize: 14,
+            //             color: Colors.black87,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 16),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: _isAgreed 
+            //       ? () => Navigator.of(context).pop(true)
+            //       : null,
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: _isAgreed 
+            //         ? const Color(0xFF00A2FF) 
+            //         : Colors.grey[300],
+            //       padding: const EdgeInsets.symmetric(vertical: 15.0),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10.0),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       'Continue',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         color: _isAgreed ? Colors.white : Colors.grey,
+            //         fontWeight: FontWeight.w500,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
