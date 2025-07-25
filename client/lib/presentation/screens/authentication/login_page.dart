@@ -29,8 +29,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   final Duration debounceDurationEmail = const Duration(milliseconds: 1250);
   final Duration debounceDurationPassword = const Duration(milliseconds: 1250);
 
-  bool _isRememberMeChecked = false;
-
   String? emailError;
   String? passwordError;
 
@@ -198,22 +196,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     ),
                     const SizedBox(height: 5.0),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _isRememberMeChecked,
-                              activeColor: const Color(0xFF00A2FF),
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _isRememberMeChecked = value ?? false;
-                                });
-                              },
-                            ),
-                            const Text('Remember Me'),
-                          ],
-                        ),
                         TextButton(
                           onPressed: () {},
                           child: const Text(
