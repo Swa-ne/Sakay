@@ -15,7 +15,7 @@ import { reportDate } from '@/utils/date.util';
 const PerformancePage = () => {
     // const { accounts } = useManageAccounts();
     const { id } = useParams();
-    const { report, loading, error, setReportID } = useReports();
+    const { report, loading, error, setReportID, toggleReportOnClick } = useReports();
     // const [selectedAdmin, setSelectedAdmin] = useState<string>('');
     // const [isClosing, setIsClosing] = useState(false);
 
@@ -124,6 +124,11 @@ const PerformancePage = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className='flex justify-end mb-2'>
+                <button className={`px-4 py-2 rounded font-semibold ${report.is_open ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white disabled:opacity-50`} onClick={toggleReportOnClick} disabled={loading}>
+                    {loading ? (report.is_open ? 'Closing...' : 'Reopening...') : report.is_open ? 'Close Report' : 'Reopen Report'}
+                </button>
             </div>
         </div>
     );
