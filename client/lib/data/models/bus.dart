@@ -21,6 +21,14 @@ class BusModel extends Equatable {
   });
 
   factory BusModel.fromJson(Map<String, dynamic> json) {
+    double? parseDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value);
+      return null;
+    }
+
     return BusModel(
       id: json['_id'],
       plate_number: json['plate_number'],
@@ -33,10 +41,11 @@ class BusModel extends Equatable {
       today_driver: json['today_driver'] != null
           ? UserModel.fromJson(json['today_driver']['user_id'])
           : null,
-      speed: json['speed'],
-      milage: json['milage'],
+      speed: parseDouble(json['speed']),
+      milage: parseDouble(json['milage']),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
