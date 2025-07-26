@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sakay_app/common/mixins/input_validation.dart';
@@ -18,8 +17,6 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
   late TextEditingController _confirmPasswordController;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  bool _termsAccepted = false;
-  bool _privacyAccepted = false;
 
   Timer? _debounceEmail;
   Timer? _debounceConfirmPassword;
@@ -56,7 +53,6 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
   }
 
   bool get _isFormValid {
-    // Check if passwords match
     bool passwordsMatch = _passwordController.text.isNotEmpty &&
         _confirmPasswordController.text.isNotEmpty &&
         _passwordController.text == _confirmPasswordController.text;
@@ -71,132 +67,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
         _hasDigit &&
         _hasSpecialCharacter &&
         _isLongEnough &&
-        passwordsMatch &&
-        _termsAccepted &&
-        _privacyAccepted;
-  }
-
-  void _showTermsDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          title: const Text('📄 Terms & Conditions'),
-          content: const SingleChildScrollView(
-            child: Text(
-              '''Terms and Conditions
-
-By agreeing to these Terms and Conditions, you acknowledge and accept the following:
-
-1. Usage of Sakay
-Sakay is a free public transportation companion app that provides real-time vehicle tracking, ETA notifications, and route optimization for commuters and drivers along the Lingayen-Dagupan route. The app is intended for UPang students, daily commuters, PWDs, and registered drivers.
-
-2. Account & Access
-Users are required to create an account using a valid email address and password. Drivers and commuters have separate access and features based on their account type.
-
-3. Data Collection
-By using Sakay, you consent to the collection and secure storage of your email address and password for account authentication and communication purposes. We do not sell or share your information with third parties.
-
-4. Announcements & Communication
-Admins may post important announcements which are visible to users through the app. These may include service updates, route adjustments, or general notices relevant to the Sakay system.
-
-5. Service Availability
-While we aim to provide real-time, accurate vehicle data, Sakay does not guarantee uninterrupted access or flawless performance. GPS or internet issues may affect real-time tracking at times.
-
-6. Acceptable Use
-Users must not attempt to disrupt the service, misuse data, or impersonate others. Abuse or suspicious activity may result in account restriction.
-
-7. Changes to Terms
-We may update these Terms and Conditions as the service evolves. Users will be notified of significant changes through the app.
-
-8. Contact & Support
-For questions, feedback, or issues, please reach out through our admin portal or the official Sakay website.''',
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.black,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showPrivacyDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          title: const Text('🔒 Privacy Policy'),
-          content: const SingleChildScrollView(
-            child: Text(
-              '''1. Information We Collect
-We collect information you directly provide when:
-• Creating an account
-• Using the app's features
-• Contacting support
-
-2. How We Use Your Information
-Your data is used to:
-• Provide and improve the Sakay app
-• Process logins and activity
-• Send important service or support messages
-• Communicate updates and relevant information
-
-3. Information Sharing
-We do not sell, trade, or share your personal data with third parties without your consent, except as required by law.
-
-4. Data Security
-We implement appropriate security practices to protect your data from unauthorized access, alteration, or misuse.
-
-5. Data Retention
-Your information is retained as long as your account is active or as needed for app functionality and safety.
-
-6. Your Rights
-You have the right to:
-• View your personal data
-• Request corrections
-• Delete your account
-• Withdraw consent for data use
-
-7. Cookies & Analytics
-We may use cookies and similar technologies to enhance your experience and track usage patterns for analytics.
-
-8. Changes to Policy
-This Privacy Policy may be updated as necessary. Users will be notified of changes via in-app alerts or on this page.''',
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.black,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+        passwordsMatch;
   }
 
   void _handleSubmit() {
@@ -341,8 +212,7 @@ This Privacy Policy may be updated as necessary. Users will be notified of chang
                     _buildPasswordCriteria(
                         'Contains at least one digit (0-9)', _hasDigit),
                     _buildPasswordCriteria(
-                        'Contains special character (!@#\$%^&*)',
-                        _hasSpecialCharacter),
+                        'Contains special character', _hasSpecialCharacter),
                     _buildPasswordCriteria(
                         'At least 8 characters long', _isLongEnough),
                   ],
