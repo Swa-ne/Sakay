@@ -136,7 +136,7 @@ export const sendReport = (report: Report) => {
     socket.emit('send-report', { report });
 };
 
-export const toggleReport = (report_id: string) => {
+export const toggleReportSocket = (report_id: string) => {
     socket.emit('toggle-report', { report_id });
 };
 

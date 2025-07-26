@@ -5,7 +5,7 @@ mixin InputValidationMixin {
 
   String? validateEmail(String email) {
     final RegExp emailRegExp =
-        RegExp(r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$');
+        RegExp(r'^[\w\+]+([\.-]?[\w\+]+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$');
     if (email.isEmpty) {
       return 'This field can\'t be empty';
     } else if (!emailRegExp.hasMatch(email)) {

@@ -1,5 +1,6 @@
 'use client'
-import { getAllReports, getReport, getReportStats } from '@/service/report';
+import { getAllReports, getReport, getReportStats, toggleReport } from '@/service/report';
+import { toggleReportSocket } from '@/service/websocket/realtime';
 import useReportStore from '@/stores/report.store';
 import { Report } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ const useReports = () => {
     const setReports = useReportStore((state) => state.setReports);
     const reportStats = useReportStore((state) => state.reportStats);
     const setReportStats = useReportStore((state) => state.setReportStats);
+    const onToggleReport = useReportStore((state) => state.onToggleReport);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -85,20 +87,16 @@ const useReports = () => {
     //     }
     // };
 
-    // const handleCloseTicket = async () => {
-    //     setIsClosing(true);
-    //     try {
-    //         // Replace with your actual API call
-    //         console.log(`Closing ticket ${id}`);
-    //         // await closeTicket(id);
-    //         alert('Ticket closed successfully!');
-    //     } catch (error) {
-    //         console.error('Error closing ticket:', error);
-    //         alert('Failed to close ticket');
-    //     } finally {
-    //         setIsClosing(false);
-    //     }
-    // };
+    const toggleReportOnClick = async () => {
+        if (!report) return;
+        setLoading(true);
+        const result = await toggleReport(report._id);
+        if (result && result.message) {
+            toggleReportSocket(report._id);
+            onToggleReport(report);
+        }
+        setLoading(false);
+    };
 
 
     useEffect(() => {
@@ -113,7 +111,7 @@ const useReports = () => {
         if (reportID) fetchReport(reportID)
     }, [reportID, fetchReport])
 
-    return { report, reports, reportStats, reportID, setReport, setReports, setReportStats, setReportID, reportPage, loading, error, setReportPage, setLoading };
+    return { report, reports, reportStats, reportID, setReport, setReports, setReportStats, setReportID, reportPage, loading, error, setReportPage, setLoading, toggleReportOnClick };
 }
 
 export default useReports

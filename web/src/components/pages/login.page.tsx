@@ -44,11 +44,7 @@ export default function LoginPage() {
                     {error && <p className='text-red-600 text-sm text-center mb-2'>{error}</p>}
                     <input className='w-full border-2 border-secondary p-3 rounded-md text-text' type='email' placeholder='Email' value={userIdentifier} onChange={(e) => setUserIdentifier(e.target.value)} />
                     <input className='w-full border-2 border-secondary p-3 rounded-md text-text' type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <div className='flex justify-between items-center text-sm text-text mb-5'>
-                        <label className='flex items-center space-x-1'>
-                            <input type='checkbox' className='accent-primary' />
-                            <span>Remember me</span>
-                        </label>
+                    <div className='flex justify-end items-center text-sm text-text mb-5'>
                         <a href='/forgot-password' className='text-red-600 hover:underline'>
                             Forgot password?
                         </a>

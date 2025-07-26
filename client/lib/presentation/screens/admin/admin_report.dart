@@ -21,8 +21,8 @@ class _AdminReportsState extends State<AdminReports> {
   late ReportBloc _reportBloc;
   final ScrollController _scrollController = ScrollController();
 
-  String? selectedFilter; // For report type (INCIDENT, PERFORMANCE)
-  String? selectedStatusFilter; // For report status (Open, Closed)
+  String? selectedFilter;
+  String? selectedStatusFilter;
   int currentPage = 1;
   bool isLoading = false;
 
@@ -33,6 +33,7 @@ class _AdminReportsState extends State<AdminReports> {
     super.initState();
     _reportBloc = BlocProvider.of<ReportBloc>(context);
     _reportBloc.add(GetAllReportsEvent(currentPage));
+    _reportBloc.add(ConnectReportRealtimeEvent());
     _scrollController.addListener(_onScroll);
   }
 
@@ -59,14 +60,12 @@ class _AdminReportsState extends State<AdminReports> {
   List<ReportModel> get filteredReports {
     List<ReportModel> filtered = reports;
 
-    // Filter by report type
     if (selectedFilter != null) {
       filtered = filtered
           .where((report) => report.type_of_report == selectedFilter)
           .toList();
     }
 
-    // Filter by is_open status
     if (selectedStatusFilter != null) {
       if (selectedStatusFilter == 'Open') {
         filtered = filtered.where((report) => report.is_open).toList();
@@ -140,22 +139,17 @@ class _AdminReportsState extends State<AdminReports> {
               onSelected: (String value) {
                 setState(() {
                   if (value == 'All') {
-                    // Clear all filters
                     selectedFilter = null;
                     selectedStatusFilter = null;
                   } else if (value == 'INCIDENT' || value == 'PERFORMANCE') {
-                    // Toggle report type filter
                     if (selectedFilter == value) {
-                      selectedFilter =
-                          null; // Remove filter if already selected
+                      selectedFilter = null;
                     } else {
                       selectedFilter = value;
                     }
                   } else if (value == 'Open' || value == 'Closed') {
-                    // Toggle status filter
                     if (selectedStatusFilter == value) {
-                      selectedStatusFilter =
-                          null; // Remove filter if already selected
+                      selectedStatusFilter = null;
                     } else {
                       selectedStatusFilter = value;
                     }
@@ -239,7 +233,6 @@ class _AdminReportsState extends State<AdminReports> {
         ),
         body: Column(
           children: [
-            // Display applied filters as chips
             if (selectedFilter != null || selectedStatusFilter != null)
               Padding(
                 padding: const EdgeInsets.all(8.0),
