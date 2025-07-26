@@ -179,11 +179,7 @@ You have the right to:
 We may use cookies and similar technologies to enhance your experience and track usage patterns for analytics.
 
 8. Changes to Policy
-This Privacy Policy may be updated as necessary. Users will be notified of changes via in-app alerts or on this page.
-
-9. Contact Us
-For any privacy-related inquiries, email us at:
-📧 privacy@sakayapp.com''',
+This Privacy Policy may be updated as necessary. Users will be notified of changes via in-app alerts or on this page.''',
               style: TextStyle(fontSize: 14),
             ),
           ),
