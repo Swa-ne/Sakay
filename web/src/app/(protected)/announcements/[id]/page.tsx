@@ -2,6 +2,7 @@
 
 import EditAnnouncementModal from '@/components/editAnnouncementModal';
 import FilePreview from '@/components/filePreview';
+import LoadingPage from '@/components/pages/loading.page';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -104,7 +105,7 @@ export default function AnnouncementDetails() {
         }
     }, [id, fetchAnnouncement]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingPage />;
     if (error) return <div>Error: {error}</div>;
     if (!announcement) return <div>Report not found</div>;
 

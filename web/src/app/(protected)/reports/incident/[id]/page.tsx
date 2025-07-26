@@ -2,6 +2,7 @@
 
 import IncidentReport from '@/components/icons/incidentReport';
 import PlaceOfIncident from '@/components/icons/placeOfIncident';
+import LoadingPage from '@/components/pages/loading.page';
 // import useManageAccounts from '@/hooks/useManageAccounts';
 import useReports from '@/hooks/useReports';
 import { reportDate } from '@/utils/date.util';
@@ -20,7 +21,7 @@ const IncidentPage = () => {
         }
     }, [id, setReportID]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingPage />;
     if (error) return <div>Error: {error}</div>;
     if (!report) return <div>Report not found</div>;
 
