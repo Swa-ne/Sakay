@@ -62,7 +62,7 @@ export const checkPhoneNumberValidity = (phone_number: string) => {
 };
 
 export const checkEmailValidity = (email_address: string) => {
-    const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
+    const regex = /^[\w\+]+([\.-]?[\w\+]+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
     return regex.test(email_address);
 };
 
