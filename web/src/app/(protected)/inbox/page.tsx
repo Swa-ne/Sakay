@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,14 +13,31 @@ import { Inbox as InboxType } from '@/types';
 const Inbox = () => {
     const messageRef = useRef<HTMLDivElement>(null);
     const inboxRef = useRef<HTMLDivElement>(null);
-    const [showChat, setShowChat] = useState(false); // Mobile state for chat view
+    const [showChat, setShowChat] = useState(false);
 
     const { user_id } = useAuthStore();
     const [currentUser, setCurrentUser] = useState<InboxType>();
     const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, setMessagePage, setInboxPage } = useInbox(messageRef);
 
     const [activeTab, setActiveTab] = useState('All');
-    const tabs = ['All', 'Unread'];
+    const tabs = ['All', 'Unread', 'Read'];
+
+    const filteredInboxes = useMemo(() => {
+        if (activeTab === 'All') return inboxes;
+        if (activeTab === 'Unread') {
+            return inboxes.filter(inbox => 
+                inbox.last_message.sender_id !== user_id && 
+                !inbox.last_message.isRead
+            );
+        }
+        if (activeTab === 'Read') {
+            return inboxes.filter(inbox => 
+                inbox.last_message.isRead || 
+                inbox.last_message.sender_id === user_id
+            );
+        }
+        return inboxes;
+    }, [inboxes, activeTab, user_id]);
 
     useEffect(() => {
         setCurrentUser(inboxes.find((inbox) => inbox._id === chatID));
@@ -45,13 +62,13 @@ const Inbox = () => {
 
     return (
         <div className='p-2 md:p-5 w-full h-screen flex flex-col lg:flex-row gap-2 md:gap-5'>
-            {/* Inbox List - Hidden on mobile when chat is open */}
+            {/* Inbox List */}
             <div className={`${showChat ? 'hidden lg:flex' : 'flex'} lg:w-1/3 w-full bg-background rounded-xl md:rounded-2xl p-3 md:p-5 overflow-y-auto flex-col`}>
                 <div className='w-full flex justify-between items-center mb-2 md:mb-3'>
                     <h1 className='text-2xl md:text-3xl font-bold'>Inbox</h1>
                 </div>
                 
-                {/* Tabs - Responsive sizing */}
+                {/* Tabs */}
                 <div className='flex gap-1 mb-2 md:mb-3'>
                     {tabs.map((tab) => (
                         <Button 
@@ -68,7 +85,7 @@ const Inbox = () => {
                 
                 {/* Inbox Items */}
                 <div ref={inboxRef} className='flex-1 overflow-y-auto'>
-                    {inboxes.map((inbox) => (
+                    {filteredInboxes.map((inbox) => (
                         <div
                             key={inbox._id}
                             className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
@@ -77,7 +94,7 @@ const Inbox = () => {
                             onClick={() => {
                                 setChatID(inbox._id);
                                 setMessagePage(1);
-                                setShowChat(true); // Show chat on mobile
+                                setShowChat(true);
                             }}
                         >
                             <div className='flex items-start gap-2 md:gap-3'>
@@ -105,7 +122,6 @@ const Inbox = () => {
                     ))}
                 </div>
             </div>
-
             {/* Chat Area - Hidden on mobile when not selected */}
             <div className={`${!showChat ? 'hidden lg:flex' : 'flex'} lg:w-2/3 w-full h-full flex-col bg-background rounded-xl md:rounded-2xl overflow-hidden relative`}>
                 {/* Chat Header with Back Button for mobile */}
