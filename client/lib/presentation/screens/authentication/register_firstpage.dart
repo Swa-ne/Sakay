@@ -303,7 +303,7 @@ This Privacy Policy may be updated as necessary. Users will be notified of chang
                   ),
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 3.0),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 padding: const EdgeInsets.all(16.0),
@@ -348,7 +348,7 @@ This Privacy Policy may be updated as necessary. Users will be notified of chang
                   ],
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 3.0),
               TextField(
                 controller: _confirmPasswordController,
                 onChanged: (text) {
@@ -387,104 +387,6 @@ This Privacy Policy may be updated as necessary. Users will be notified of chang
                     borderSide:
                         BorderSide(color: Color(0xFF00A2FF), width: 2.0),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              // Terms & Conditions and Privacy Policy Checkboxes
-              Container(
-                padding: const EdgeInsets.all(0.0),
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: _termsAccepted,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              _termsAccepted = value ?? false;
-                            });
-                          },
-                          activeColor: const Color(0xFF00A2FF),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _termsAccepted = !_termsAccepted;
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: Text.rich(
-                                TextSpan(
-                                  text: "I agree to the ",
-                                  style: const TextStyle(fontSize: 14.0),
-                                  children: [
-                                    TextSpan(
-                                      text: "Terms & Conditions",
-                                      style: const TextStyle(
-                                        color: Color(0xFF00A2FF),
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = _showTermsDialog,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 1.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: _privacyAccepted,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              _privacyAccepted = value ?? false;
-                            });
-                          },
-                          activeColor: const Color(0xFF00A2FF),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _privacyAccepted = !_privacyAccepted;
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: Text.rich(
-                                TextSpan(
-                                  text: "I agree to the ",
-                                  style: const TextStyle(fontSize: 14.0),
-                                  children: [
-                                    TextSpan(
-                                      text: "Privacy Policy",
-                                      style: const TextStyle(
-                                        color: Color(0xFF00A2FF),
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = _showPrivacyDialog,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -529,7 +431,6 @@ This Privacy Policy may be updated as necessary. Users will be notified of chang
                   ),
                 ],
               ),
-              const SizedBox(height: 50.0),
             ],
           ),
         ),
