@@ -56,9 +56,9 @@ const Map = ({ busses, polylines, setMap }: MapProps) => {
                 setMap(mapRef.current);
             }}
         >
-            {Array.from(busses.values()).map((bus) => (
+            {Array.from(busses.values()).map((bus, idx) => (
                 <Marker
-                    key={bus._id}
+                    key={`${bus._id}-${idx}`}
                     position={{ lng: bus.longitude, lat: bus.latitude }}
                     icon={{
                         url: '/icon/bus_icon.png',
