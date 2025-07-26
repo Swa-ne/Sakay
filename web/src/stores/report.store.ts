@@ -47,7 +47,9 @@ const useReportStore = create<ReportStore>((set) => ({
     onToggleReport: (report) =>
         set((state) => ({
             reports: state.reports.map((r) =>
-                r._id === report._id ? report : r
+                r._id === report._id
+                    ? { ...r, is_open: !r.is_open }
+                    : r
             ),
         })),
 
@@ -67,6 +69,7 @@ const useReportStore = create<ReportStore>((set) => ({
 export default useReportStore;
 
 export const reportActions = {
+    setReportStats: useReportStore.getState().setReportStats,
     onToggleReport: useReportStore.getState().onToggleReport,
     onAdminReport: useReportStore.getState().onAdminReport,
     onAdminToggleReport: useReportStore.getState().onAdminToggleReport,
