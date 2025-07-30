@@ -3,18 +3,23 @@ import { assignUserToBus, getAllBusses, unassignDriverToBus } from '@/service/bu
 import { getAllUsers } from '@/service/users';
 import useManageStore from '@/stores/manage.store';
 import { fetchBus, fetchUser, Unit } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
-
-
+import { useCallback, useEffect, useState, useRef } from 'react';
 
 const useManageAccounts = () => {
-    const [userPage, setUserPage] = useState<number>(1)
-    const [unitPage, setUnitPage] = useState<number>(1)
+    const [userCursor, setUserCursor] = useState<string | null>(null)
+    const [unitCursor, setUnitCursor] = useState<string | null>(null)
+    const lastFetchedCursor = useRef<string | null>(null);
+    const lastFetchedUnitCursor = useRef<string | null>(null);
 
+    const [total, setTotal] = useState<number>(1)
+    const [commuterCount, setCommuterCount] = useState<number>(1)
+    const [driverCount, setDriverCount] = useState<number>(1)
+    const [adminCount, setAdminCount] = useState<number>(1)
 
     const accounts = useManageStore((state) => state.accounts);
     const units = useManageStore((state) => state.units);
     const setAccounts = useManageStore((state) => state.setAccounts);
+
     const setUnits = useManageStore((state) => state.setUnits);
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -42,11 +47,16 @@ const useManageAccounts = () => {
         }
     };
 
-    const fetchBusses = useCallback(async (currentPage: number) => {
+    const fetchBusses = useCallback(async (cursor?: string | null) => {
+        if (cursor && cursor === lastFetchedUnitCursor.current) {
+            console.log('Skipping unit fetch - cursor is the same:', cursor);
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
-        const busses = await getAllBusses(currentPage);
+        const busses = await getAllBusses(cursor || undefined);
         if (typeof busses === 'string') {
             setUnits([]);
             setError(busses);
@@ -58,42 +68,101 @@ const useManageAccounts = () => {
                 plate_number: bus.plate_number,
                 assignedDriverId: bus.today_driver ? bus.today_driver._id : null,
             }));
-            setUnits(updatedBusses);
+            console.log(busses["nextCursor"])
+            setUnitCursor(busses["nextCursor"]);
+
+            if (cursor) {
+                setUnits((prev) => [...prev, ...updatedBusses]);
+                lastFetchedUnitCursor.current = cursor;
+            } else {
+                setUnits(updatedBusses);
+                lastFetchedUnitCursor.current = null;
+            }
         }
         setLoading(false);
     }, [setUnits]);
 
-    const fetchUsers = useCallback(async (currentPage: number) => {
+    const fetchUsers = useCallback(async (cursor?: string | null) => {
+        if (cursor && cursor === lastFetchedCursor.current) {
+            console.log('Skipping fetch - cursor is the same:', cursor);
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
-        const users = await getAllUsers(currentPage);
+        const users = await getAllUsers(cursor || undefined);
         if (typeof users === 'string') {
             setAccounts([]);
             setError(users);
         } else {
-            const updatedUsers = users.map((user: fetchUser) => ({
+            const updatedUsers = users["users"].map((user: fetchUser) => ({
                 id: user._id,
                 name: `${user.first_name} ${user.last_name}`,
                 role: user.user_type,
                 assignedUnitId: user.assigned_bus_id,
                 phone_number: user.phone_number,
-                profile_picture_url: user.profile_picture_url
+                profile_picture_url: user.profile_picture_url,
+                createdAt: user.createdAt
             }));
-            setAccounts(updatedUsers);
+            console.log(users["nextCursor"])
+            setUserCursor(users["nextCursor"]);
+
+            if (cursor) {
+                setAccounts((prev) => [...prev, ...updatedUsers]);
+                lastFetchedCursor.current = cursor;
+            } else {
+                setAccounts(updatedUsers);
+                setTotal(users["total"])
+                setCommuterCount(users["commuterCount"])
+                setDriverCount(users["driverCount"])
+                setAdminCount(users["adminCount"])
+                lastFetchedCursor.current = null;
+            }
         }
         setLoading(false);
-    }, [setAccounts]);
+    }, []);
 
     useEffect(() => {
-        fetchUsers(userPage)
-    }, [userPage, fetchUsers])
+        fetchUsers(null);
+    }, [fetchUsers]);
 
     useEffect(() => {
-        fetchBusses(unitPage)
-    }, [unitPage, fetchBusses])
+        fetchBusses(null);
+    }, [fetchBusses])
 
-    return { accounts, units, userPage, unitPage, loading, error, setAccounts, setUnits, setUserPage, setUnitPage, assignDriverToUnit };
+    const loadMoreUsers = useCallback(() => {
+        console.log(userCursor, lastFetchedCursor.current)
+        if (userCursor && !loading && userCursor !== lastFetchedCursor.current) {
+            fetchUsers(userCursor);
+        }
+    }, [userCursor, loading, fetchUsers]);
+
+    const loadMoreUnits = useCallback(() => {
+        console.log(unitCursor, lastFetchedUnitCursor.current)
+        if (unitCursor && !loading && unitCursor !== lastFetchedUnitCursor.current) {
+            fetchBusses(unitCursor);
+        }
+    }, [unitCursor, loading, fetchBusses]);
+
+    return {
+        total,
+        commuterCount,
+        driverCount,
+        adminCount,
+        accounts,
+        units,
+        loading,
+        error,
+        setAccounts,
+        setUnits,
+        assignDriverToUnit,
+        loadMoreUsers,
+        loadMoreUnits,
+        lastFetchedCursor,
+        userCursor,
+        unitCursor
+    };
 }
 
 export default useManageAccounts
