@@ -2,7 +2,7 @@
 import { assignUserToBus, getAllBusses, unassignDriverToBus } from '@/service/bus';
 import { getAllUsers } from '@/service/users';
 import useManageStore from '@/stores/manage.store';
-import { fetchBus, fetchUser, Unit } from '@/types';
+import { fetchBus, fetchUser, Unit, Role, Account } from '@/types';
 import { useCallback, useEffect, useState, useRef } from 'react';
 
 const useManageAccounts = () => {
@@ -10,6 +10,10 @@ const useManageAccounts = () => {
     const [unitCursor, setUnitCursor] = useState<string | null>(null)
     const lastFetchedCursor = useRef<string | null>(null);
     const lastFetchedUnitCursor = useRef<string | null>(null);
+    const hasLoadedUsers = useRef(false);
+    const hasLoadedUnits = useRef(false);
+    const [currentRole, setCurrentRole] = useState<string | null>(null);
+    const roleData = useRef<Map<string, { accounts: Account[], cursor: string | null, hasMore: boolean }>>(new Map());
 
     const [total, setTotal] = useState<number>(1)
     const [commuterCount, setCommuterCount] = useState<number>(1)
@@ -77,12 +81,15 @@ const useManageAccounts = () => {
             } else {
                 setUnits(updatedBusses);
                 lastFetchedUnitCursor.current = null;
+                hasLoadedUnits.current = true;
             }
         }
         setLoading(false);
     }, [setUnits]);
 
-    const fetchUsers = useCallback(async (cursor?: string | null) => {
+    const fetchUsers = useCallback(async (cursor?: string | null, role?: string) => {
+        const roleKey = role || 'all';
+
         if (cursor && cursor === lastFetchedCursor.current) {
             console.log('Skipping fetch - cursor is the same:', cursor);
             return;
@@ -91,7 +98,7 @@ const useManageAccounts = () => {
         setLoading(true);
         setError(null);
 
-        const users = await getAllUsers(cursor || undefined);
+        const users = await getAllUsers(cursor || undefined, role);
         if (typeof users === 'string') {
             setAccounts([]);
             setError(users);
@@ -99,7 +106,7 @@ const useManageAccounts = () => {
             const updatedUsers = users["users"].map((user: fetchUser) => ({
                 id: user._id,
                 name: `${user.first_name} ${user.last_name}`,
-                role: user.user_type,
+                role: user.user_type as Role,
                 assignedUnitId: user.assigned_bus_id,
                 phone_number: user.phone_number,
                 profile_picture_url: user.profile_picture_url,
@@ -111,6 +118,13 @@ const useManageAccounts = () => {
             if (cursor) {
                 setAccounts((prev) => [...prev, ...updatedUsers]);
                 lastFetchedCursor.current = cursor;
+
+                const currentRoleData = roleData.current.get(roleKey);
+                if (currentRoleData) {
+                    currentRoleData.accounts = [...currentRoleData.accounts, ...updatedUsers];
+                    currentRoleData.cursor = users["nextCursor"];
+                    currentRoleData.hasMore = !!users["nextCursor"];
+                }
             } else {
                 setAccounts(updatedUsers);
                 setTotal(users["total"])
@@ -118,25 +132,57 @@ const useManageAccounts = () => {
                 setDriverCount(users["driverCount"])
                 setAdminCount(users["adminCount"])
                 lastFetchedCursor.current = null;
+                hasLoadedUsers.current = true;
+
+                roleData.current.set(roleKey, {
+                    accounts: updatedUsers,
+                    cursor: users["nextCursor"],
+                    hasMore: !!users["nextCursor"]
+                });
             }
         }
         setLoading(false);
     }, []);
 
-    useEffect(() => {
-        fetchUsers(null);
-    }, [fetchUsers]);
+    const fetchUsersWithRole = useCallback(async (role: string) => {
+        const roleKey = role;
+
+        if (roleData.current.has(roleKey)) {
+            console.log('Role already loaded, switching to cached data');
+            const cachedData = roleData.current.get(roleKey)!;
+            setCurrentRole(role);
+            setAccounts(cachedData.accounts);
+            setUserCursor(cachedData.cursor);
+            return;
+        }
+
+        console.log('Loading new role:', role);
+        setCurrentRole(role);
+        hasLoadedUsers.current = false;
+        lastFetchedCursor.current = null;
+        setUserCursor(null);
+        setAccounts([]);
+        await fetchUsers(null, role);
+    }, [fetchUsers, setAccounts]);
 
     useEffect(() => {
-        fetchBusses(null);
-    }, [fetchBusses])
+        if (!hasLoadedUsers.current && accounts.length === 0) {
+            fetchUsers(null, currentRole || undefined);
+        }
+    }, [fetchUsers, accounts.length, currentRole]);
+
+    useEffect(() => {
+        if (!hasLoadedUnits.current && units.length === 0) {
+            fetchBusses(null);
+        }
+    }, [fetchBusses, units.length])
 
     const loadMoreUsers = useCallback(() => {
         console.log(userCursor, lastFetchedCursor.current)
         if (userCursor && !loading && userCursor !== lastFetchedCursor.current) {
-            fetchUsers(userCursor);
+            fetchUsers(userCursor, currentRole || undefined);
         }
-    }, [userCursor, loading, fetchUsers]);
+    }, [userCursor, loading, fetchUsers, currentRole]);
 
     const loadMoreUnits = useCallback(() => {
         console.log(unitCursor, lastFetchedUnitCursor.current)
@@ -159,6 +205,7 @@ const useManageAccounts = () => {
         assignDriverToUnit,
         loadMoreUsers,
         loadMoreUnits,
+        fetchUsersWithRole,
         lastFetchedCursor,
         userCursor,
         unitCursor

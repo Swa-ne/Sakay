@@ -3,8 +3,8 @@ import { getDriver, getDrivers, getUser, getUsers } from "../services/user.servi
 
 export const getUsersController = async (req: Request, res: Response) => {
     try {
-        const { cursor } = req.query;
-        const users = await getUsers(cursor as string);
+        const { cursor, role } = req.query;
+        const users = await getUsers(cursor as string, role as string);
         if (users.httpCode === 200) {
             res.status(users.httpCode).json({ message: users.message });
             return;

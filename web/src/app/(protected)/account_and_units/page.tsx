@@ -21,7 +21,7 @@ const ManageAccount = () => {
     const [isLoadingUnits, setIsLoadingUnits] = useState(false);
     const hasCheckedAutoLoad = useRef(false);
 
-    const { accounts, units, assignDriverToUnit, total, commuterCount, driverCount, adminCount, loadMoreUsers, loadMoreUnits, userCursor, lastFetchedCursor } = useManageAccounts();
+    const { accounts, units, assignDriverToUnit, total, commuterCount, driverCount, adminCount, loadMoreUsers, loadMoreUnits, fetchUsersWithRole, userCursor, lastFetchedCursor } = useManageAccounts();
 
     const [openDriverModal, setOpenDriverModal] = useState(false);
     const [openUnitModal, setOpenUnitModal] = useState(false);
@@ -30,7 +30,14 @@ const ManageAccount = () => {
 
     const [filterRole, setFilterRole] = useState<Role | 'all'>('all');
 
-    const filteredAccounts = accounts.filter((acc) => (filterRole === 'all' ? true : acc.role === filterRole));
+    const handleRoleFilterChange = (role: Role | 'all') => {
+        setFilterRole(role);
+        if (role === 'all') {
+            fetchUsersWithRole('all');
+        } else {
+            fetchUsersWithRole(role);
+        }
+    };
 
     useEffect(() => {
         const container = accountRef.current;
@@ -145,7 +152,7 @@ const ManageAccount = () => {
                         <div className='flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 items-start sm:items-center justify-between mb-4 px-2 sm:px-4 py-2 flex-shrink-0'>
                             <div className='flex flex-wrap gap-2 sm:space-x-3'>
                                 {['all', 'COMMUTER', 'DRIVER', 'ADMIN'].map((r) => (
-                                    <Button key={r} onClick={() => setFilterRole(r as Role | 'all')} className={`px-2 sm:px-4 py-2 sm:py-5 rounded text-xs sm:text-sm ${filterRole === r ? 'bg-primary text-white' : 'bg-gray-200'}`}>
+                                    <Button key={r} onClick={() => handleRoleFilterChange(r as Role | 'all')} className={`px-2 sm:px-4 py-2 sm:py-5 rounded text-xs sm:text-sm ${filterRole === r ? 'bg-primary text-white' : 'bg-gray-200'}`}>
                                         {r.charAt(0).toUpperCase() + r.slice(1)}
                                     </Button>
                                 ))}
@@ -162,7 +169,7 @@ const ManageAccount = () => {
 
                         <div className='flex-1 min-h-0 overflow-hidden'>
                             <div className='h-full overflow-y-auto' ref={accountRef}>
-                                <AccountTable filteredAccounts={filteredAccounts} units={units} assignDriverToUnit={assignDriverToUnit} />
+                                <AccountTable filteredAccounts={accounts} units={units} assignDriverToUnit={assignDriverToUnit} />
                             </div>
                         </div>
                     </TabsContent>

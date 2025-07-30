@@ -2,10 +2,10 @@ import { useAuthStore } from "@/stores";
 import api from ".";
 import { AxiosError } from "axios";
 import { UserModel } from "@/schema/account.unit.schema";
-import { Account } from "@/types";
+import { Account, UsersResponse } from "@/types";
 
 const ROUTE = "/user"
-export const getAllUsers = async (cursor?: string) => {
+export const getAllUsers = async (cursor?: string, role?: string): Promise<UsersResponse | string> => {
     const { access_token } = useAuthStore.getState();
     try {
         const response = await api.get(
@@ -14,7 +14,7 @@ export const getAllUsers = async (cursor?: string) => {
                 headers: {
                     "Authorization": access_token
                 },
-                params: { cursor }
+                params: { cursor, role }
             }
         );
         const data = response.data;

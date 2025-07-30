@@ -2,7 +2,7 @@ import { startSession } from "mongoose";
 import { User } from "../models/authentication/user.model";
 import { UserBusAssigning } from "../models/user.bus.assigning.model";
 
-export const getUsers = async (cursor?: string) => {
+export const getUsers = async (cursor?: string, role?: string) => {
     const session = await startSession();
     session.startTransaction();
 
@@ -22,6 +22,9 @@ export const getUsers = async (cursor?: string) => {
         const query: any = {};
         if (cursor) {
             query.createdAt = { $lt: new Date(cursor) };
+        }
+        if (role && role !== 'all') {
+            query.user_type = role;
         }
 
         const users = await User.find(query)
