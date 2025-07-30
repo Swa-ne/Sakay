@@ -1,7 +1,6 @@
 'use client';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import type { Account, Unit } from '@/types';
 import { AssignmentConfirmationModal } from './assignmentConfirmationModal';
@@ -17,21 +16,8 @@ interface AccountTableProps {
 }
 
 export function AccountTable({ filteredAccounts, units, assignDriverToUnit }: AccountTableProps) {
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [pendingAssignment, setPendingAssignment] = useState<PendingAssignment | null>(null);
-
-    const toggleCheckbox = (id: string) => {
-        setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
-    };
-
-    const toggleAllCheckboxes = () => {
-        if (selectedIds.length === filteredAccounts.length) {
-            setSelectedIds([]);
-        } else {
-            setSelectedIds(filteredAccounts.map((acc) => acc.id));
-        }
-    };
 
     const handleAssignmentChange = (driverId: string, newUnitId?: string) => {
         const driver = filteredAccounts.find((acc) => acc.id === driverId);
@@ -75,9 +61,6 @@ export function AccountTable({ filteredAccounts, units, assignDriverToUnit }: Ac
                 <Table className='min-w-full'>
                     <TableHeader>
                         <TableRow className='h-12'>
-                            <TableHead className='w-8 sm:w-12 h-12'>
-                                <Checkbox checked={selectedIds.length === filteredAccounts.length && filteredAccounts.length > 0} onCheckedChange={toggleAllCheckboxes} />
-                            </TableHead>
                             <TableHead className='text-xs sm:text-sm h-12'>Name</TableHead>
                             <TableHead className='text-xs sm:text-sm hidden sm:table-cell h-12'>Role</TableHead>
                             <TableHead className='text-xs sm:text-sm hidden md:table-cell h-12'>Assigned Unit</TableHead>
@@ -87,16 +70,13 @@ export function AccountTable({ filteredAccounts, units, assignDriverToUnit }: Ac
                     <TableBody>
                         {filteredAccounts.length === 0 ? (
                             <TableRow className='h-12'>
-                                <TableCell colSpan={5} className='text-center italic text-muted-foreground text-xs sm:text-sm h-12'>
+                                <TableCell colSpan={4} className='text-center italic text-muted-foreground text-xs sm:text-sm h-12'>
                                     No accounts found.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredAccounts.map((acc, idx) => (
                                 <TableRow key={`${acc.id} + ${idx}`} className='h-12'>
-                                    <TableCell className='h-12'>
-                                        <Checkbox checked={selectedIds.includes(acc.id)} onCheckedChange={() => toggleCheckbox(acc.id)} />
-                                    </TableCell>
                                     <TableCell className='font-medium text-xs sm:text-sm h-12'>
                                         <div className='flex flex-col justify-center h-full'>
                                             <div className='font-medium'>{acc.name}</div>
