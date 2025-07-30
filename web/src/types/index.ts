@@ -10,6 +10,7 @@ export interface fetchUser {
     assigned_bus_id: string
     phone_number: string
     profile_picture_url: string
+    createdAt?: string | null
 }
 export interface fetchBus {
     _id: string
