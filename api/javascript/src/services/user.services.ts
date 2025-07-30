@@ -2,15 +2,31 @@ import { startSession } from "mongoose";
 import { User } from "../models/authentication/user.model";
 import { UserBusAssigning } from "../models/user.bus.assigning.model";
 
-export const getUsers = async (page: string) => {
+export const getUsers = async (cursor?: string) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        const users = await User.find()
+        let total = 0;
+        let commuterCount = 0;
+        let driverCount = 0;
+        let adminCount = 0;
+
+        if (!cursor) {
+            total = await User.countDocuments();
+            commuterCount = await User.countDocuments({ user_type: 'COMMUTER' });
+            driverCount = await User.countDocuments({ user_type: 'DRIVER' });
+            adminCount = await User.countDocuments({ user_type: 'ADMIN' });
+        }
+
+        const query: any = {};
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+
+        const users = await User.find(query)
             .sort({ createdAt: -1 })
-            .skip((parseInt(page) - 1) * 30)
-            .limit(30)
+            .limit(15)
             .session(session);
 
         const updatedUsers = await Promise.all(
@@ -33,8 +49,21 @@ export const getUsers = async (page: string) => {
         await session.commitTransaction();
         session.endSession();
 
-        return { message: updatedUsers, httpCode: 200 };
+        const nextCursor = updatedUsers.length > 0 ? updatedUsers[updatedUsers.length - 1].createdAt : null;
+
+        return {
+            message: {
+                total,
+                commuterCount,
+                driverCount,
+                adminCount,
+                users: updatedUsers,
+                nextCursor
+            },
+            httpCode: 200
+        };
     } catch (error) {
+        console.log(error)
         await session.abortTransaction();
         session.endSession();
         return { error: "Internal Server Error", httpCode: 500 };

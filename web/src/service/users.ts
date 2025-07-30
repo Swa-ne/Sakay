@@ -5,7 +5,7 @@ import { UserModel } from "@/schema/account.unit.schema";
 import { Account } from "@/types";
 
 const ROUTE = "/user"
-export const getAllUsers = async (page: number) => {
+export const getAllUsers = async (cursor?: string) => {
     const { access_token } = useAuthStore.getState();
     try {
         const response = await api.get(
@@ -14,7 +14,7 @@ export const getAllUsers = async (page: number) => {
                 headers: {
                     "Authorization": access_token
                 },
-                params: { page }
+                params: { cursor }
             }
         );
         const data = response.data;

@@ -23,14 +23,17 @@ export const postBus = async (bus_number: string, plate_number: string) => {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getBusses = async (page: string) => {
+export const getBusses = async (cursor?: string) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        const busses = await Bus.find()
+        const query: any = {};
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+        const busses = await Bus.find(query)
             .sort({ createdAt: -1 })
-            .skip((parseInt(page) - 1) * 30)
             .limit(30)
             .session(session);
 
