@@ -2,6 +2,7 @@ import * as bcrypt from "bcryptjs";
 import { User, UserSchemaInterface } from "../../models/authentication/user.model";
 import { CustomResponse } from "../../utils/input.validators";
 import { generateAccessAndRefereshTokens, sendEmailCode } from "../index.services";
+import { emitUserCreated } from "../../socket";
 
 export const signupUsertoDatabase = async (
     first_name: string,
@@ -31,6 +32,7 @@ export const signupUsertoDatabase = async (
 
         const result: any = await generateAccessAndRefereshTokens(userCredentialResult._id.toString());
         if (result.httpCode === 200) {
+            emitUserCreated(userCredentialResult);
             return {
                 message: "Congratulations, your account has been successfully created",
                 access_token: result.message?.access_token,

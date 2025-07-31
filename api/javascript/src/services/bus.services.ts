@@ -2,6 +2,7 @@ import { startSession } from "mongoose";
 import { Bus } from "../models/bus.model";
 import { User } from "../models/authentication/user.model";
 import { UserBusAssigning } from "../models/user.bus.assigning.model"; import { startOfDay, differenceInDays } from "date-fns";
+import { emitBusCreated, emitDriverAssigned, emitDriverUnassigned } from "../socket";
 
 export const postBus = async (bus_number: string, plate_number: string) => {
     const session = await startSession();
@@ -15,7 +16,7 @@ export const postBus = async (bus_number: string, plate_number: string) => {
 
         await session.commitTransaction();
         session.endSession();
-
+        emitBusCreated(bus);
         return { message: bus._id, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
@@ -177,7 +178,7 @@ export const assignUserToBus = async (user_id: string, bus_id: string) => {
 
         await session.commitTransaction();
         session.endSession();
-
+        emitDriverAssigned(user_id, bus_id);
         return { message: 'Success', httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
@@ -200,7 +201,7 @@ export const removeAssignUserToBus = async (user_id: string) => {
 
         await session.commitTransaction();
         session.endSession();
-
+        emitDriverUnassigned(user_id);
         return { message: 'Success', httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
