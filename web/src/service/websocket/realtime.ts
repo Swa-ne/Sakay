@@ -3,7 +3,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { chatActions } from '@/stores/chat.store';
 import { announcementActions } from '@/stores/announcement.store';
 import { reportActions } from '@/stores/report.store';
-import { Announcement, Report, File, fetchUser } from '@/types';
+import { Announcement, Report, File, fetchUser, Account, Unit, Role } from '@/types';
+import { ManageActions } from '@/stores';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/realtime`;
 
@@ -24,6 +25,12 @@ export interface AnnouncementSocketPayload {
 
 export interface ToggleReportPayload {
     report: Report;
+}
+export interface ManagePayload {
+    user?: fetchUser;
+    bus?: Unit;
+    userId?: string;
+    busId?: string;
 }
 
 let socket: Socket;
@@ -75,6 +82,38 @@ export const connectSocket = async () => {
 
     socket.on('toggle-report-receive', (data: ToggleReportPayload) => {
         reportActions.onToggleReport(data.report as Report);
+    });
+
+    socket.on('user-created-receive', (data: ManagePayload) => {
+        console.log('user-created-receive', data);
+        if (data.user) {
+            const { _id, first_name, last_name, user_type, phone_number, profile_picture_url, assigned_bus_id } = data.user;
+            const newAccount: Account = {
+                id: _id,
+                name: `${first_name} ${last_name}`,
+                role: user_type as Role,
+                assignedUnitId: assigned_bus_id || null,
+                phone_number: phone_number,
+                profile_picture_url: profile_picture_url,
+            }
+
+            ManageActions.setAccounts((prev) => [newAccount, ...prev]);
+        }
+    });
+    socket.on('bus-created-receive', (data: ManagePayload) => {
+        if (data.bus) {
+            ManageActions.setUnits((prev) => [...prev, data.bus as Unit]);
+        }
+    });
+    socket.on('driver-assigned-receive', (data: ManagePayload) => {
+        if (data.userId && data.busId) {
+            ManageActions.assignDriverToUnit(data.userId, data.busId);
+        }
+    });
+    socket.on('driver-unassigned-receive', (data: ManagePayload) => {
+        if (data.userId) {
+            ManageActions.removeDriverFromUnit(data.userId);
+        }
     });
 
     socket.on('disconnect', () => {
