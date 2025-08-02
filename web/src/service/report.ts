@@ -66,6 +66,7 @@ export const toggleReport = async (report_id: string) => {
     try {
         const response = await api.put(
             `${ROUTE}/toggle-report/${report_id}`,
+            {},
             {
                 headers: {
                     "Authorization": access_token

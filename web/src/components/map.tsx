@@ -2,6 +2,7 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 import { GoogleMap, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import { BusInformation } from '@/types';
+import LoadingPage from './pages/loading.page';
 
 const containerStyle = {
     width: '100%',
@@ -39,7 +40,7 @@ const Map = ({ busses, polylines, setMap }: MapProps) => {
 
     const mapRef = useRef<google.maps.Map>(null);
 
-    if (!isLoaded) return <div>Loading...</div>;
+    if (!isLoaded) return <LoadingPage />;
 
     return (
         <GoogleMap
@@ -55,9 +56,9 @@ const Map = ({ busses, polylines, setMap }: MapProps) => {
                 setMap(mapRef.current);
             }}
         >
-            {Array.from(busses.values()).map((bus) => (
+            {Array.from(busses.values()).map((bus, idx) => (
                 <Marker
-                    key={bus._id}
+                    key={`${bus._id}-${idx}`}
                     position={{ lng: bus.longitude, lat: bus.latitude }}
                     icon={{
                         url: '/icon/bus_icon.png',

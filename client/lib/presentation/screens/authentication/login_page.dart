@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -18,14 +17,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   bool _isPasswordVisible = false;
-
   late AuthBloc _authBloc;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-
   Timer? _debounceEmail;
   Timer? _debouncePassword;
-
   final Duration debounceDurationEmail = const Duration(milliseconds: 1250);
   final Duration debounceDurationPassword = const Duration(milliseconds: 1250);
 
@@ -56,7 +52,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
             passwordError = "Incorrect Email or Password";
           });
         }
-
         if (state is LoginSuccess) {
           if (state.userType == "ADMIN") {
             return context.go("/admin/home");
@@ -106,7 +101,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                   ],
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 30.0, vertical: 170.0),
@@ -147,7 +141,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       ),
                     ),
                     const SizedBox(height: 10.0),
-
                     // Password Field
                     TextField(
                       controller: _passwordController,
@@ -226,7 +219,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           });
                           return;
                         }
-
                         final newUser = LoginUserModel(
                           user_identifier: _emailController.text,
                           password: _passwordController.text,
@@ -235,26 +227,20 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00A2FF),
-                        padding: EdgeInsets.symmetric(
-                          vertical: 15.0,
-                          horizontal: 140.0,
-                        ),
+                        minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(50.0),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Login',
                         style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 5.0),
-
-                    // Register Link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

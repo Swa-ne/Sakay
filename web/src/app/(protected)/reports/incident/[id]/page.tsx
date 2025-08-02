@@ -2,6 +2,7 @@
 
 import IncidentReport from '@/components/icons/incidentReport';
 import PlaceOfIncident from '@/components/icons/placeOfIncident';
+import LoadingPage from '@/components/pages/loading.page';
 // import useManageAccounts from '@/hooks/useManageAccounts';
 import useReports from '@/hooks/useReports';
 import { reportDate } from '@/utils/date.util';
@@ -12,7 +13,7 @@ import { useEffect } from 'react';
 const IncidentPage = () => {
     // const { accounts } = useManageAccounts();
     const { id } = useParams();
-    const { report, loading, error, setReportID } = useReports();
+    const { report, loading, error, setReportID, toggleReportOnClick } = useReports();
 
     useEffect(() => {
         if (typeof id === 'string') {
@@ -20,7 +21,7 @@ const IncidentPage = () => {
         }
     }, [id, setReportID]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingPage />;
     if (error) return <div>Error: {error}</div>;
     if (!report) return <div>Report not found</div>;
 
@@ -59,6 +60,11 @@ const IncidentPage = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className='flex justify-end mb-2'>
+                <button className={`px-4 py-2 rounded font-semibold ${report.is_open ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white disabled:opacity-50`} onClick={toggleReportOnClick} disabled={loading}>
+                    {loading ? (report.is_open ? 'Closing...' : 'Reopening...') : report.is_open ? 'Close Report' : 'Reopen Report'}
+                </button>
             </div>
         </div>
     );

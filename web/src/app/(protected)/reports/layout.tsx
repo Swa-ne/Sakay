@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import IncidentReport from '@/components/icons/incidentReport';
 import PerformanceReport from '@/components/icons/performanceReport';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +11,8 @@ import { TypesOfReport } from '@/types';
 import { timeAgo } from '@/utils/date.util';
 import LoadingPage from '@/components/pages/loading.page';
 import Link from 'next/link';
+import { reportActions } from '@/stores';
+import { getReportStats } from '@/service/report';
 
 export default function ReportsLayout({ children }: { children: ReactNode }) {
     const { reports, loading, error } = useReports();
@@ -25,12 +27,21 @@ export default function ReportsLayout({ children }: { children: ReactNode }) {
 
     const filteredReports = (type: TypesOfReport | 'all') => reports.filter((report) => (type === 'all' ? true : report.type_of_report === type));
 
+    useEffect(() => {
+        const fetchReportStats = async () => {
+            const stats = await getReportStats();
+            if (typeof stats !== 'string') {
+                reportActions.setReportStats(stats);
+            }
+        };
+        fetchReportStats();
+    }, [reports]);
+
     if (loading) return <LoadingPage />;
 
     if (error) {
         // TODO: show a something
     }
-
     return (
         <div className='flex flex-col h-screen w-full p-3 md:p-5 space-y-4 overflow-hidden bg-gray-50'>
             <Card className='p-1 w-full shadow-sm'>
