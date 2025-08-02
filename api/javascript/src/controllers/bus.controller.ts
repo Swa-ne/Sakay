@@ -24,8 +24,8 @@ export const postBusController = async (req: Request, res: Response) => {
 };
 export const getBussesController = async (req: Request, res: Response) => {
     try {
-        const { page = 1 } = req.query
-        const bus = await getBusses(page as string);
+        const { cursor } = req.query;
+        const bus = await getBusses(cursor as string);
         if (bus.httpCode === 200) {
             res.status(bus.httpCode).json({ message: bus.message });
             return;

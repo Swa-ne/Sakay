@@ -5,7 +5,7 @@ import { BusModel } from "@/schema/account.unit.schema";
 import { Unit } from "@/types";
 
 const ROUTE = "/bus"
-export const getAllBusses = async (page: number) => {
+export const getAllBusses = async (cursor?: string) => {
     const { access_token } = useAuthStore.getState();
     try {
         const response = await api.get(
@@ -14,7 +14,7 @@ export const getAllBusses = async (page: number) => {
                 headers: {
                     "Authorization": access_token
                 },
-                params: { page }
+                params: { cursor }
             }
         );
         const data = response.data;
