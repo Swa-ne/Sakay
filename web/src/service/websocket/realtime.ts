@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { chatActions } from '@/stores/chat.store';
 import { announcementActions } from '@/stores/announcement.store';
 import { reportActions } from '@/stores/report.store';
-import { Announcement, Report, File, fetchUser, Account, Unit, Role } from '@/types';
+import { Announcement, Report, File, fetchUser, Account, Unit, Role, fetchBus } from '@/types';
 import { ManageActions } from '@/stores';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/realtime`;
@@ -28,7 +28,7 @@ export interface ToggleReportPayload {
 }
 export interface ManagePayload {
     user?: fetchUser;
-    bus?: Unit;
+    bus?: fetchBus;
     userId?: string;
     busId?: string;
 }
@@ -85,7 +85,6 @@ export const connectSocket = async () => {
     });
 
     socket.on('user-created-receive', (data: ManagePayload) => {
-        console.log('user-created-receive', data);
         if (data.user) {
             const { _id, first_name, last_name, user_type, phone_number, profile_picture_url, assigned_bus_id } = data.user;
             const newAccount: Account = {
@@ -102,7 +101,14 @@ export const connectSocket = async () => {
     });
     socket.on('bus-created-receive', (data: ManagePayload) => {
         if (data.bus) {
-            ManageActions.setUnits((prev) => [...prev, data.bus as Unit]);
+            const { _id, bus_number, plate_number } = data.bus;
+            const newUnit: Unit = {
+                id: _id,
+                name: `${bus_number} - ${plate_number}`,
+                bus_number,
+                plate_number,
+            }
+            ManageActions.setUnits((prev) => [newUnit, ...prev]);
         }
     });
     socket.on('driver-assigned-receive', (data: ManagePayload) => {
