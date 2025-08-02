@@ -2,8 +2,8 @@
 import { assignUserToBus, getAllBusses, unassignDriverToBus } from '@/service/bus';
 import { getAllUsers } from '@/service/users';
 import useManageStore from '@/stores/manage.store';
-import { fetchBus, fetchUser, Unit, Role, Account } from '@/types';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { fetchBus, fetchUser, Unit, Role } from '@/types';
+import { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 
 const useManageAccounts = () => {
     const [userCursor, setUserCursor] = useState<string | null>(null)
@@ -13,7 +13,6 @@ const useManageAccounts = () => {
     const hasLoadedUsers = useRef(false);
     const hasLoadedUnits = useRef(false);
     const [currentRole, setCurrentRole] = useState<string | null>(null);
-    const roleData = useRef<Map<string, { accounts: Account[], cursor: string | null, hasMore: boolean }>>(new Map());
 
     const [total, setTotal] = useState<number>(1)
     const [commuterCount, setCommuterCount] = useState<number>(1)
@@ -28,6 +27,14 @@ const useManageAccounts = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Filtered accounts for display based on current role
+    const filteredAccounts = useMemo(() => {
+        if (!currentRole || currentRole === 'all') {
+            return accounts;
+        }
+        return accounts.filter(account => account.role === currentRole);
+    }, [accounts, currentRole]);
 
     const assignDriverToUnit = async (accountId: string, unitId?: string) => {
         let success = false;
@@ -72,7 +79,6 @@ const useManageAccounts = () => {
                 plate_number: bus.plate_number,
                 assignedDriverId: bus.today_driver ? bus.today_driver._id : null,
             }));
-            console.log(busses["nextCursor"])
             setUnitCursor(busses["nextCursor"]);
 
             if (cursor) {
@@ -87,9 +93,7 @@ const useManageAccounts = () => {
         setLoading(false);
     }, [setUnits]);
 
-    const fetchUsers = useCallback(async (cursor?: string | null, role?: string) => {
-        const roleKey = role || 'all';
-
+    const fetchUsers = useCallback(async (cursor?: string | null) => {
         if (cursor && cursor === lastFetchedCursor.current) {
             console.log('Skipping fetch - cursor is the same:', cursor);
             return;
@@ -98,7 +102,8 @@ const useManageAccounts = () => {
         setLoading(true);
         setError(null);
 
-        const users = await getAllUsers(cursor || undefined, role);
+        // Always fetch all users without role filtering
+        const users = await getAllUsers(cursor || undefined, undefined);
         if (typeof users === 'string') {
             setAccounts([]);
             setError(users);
@@ -112,19 +117,11 @@ const useManageAccounts = () => {
                 profile_picture_url: user.profile_picture_url,
                 createdAt: user.createdAt
             }));
-            console.log(users["nextCursor"])
             setUserCursor(users["nextCursor"]);
 
             if (cursor) {
                 setAccounts((prev) => [...prev, ...updatedUsers]);
                 lastFetchedCursor.current = cursor;
-
-                const currentRoleData = roleData.current.get(roleKey);
-                if (currentRoleData) {
-                    currentRoleData.accounts = [...currentRoleData.accounts, ...updatedUsers];
-                    currentRoleData.cursor = users["nextCursor"];
-                    currentRoleData.hasMore = !!users["nextCursor"];
-                }
             } else {
                 setAccounts(updatedUsers);
                 setTotal(users["total"])
@@ -133,43 +130,21 @@ const useManageAccounts = () => {
                 setAdminCount(users["adminCount"])
                 lastFetchedCursor.current = null;
                 hasLoadedUsers.current = true;
-
-                roleData.current.set(roleKey, {
-                    accounts: updatedUsers,
-                    cursor: users["nextCursor"],
-                    hasMore: !!users["nextCursor"]
-                });
             }
         }
         setLoading(false);
     }, []);
 
     const fetchUsersWithRole = useCallback(async (role: string) => {
-        const roleKey = role;
-
-        if (roleData.current.has(roleKey)) {
-            console.log('Role already loaded, switching to cached data');
-            const cachedData = roleData.current.get(roleKey)!;
-            setCurrentRole(role);
-            setAccounts(cachedData.accounts);
-            setUserCursor(cachedData.cursor);
-            return;
-        }
-
-        console.log('Loading new role:', role);
+        // Just change the current role - no need to fetch new data
         setCurrentRole(role);
-        hasLoadedUsers.current = false;
-        lastFetchedCursor.current = null;
-        setUserCursor(null);
-        setAccounts([]);
-        await fetchUsers(null, role);
-    }, [fetchUsers, setAccounts]);
+    }, []);
 
     useEffect(() => {
         if (!hasLoadedUsers.current && accounts.length === 0) {
-            fetchUsers(null, currentRole || undefined);
+            fetchUsers(null);
         }
-    }, [fetchUsers, accounts.length, currentRole]);
+    }, [fetchUsers, accounts.length]);
 
     useEffect(() => {
         if (!hasLoadedUnits.current && units.length === 0) {
@@ -178,14 +153,12 @@ const useManageAccounts = () => {
     }, [fetchBusses, units.length])
 
     const loadMoreUsers = useCallback(() => {
-        console.log(userCursor, lastFetchedCursor.current)
         if (userCursor && !loading && userCursor !== lastFetchedCursor.current) {
-            fetchUsers(userCursor, currentRole || undefined);
+            fetchUsers(userCursor);
         }
-    }, [userCursor, loading, fetchUsers, currentRole]);
+    }, [userCursor, loading, fetchUsers]);
 
     const loadMoreUnits = useCallback(() => {
-        console.log(unitCursor, lastFetchedUnitCursor.current)
         if (unitCursor && !loading && unitCursor !== lastFetchedUnitCursor.current) {
             fetchBusses(unitCursor);
         }
@@ -196,7 +169,7 @@ const useManageAccounts = () => {
         commuterCount,
         driverCount,
         adminCount,
-        accounts,
+        accounts: filteredAccounts, // Return filtered accounts instead of raw accounts
         units,
         loading,
         error,
@@ -208,7 +181,9 @@ const useManageAccounts = () => {
         fetchUsersWithRole,
         lastFetchedCursor,
         userCursor,
-        unitCursor
+        unitCursor,
+        currentRole,
+        setCurrentRole
     };
 }
 

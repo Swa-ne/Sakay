@@ -1,5 +1,4 @@
 import { FormEvent, useState } from "react";
-import useManageAccounts from "./useManageAccounts";
 import { BusModel, BusSchema } from "@/schema/account.unit.schema";
 import { postBus } from "@/service/bus";
 
@@ -11,7 +10,6 @@ interface FormErrors {
 }
 
 const useDriverForm = () => {
-    const { setUnits } = useManageAccounts();
     const [unitForm, setUnitForm] = useState<BusModel>({
         bus_number: "",
         plate_number: "",
@@ -48,7 +46,6 @@ const useDriverForm = () => {
         if (validateForm()) {
             const unit = await postBus(unitForm);
             if (typeof unit === "object") {
-                setUnits((prevState) => [unit, ...prevState,])
                 setOpen(false);
                 setUnitForm({
                     bus_number: "",
