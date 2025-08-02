@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,7 +20,18 @@ const Inbox = () => {
     const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, setMessagePage, setInboxPage } = useInbox(messageRef);
 
     const [activeTab, setActiveTab] = useState('All');
-    const tabs = ['All', 'Unread'];
+    const tabs = ['All', 'Unread', 'Read'];
+
+    const filteredInboxes = useMemo(() => {
+        if (activeTab === 'All') return inboxes;
+        if (activeTab === 'Unread') {
+            return inboxes.filter((inbox) => inbox.last_message.sender_id !== user_id && !inbox.last_message.isRead);
+        }
+        if (activeTab === 'Read') {
+            return inboxes.filter((inbox) => inbox.last_message.isRead || inbox.last_message.sender_id === user_id);
+        }
+        return inboxes;
+    }, [inboxes, activeTab, user_id]);
 
     useEffect(() => {
         setCurrentUser(inboxes.find((inbox) => inbox._id === chatID));
@@ -59,7 +70,7 @@ const Inbox = () => {
                 </div>
 
                 <div ref={inboxRef} className='flex-1 overflow-y-auto'>
-                    {inboxes.map((inbox) => (
+                    {filteredInboxes.map((inbox) => (
                         <div
                             key={inbox._id}
                             className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${chatID === inbox._id ? 'bg-blue-50 border-l-2 md:border-l-4 border-l-primary' : ''}`}
