@@ -10,6 +10,17 @@ export interface fetchUser {
     assigned_bus_id: string
     phone_number: string
     profile_picture_url: string
+    createdAt?: string | null
+}
+
+export interface UsersResponse {
+    users: fetchUser[];
+    total: number;
+    nextCursor: string | null;
+    hasMore: boolean;
+    commuterCount: number;
+    driverCount: number;
+    adminCount: number;
 }
 export interface fetchBus {
     _id: string

@@ -1,7 +1,6 @@
 import { UserModel, UserSchema } from "@/schema/account.unit.schema";
 import { postDriver } from "@/service/users";
 import { FormEvent, useState } from "react";
-import useManageAccounts from "./useManageAccounts";
 
 
 
@@ -16,7 +15,6 @@ interface FormErrors {
 }
 
 const useDriverForm = () => {
-    const { setAccounts } = useManageAccounts();
     const [userFrom, setUserForm] = useState<UserModel>({
         email_address: '',
         password_hash: '',
@@ -65,7 +63,6 @@ const useDriverForm = () => {
         if (validateForm()) {
             const user = await postDriver(userFrom);
             if (typeof user === "object") {
-                setAccounts((prevState) => [user, ...prevState,])
                 setOpen(false);
                 setUserForm({
                     email_address: '',

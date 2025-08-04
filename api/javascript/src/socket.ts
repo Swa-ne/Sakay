@@ -125,4 +125,32 @@ realtimeSocket.on("connection", async (socket) => {
         removeUserFromRedisRealtimeController(socket.user?.user_id!)
     });
 });
+
+
+export const emitUserCreated = (userData: any) => {
+    io.of("/realtime").emit("user-created-receive", {
+        user: userData,
+    });
+};
+
+export const emitBusCreated = (busData: any) => {
+    io.of("/realtime").emit("bus-created-receive", {
+        bus: busData,
+    });
+};
+
+export const emitDriverAssigned = (userId: string, busId: string) => {
+    io.of("/realtime").emit("driver-assigned-receive", {
+        userId,
+        busId,
+    });
+};
+
+export const emitDriverUnassigned = (userId: string) => {
+    io.of("/realtime").emit("driver-unassigned-receive", {
+        userId,
+    });
+};
+
+
 export { app, io, server };
