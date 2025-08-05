@@ -4,8 +4,8 @@ import { UserType } from "../middlewares/token.authentication";
 
 export const getAllInboxesController = async (req: Request, res: Response) => {
     try {
-        const { page = 1 } = req.params;
-        const result = await getAllInboxes(page as string);
+        const { cursor = 1 } = req.params;
+        const result = await getAllInboxes(cursor as string);
 
         if (result.httpCode === 200) {
             if (result.message && result.message.length !== 0) {
@@ -109,12 +109,12 @@ export const saveMessageController = async (req: Request & { user?: UserType }, 
 };
 export const getMessagesController = async (req: Request, res: Response) => {
     try {
-        const { chat_id, page = 1 } = req.params;
+        const { chat_id, cursor } = req.params;
         if (!chat_id) {
             res.status(400).json({ message: 'Chat ID not provided' });
             return;
         }
-        const result = await getChatMessages(chat_id as string, page as string)
+        const result = await getChatMessages(chat_id as string, cursor as string)
 
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });

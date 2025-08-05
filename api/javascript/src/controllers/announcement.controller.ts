@@ -61,8 +61,8 @@ export const getAllAnnouncementsController = async (req: Request & { user?: User
             return;
         }
 
-        const { page = 1 } = req.params;
-        const result = await getAllAnnouncements(page as string, user_type as string);
+        const { cursor = 1 } = req.params;
+        const result = await getAllAnnouncements(cursor as string, user_type as string);
 
         if (result.httpCode === 200) {
             res.status(200).json({ message: result.message });

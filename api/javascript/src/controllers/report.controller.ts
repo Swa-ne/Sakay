@@ -110,8 +110,8 @@ export const postPerformanceReportController = async (req: Request & { user?: Us
 };
 export const getAllReportsController = async (req: Request, res: Response) => {
     try {
-        const { page = 1 } = req.params;
-        const reports = await getAllReports(page as string);
+        const { cursor } = req.params;
+        const reports = await getAllReports(cursor as string);
 
         if (reports.httpCode === 200) {
             res.status(reports.httpCode).json({ message: reports.message });
