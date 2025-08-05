@@ -4,13 +4,13 @@ import { UserType } from "../middlewares/token.authentication";
 
 export const getAllInboxesController = async (req: Request, res: Response) => {
     try {
-        const { cursor = 1 } = req.params;
+        const { cursor } = req.query;
         const result = await getAllInboxes(cursor as string);
 
         if (result.httpCode === 200) {
-            if (result.message && result.message.length !== 0) {
+            if (result.message && result.message.inbox.length !== 0) {
                 const inboxes = await Promise.all(
-                    result.message.map(async (inbox) => {
+                    result.message.inbox.map(async (inbox) => {
                         const last_message = await getLastMessageFromInbox(inbox._id);
                         return {
                             ...inbox._doc,
@@ -24,7 +24,7 @@ export const getAllInboxesController = async (req: Request, res: Response) => {
                     new Date(a.last_message.createdAt).getTime()
                 );
 
-                res.status(200).json({ message: inboxes });
+                res.status(200).json({ message: { inboxes, nextCrusor: result.message.nextCursor } });
                 return;
             }
             res.status(200).json({ message: result.message });
@@ -109,7 +109,8 @@ export const saveMessageController = async (req: Request & { user?: UserType }, 
 };
 export const getMessagesController = async (req: Request, res: Response) => {
     try {
-        const { chat_id, cursor } = req.params;
+        const { chat_id } = req.params;
+        const { cursor } = req.query;
         if (!chat_id) {
             res.status(400).json({ message: 'Chat ID not provided' });
             return;

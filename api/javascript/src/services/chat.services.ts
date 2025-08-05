@@ -1,14 +1,19 @@
 import { Inbox } from "../models/chat/inbox.model";
 import { Message } from "../models/chat/message.model";
 
-export async function getAllInboxes(page: string) {
+export async function getAllInboxes(cursor?: string) {
     try {
-        const inbox = await Inbox.find({ is_active: true })
+        const query: any = { is_active: true };
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+        const inbox = await Inbox.find(query)
             .sort({ createdAt: -1 })
             .populate("user_id")
-            .skip((parseInt(page) - 1) * 30)
             .limit(30);
-        return { message: inbox, httpCode: 200 };
+
+        const nextCursor = inbox.length > 0 ? inbox[inbox.length - 1].createdAt : null;
+        return { message: { inbox, nextCursor }, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
@@ -49,13 +54,18 @@ export async function openInboxByUserID(user_id: string) {
     }
 }
 
-export async function getChatMessages(chat_id: string, page: string) {
+export async function getChatMessages(chat_id: string, cursor: string) {
     try {
-        const result = await Message.find({ chat_id })
+        const query: any = { chat_id };
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+        const result = await Message.find()
             .sort({ createdAt: -1 })
-            .skip((parseInt(page) - 1) * 30)
             .limit(30);
-        return { message: result, httpCode: 200 };
+
+        const nextCursor = result.length > 0 ? result[result.length - 1].createdAt : null;
+        return { message: { result, nextCursor }, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }

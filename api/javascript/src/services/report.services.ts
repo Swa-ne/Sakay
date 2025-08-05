@@ -89,23 +89,27 @@ export const postPerformanceReport = async (bus_id: string, user_id: string, dri
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getAllReports = async (page: string) => {
+export const getAllReports = async (cursor?: string) => {
     const session = await startSession();
     session.startTransaction();
     try {
-        const reports = await Report.find()
+        const query: any = {};
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+        const reports = await Report.find(query)
             .sort({ createdAt: -1 })
             .populate("bus")
             .populate("investigator")
             .populate("reporter")
             .populate("driver")
-            .skip((parseInt(page) - 1) * 30)
             .limit(30)
             .session(session);
+        const nextCursor = reports.length > 0 ? reports[reports.length - 1].createdAt : null;
 
         await session.commitTransaction();
         session.endSession();
-        return { message: reports, httpCode: 200 };
+        return { message: { reports, nextCursor }, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
         session.endSession();

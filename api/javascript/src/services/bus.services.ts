@@ -46,7 +46,9 @@ export const getBusses = async (cursor?: string) => {
                 return { ...bus.toObject(), today_driver: driver?.message };
             })
         );
-        return { message: busesWithDrivers, httpCode: 200 };
+        const nextCursor = busses.length > 0 ? busses[busses.length - 1].createdAt : null;
+
+        return { message: { busesWithDrivers, nextCursor }, httpCode: 200 };
     } catch (error) {
         await session.abortTransaction();
         session.endSession();

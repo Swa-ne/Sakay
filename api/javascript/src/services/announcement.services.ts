@@ -54,21 +54,27 @@ export const saveAnnouncement = async (user_id: string, headline: string, conten
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
-export const getAllAnnouncements = async (page: string, user_type: string) => {
+export const getAllAnnouncements = async (user_type: string, cursor?: string) => {
     try {
-        const announcements = await Announcement.find({
+        const query: any = {
             $or: [
-                { audience: { $exists: false } }, // Include documents where audience is not defined
+                { audience: { $exists: false } },
                 { audience: user_type === "ADMIN" ? { $exists: true } : { $in: [user_type, "EVERYONE"] } }
             ]
-        })
+        };
+        if (cursor) {
+            query.createdAt = { $lt: new Date(cursor) };
+        }
+        const announcements = await Announcement.find(query)
             .sort({ createdAt: -1 })
             .populate("files")
             .populate("posted_by")
             .populate("edited_by")
-            .skip((parseInt(page) - 1) * 30)
             .limit(30);
-        return { message: announcements, httpCode: 200 };
+
+        const nextCursor = announcements.length > 0 ? announcements[announcements.length - 1].createdAt : null;
+
+        return { message: { announcements, nextCursor }, httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }
