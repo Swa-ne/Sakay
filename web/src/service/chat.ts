@@ -1,7 +1,7 @@
 import { AxiosError } from
     'axios'; import api from ".";
 import { useAuthStore } from '@/stores/auth.store';
-import { Inbox, Message } from '@/types';
+import { Inbox } from '@/types';
 import { sendMessage } from './websocket/realtime';
 const ROUTE = '/chat';
 
@@ -61,15 +61,16 @@ export const openCreatedInboxContentByChatID = async (chat_id: string): Promise<
     }
 };
 
-export const getMessage = async (chat_id: string, page: number): Promise<Message[] | string> => {
+export const getMessage = async (chat_id: string, cursor?: string) => {
     try {
         const { access_token } = useAuthStore.getState();
-        const response = await api.get(`${ROUTE}/get-messages/${chat_id}/${page}`, {
+        const response = await api.get(`${ROUTE}/get-messages/${chat_id}`, {
             headers: {
                 'Authorization': access_token,
-            }
+            },
+            params: { cursor }
         });
-        return response.data.message as Message[];
+        return response.data.message;
     } catch (error) {
         const err = error as AxiosError<{ message: string }>;
         const errMsg = err.response?.data?.message || 'Unknown error';
@@ -93,15 +94,16 @@ export const openInbox = async (): Promise<Inbox | string> => {
     }
 };
 
-export const getAllInboxes = async (page: number): Promise<Inbox[] | string> => {
+export const getAllInboxes = async (cursor?: string) => {
     try {
         const { access_token } = useAuthStore.getState();
-        const response = await api.get(`${ROUTE}/get-all-inbox/${page}`, {
+        const response = await api.get(`${ROUTE}/get-all-inbox`, {
             headers: {
                 'Authorization': access_token,
-            }
+            },
+            params: { cursor }
         });
-        return response.data.message as Inbox[];
+        return response.data.message;
     } catch (error) {
         const err = error as AxiosError<{ message: string }>;
         const errMsg = err.response?.data?.message || 'Unknown error';

@@ -1,16 +1,20 @@
 'use client'
 import { getAllInboxes, getMessage, isReadInboxes, saveMessage } from '@/service/chat';
 import { useAuthStore } from '@/stores';
-import { useChatStore } from '@/stores/chat.store';
+import { chatActions, useChatStore } from '@/stores/chat.store';
 import useInboxStore, { inboxActions } from '@/stores/inbox.store';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | null>) => {
     const { user_id } = useAuthStore()
     const [messageInput, setMessageInput] = useState<string>("")
 
-    const [inboxPage, setInboxPage] = useState<number>(1)
-    const [messagePage, setMessagePage] = useState<number>(1)
+    const [inboxCursor, setInboxCursor] = useState<string | null>(null)
+    const lastFetchedCursor = useRef<string | null>(null);
+    const hasLoadedInboxes = useRef(false);
+    const [messageCursor, setMessageCursor] = useState<string | null>(null)
+    const lastFetchedCursorMessages = useRef<string | null>(null);
+    const hasLoadedMessages = useRef(false);
     const [chatID, setChatID] = useState<string>("")
 
     const messages = useChatStore((state) => state.messages);
@@ -22,9 +26,6 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const setMessages = useChatStore((state) => state.setMessages);
-    const appendMessages = useChatStore((state) => state.appendMessages);
-    const onReceiveMessage = useChatStore((state) => state.onReceiveMessage);
     const seenSent = useInboxStore((state) => state.seenSent);
     const setSeen = useInboxStore((state) => state.setSeen);
 
@@ -37,7 +38,7 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
         const receiver_id = inbox.user_id;
         const result = await saveMessage(messageInput.trim(), chatID, receiver_id._id);
         if (result) {
-            onReceiveMessage({
+            chatActions.onReceiveMessage({
                 chat_id: chatID,
                 sender_id: user_id,
                 message: messageInput,
@@ -50,50 +51,78 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
             console.error('Failed to send message:', result);
         }
     };
-
-    const fetchInboxes = useCallback(async (currentPage: number) => {
+    const fetchInboxes = useCallback(async (cursor?: string | null) => {
         setLoading(true);
         setError(null);
 
-        const inboxes = await getAllInboxes(currentPage);
+        const inboxes = await getAllInboxes(cursor || undefined);
+
 
         if (typeof inboxes === 'string') {
             inboxActions.setInboxes([]);
             setError(inboxes);
         } else {
-            inboxActions.setInboxes(inboxes);
-            setChatID(inboxes[0]._id)
+            setInboxCursor(inboxes["nextCursor"]);
+            if (cursor) {
+                inboxActions.setInboxes((prev) => [...prev, ...inboxes["inboxes"]]);
+                lastFetchedCursor.current = cursor;
+            } else {
+                inboxActions.setInboxes(inboxes["inboxes"]);
+                setChatID(inboxes["inboxes"][0]._id);
+                lastFetchedCursor.current = null;
+                hasLoadedInboxes.current = true;
+            }
         }
         setLoading(false);
     }, []);
 
-    const fetchMessages = useCallback(async (chat_id: string, currentPage: number) => {
+    const fetchMessages = useCallback(async (chat_id: string, cursor?: string | null) => {
         setLoading(true);
         setError(null);
 
-        const messages = await getMessage(chat_id, currentPage);
+        const messages = await getMessage(chat_id, cursor || undefined);
 
         if (typeof messages === 'string') {
-            setMessages(chat_id, []);
+            chatActions.setMessages(chat_id, []);
             setError(messages);
         } else {
-            if (currentPage > 1) {
-                appendMessages(chat_id, messages);
+            console.log(messages["nextCursor"])
+            setMessageCursor(messages["nextCursor"]);
+            if (cursor) {
+                chatActions.appendMessages(chat_id, messages["result"]);
+                lastFetchedCursorMessages.current = cursor;
             } else {
-                setMessages(chat_id, messages);
+                chatActions.setMessages(chat_id, messages["result"]);
+                lastFetchedCursorMessages.current = null;
+                hasLoadedMessages.current = true;
             }
         }
         setLoading(false);
-    }, [setMessages, appendMessages]);
+    }, []);
 
     useEffect(() => {
-        fetchInboxes(inboxPage)
-    }, [inboxPage, fetchInboxes])
+        if (!hasLoadedInboxes.current && inboxes.length === 0) {
+            fetchInboxes()
+        }
+    }, [fetchInboxes, inboxes.length])
+
+    const loadMoreInboxes = useCallback(() => {
+        if (inboxCursor && !loading && inboxCursor !== lastFetchedCursor.current) {
+            fetchInboxes(inboxCursor);
+        }
+    }, [inboxCursor, loading, fetchInboxes]);
 
     useEffect(() => {
-        if (chatID) fetchMessages(chatID, messagePage)
-    }, [chatID, messagePage, fetchMessages])
+        if (chatID) fetchMessages(chatID)
+    }, [chatID, fetchMessages])
 
+    const loadMoreMessages = useCallback(() => {
+        console.log("Im running 1", messageCursor)
+        if (messageCursor && !loading && messageCursor !== lastFetchedCursorMessages.current) {
+            console.log("Im running 2")
+            fetchMessages(chatID, messageCursor)
+        }
+    }, [messageCursor, loading, fetchMessages, chatID]);
 
     useEffect(() => {
         const container = messageRef.current;
@@ -101,7 +130,7 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
         const handleScroll = () => {
             const isAtTop = container.scrollHeight + container.scrollTop - container.clientHeight <= 5;
             if (isAtTop) {
-                setMessagePage((prev) => prev + 1);
+                loadMoreMessages();
             }
         };
 
@@ -110,7 +139,7 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
         return () => {
             container.removeEventListener('scroll', handleScroll);
         };
-    }, [messageRef]);
+    }, [messageRef, loadMoreMessages]);
 
     useEffect(() => {
         const container = messageRef.current;
@@ -146,7 +175,7 @@ const useInbox = (messageRef: React.RefObject<HTMLElementTagNameMap['div'] | nul
         return () => container.removeEventListener('scroll', handleScroll);
     }, [chatID, messageRef, seenSent, setSeen]);
 
-    return { messageInput, setMessageInput, handleSendMessage, inboxPage, setInboxPage, messagePage, setMessagePage, chatID, setChatID, messages, resetChat, inboxes, resetInbox, loading, setLoading, error, setError };
+    return { messageInput, setMessageInput, handleSendMessage, loadMoreMessages, chatID, setChatID, messages, resetChat, inboxes, resetInbox, loading, setLoading, error, setError, loadMoreInboxes, setMessageCursor };
 }
 
 export default useInbox

@@ -17,7 +17,7 @@ const Inbox = () => {
 
     const { user_id } = useAuthStore();
     const [currentUser, setCurrentUser] = useState<InboxType>();
-    const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, setMessagePage, setInboxPage } = useInbox(messageRef);
+    const { messageInput, setMessageInput, handleSendMessage, messages, chatID, setChatID, inboxes, loadMoreInboxes, setMessageCursor } = useInbox(messageRef);
 
     const [activeTab, setActiveTab] = useState('All');
     const tabs = ['All', 'Unread', 'Read'];
@@ -36,7 +36,6 @@ const Inbox = () => {
     useEffect(() => {
         setCurrentUser(inboxes.find((inbox) => inbox._id === chatID));
     }, [inboxes, chatID]);
-
     useEffect(() => {
         const container = inboxRef.current;
         if (!container) return;
@@ -46,13 +45,13 @@ const Inbox = () => {
             const isNearTop = container.scrollHeight - container.scrollTop - container.clientHeight <= scrollThreshold;
 
             if (isNearTop) {
-                setInboxPage((prev) => prev + 1);
+                loadMoreInboxes();
             }
         };
 
         container.addEventListener('scroll', handleInboxScroll);
         return () => container.removeEventListener('scroll', handleInboxScroll);
-    }, [setInboxPage]);
+    }, []);
 
     return (
         <div className='p-2 md:p-5 w-full h-screen flex flex-col lg:flex-row gap-2 md:gap-5'>
@@ -76,7 +75,10 @@ const Inbox = () => {
                             className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${chatID === inbox._id ? 'bg-blue-50 border-l-2 md:border-l-4 border-l-primary' : ''}`}
                             onClick={() => {
                                 setChatID(inbox._id);
-                                setMessagePage(1);
+                                console.log('reseting message cursor');
+                                const lastMessage = messages[inbox._id]?.[messages[inbox._id].length - 1];
+                                console.log('lastMessage is', lastMessage);
+                                setMessageCursor(lastMessage?._id || null);
                                 setShowChat(true);
                             }}
                         >
