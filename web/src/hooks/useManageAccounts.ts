@@ -72,7 +72,7 @@ const useManageAccounts = () => {
             setUnits([]);
             setError(busses);
         } else {
-            const updatedBusses: Unit[] = busses.map((bus: fetchBus) => ({
+            const updatedBusses: Unit[] = busses["busesWithDrivers"].map((bus: fetchBus) => ({
                 id: bus._id,
                 name: `${bus.bus_number} - ${bus.plate_number}`,
                 bus_number: bus.bus_number,
