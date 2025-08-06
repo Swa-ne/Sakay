@@ -103,7 +103,7 @@ export const getAllReports = async (cursor?: string) => {
             .populate("investigator")
             .populate("reporter")
             .populate("driver")
-            .limit(30)
+            .limit(300)
             .session(session);
         const nextCursor = reports.length > 0 ? reports[reports.length - 1].createdAt : null;
 

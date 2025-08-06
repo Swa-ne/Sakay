@@ -54,13 +54,13 @@ export async function openInboxByUserID(user_id: string) {
     }
 }
 
-export async function getChatMessages(chat_id: string, cursor: string) {
+export async function getChatMessages(chat_id: string, cursor?: string) {
     try {
         const query: any = { chat_id };
         if (cursor) {
             query.createdAt = { $lt: new Date(cursor) };
         }
-        const result = await Message.find()
+        const result = await Message.find(query)
             .sort({ createdAt: -1 })
             .limit(30);
 
