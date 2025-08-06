@@ -24,7 +24,7 @@ export default function ReportsLayout({ children }: { children: ReactNode }) {
     ];
 
     // const [filterReport, setFilterReport] = useState<TypesOfReport | 'all'>('all');
-
+    // TODO: ADD SCROLL FUNCTION TO GET THE OTHER REPORTS
     const filteredReports = (type: TypesOfReport | 'all') => reports.filter((report) => (type === 'all' ? true : report.type_of_report === type));
 
     useEffect(() => {

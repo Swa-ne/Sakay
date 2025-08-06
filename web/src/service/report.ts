@@ -3,15 +3,16 @@ import api from ".";
 import { AxiosError } from "axios";
 
 const ROUTE = "/report"
-export const getAllReports = async (page: number) => {
+export const getAllReports = async (cursor?: string) => {
     const { access_token } = useAuthStore.getState();
     try {
         const response = await api.get(
-            `${ROUTE}/get-all-report/${page}`,
+            `${ROUTE}/get-all-report`,
             {
                 headers: {
                     "Authorization": access_token
-                }
+                },
+                params: { cursor }
             }
         );
         const data = response.data;

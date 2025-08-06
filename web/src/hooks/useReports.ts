@@ -3,10 +3,13 @@ import { getAllReports, getReport, getReportStats, toggleReport } from '@/servic
 import { toggleReportSocket } from '@/service/websocket/realtime';
 import useReportStore from '@/stores/report.store';
 import { Report } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const useReports = () => {
-    const [reportPage, setReportPage] = useState<number>(1)
+    const lastFetchedCursor = useRef<string | null>(null);
+    const hasLoadedAnnouncements = useRef(false);
+
+    const [reportCursor, setReportCursor] = useState<string | null>(null)
     const [reportID, setReportID] = useState<string | undefined>()
     const [report, setReport] = useState<Report | null>()
 
@@ -42,17 +45,25 @@ const useReports = () => {
         setLoading(false);
     }, [reports, setReport]);
 
-    const fetchReports = useCallback(async (currentPage: number) => {
+    const fetchReports = useCallback(async (cursor?: string | null) => {
         setLoading(true);
         setError(null);
 
-        const reports = await getAllReports(currentPage);
+        const reports = await getAllReports(cursor || undefined);
 
         if (typeof reports === 'string') {
             setReports([]);
             setError(reports);
         } else {
-            setReports(reports);
+            setReportCursor(reports["nextCursor"]);
+            if (cursor) {
+                setReports((prev) => [...prev, reports["reports"]]);
+                lastFetchedCursor.current = cursor;
+            } else {
+                setReports(reports["reports"]);
+                lastFetchedCursor.current = null;
+                hasLoadedAnnouncements.current = true;
+            }
         }
         setLoading(false);
     }, [setReports]);
@@ -104,14 +115,22 @@ const useReports = () => {
     }, [fetchReportStats])
 
     useEffect(() => {
-        fetchReports(reportPage)
-    }, [reportPage, fetchReports])
+        if (!hasLoadedAnnouncements.current && reports.length === 0) {
+            fetchReports(reportCursor)
+        }
+    }, [reportCursor, fetchReports])
+
+    const loadMoreReports = useCallback(() => {
+        if (reportCursor && !loading && reportCursor !== lastFetchedCursor.current) {
+            fetchReports(reportCursor);
+        }
+    }, [reportCursor, loading, fetchReports]);
 
     useEffect(() => {
         if (reportID) fetchReport(reportID)
     }, [reportID, fetchReport])
 
-    return { report, reports, reportStats, reportID, setReport, setReports, setReportStats, setReportID, reportPage, loading, error, setReportPage, setLoading, toggleReportOnClick };
+    return { loadMoreReports, report, reports, reportStats, reportID, setReport, setReports, setReportStats, setReportID, reportCursor, setReportCursor, loading, error, setLoading, toggleReportOnClick };
 }
 
 export default useReports
