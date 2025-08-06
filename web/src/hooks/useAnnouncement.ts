@@ -3,7 +3,7 @@ import { deleteAnnouncement, editAnnouncement, getAllAnnouncements, getAnnouncem
 import useAnnouncementStore from '@/stores/announcement.store';
 import { AnnoucementLocal, Announcement } from '@/types';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 interface FormErrors {
     headline?: string;
@@ -15,7 +15,9 @@ const useAnnouncement = () => {
     const router = useRouter();
 
     const MAX_FILE_SIZE_MB = 50;
-    const [announcementPage, setAnnouncementPage] = useState<number>(1)
+    const [announcementCursor, setAnnouncementCursor] = useState<string | null>(null)
+    const lastFetchedCursor = useRef<string | null>(null);
+    const hasLoadedAnnouncements = useRef(false);
     const [announcementForm, setAnnouncementForm] = useState<AnnouncementModel>({
         headline: "",
         content: "",
@@ -57,28 +59,41 @@ const useAnnouncement = () => {
         setLoading(false);
     }, [announcements, setAnnouncement]);
 
-    const fetchAnnouncements = useCallback(async (currentPage: number) => {
+    const fetchAnnouncements = useCallback(async (cursor?: string | null) => {
         setLoading(true);
         setError(null);
 
-        const announcementsRes = await getAllAnnouncements(currentPage);
+        const announcementsRes = await getAllAnnouncements(cursor || undefined);
         if (typeof announcementsRes === 'string') {
             setAnnouncements([]);
             setError(announcementsRes);
         } else {
-            if (currentPage > 1) {
-                appendAnnouncements(announcementsRes);
+
+            setAnnouncementCursor(announcementsRes["nextCursor"]);
+            if (cursor) {
+                appendAnnouncements(announcementsRes["announcements"]);
+                lastFetchedCursor.current = cursor;
             } else {
-                setAnnouncements(announcementsRes);
+                setAnnouncements(announcementsRes["announcements"]);
+                lastFetchedCursor.current = null;
+                hasLoadedAnnouncements.current = true;
             }
         }
         setLoading(false);
-    }, [setAnnouncements, appendAnnouncements]);
+    }, []);
 
 
     useEffect(() => {
-        fetchAnnouncements(announcementPage)
-    }, [announcementPage, fetchAnnouncements])
+        if (!hasLoadedAnnouncements.current && announcements.length === 0) {
+            fetchAnnouncements(announcementCursor)
+        }
+    }, [announcementCursor, fetchAnnouncements])
+
+    const loadMoreAnnouncements = useCallback(() => {
+        if (announcementCursor && !loading && announcementCursor !== lastFetchedCursor.current) {
+            fetchAnnouncements(announcementCursor);
+        }
+    }, [announcementCursor, loading, fetchAnnouncements]);
 
     const handleInputChange = (field: keyof AnnouncementModel, value: string) => {
         setAnnouncementForm((prev) => ({ ...prev, [field]: value }));
@@ -217,7 +232,8 @@ const useAnnouncement = () => {
         }
     };
 
-    return { handleFileSelect, handleEditSubmit, handleDelete, handleEdit, announcement, fetchAnnouncement, announcementForm, setAnnouncementForm, handleInputChange, announcements, setAnnouncements, announcementPage, setAnnouncementPage, files, setFiles, loading, setLoading, error, errors, setErrors, setError, handleSubmit };
+
+    return { handleFileSelect, handleEditSubmit, handleDelete, handleEdit, announcement, fetchAnnouncement, announcementForm, setAnnouncementForm, handleInputChange, announcements, setAnnouncements, announcementCursor, setAnnouncementCursor, files, setFiles, loading, setLoading, error, errors, setErrors, setError, handleSubmit, loadMoreAnnouncements };
 }
 
 export default useAnnouncement

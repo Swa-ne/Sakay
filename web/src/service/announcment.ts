@@ -3,15 +3,16 @@ import api from ".";
 import { AxiosError } from "axios";
 
 const ROUTE = "/announcement"
-export const getAllAnnouncements = async (page: number) => {
+export const getAllAnnouncements = async (cursor?: string) => {
     const { access_token } = useAuthStore.getState();
     try {
         const response = await api.get(
-            `${ROUTE}/get-all-announcements/${page}`,
+            `${ROUTE}/get-all-announcements`,
             {
                 headers: {
                     "Authorization": access_token
-                }
+                },
+                params: { cursor }
             }
         );
         const data = response.data;
