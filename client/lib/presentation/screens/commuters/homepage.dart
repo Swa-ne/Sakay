@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
-import 'package:sakay_app/common/widgets/map.dart';
+// import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,11 +32,141 @@ class _HomePageState extends State<HomePage> {
   bool _showProfileHint = false;
   bool isTrackerOn = false;
 
+// PARA DI MA ZOOM OUT MASYADO
+  final CameraPosition _defaultCameraPosition = const CameraPosition(
+    target: LatLng(16.0439, 120.3331),
+    zoom: 14,
+    bearing: 0,
+    tilt: 0,
+  );
+  final LatLngBounds _pangasinanBounds = LatLngBounds(
+    northeast: const LatLng(16.5, 120.8),
+    southwest: const LatLng(15.5, 119.8),
+  );
+
+  MapType _currentMapType = MapType.normal;
+  late SharedPreferences _prefs;
+  bool _mapInitialized = false;
+  GoogleMapController? _mapController;
+  bool _showTraffic = false;
+
   @override
   void initState() {
     super.initState();
+    _initPreferences(); // FOR MAP STYLE PREFERENCE
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
     _checkFirstTime();
+  }
+
+  // PARA SA SHARED PREFERENCES NG MAP STYLE AND LIVE TRAFFIC
+  Future<void> _initPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentMapType = MapType.values[_prefs.getInt('mapType') ?? 0];
+      _showTraffic = _prefs.getBool('showTraffic') ?? false;
+    });
+  }
+
+  Future<void> _saveTrafficPreference(bool showTraffic) async {
+    await _prefs.setBool('showTraffic', showTraffic);
+  }
+
+  void _changeMapType(MapType type) {
+    setState(() {
+      _currentMapType = type;
+    });
+    _prefs.setInt('mapType', type.index);
+  }
+
+  String _getMapStyle() {
+    return '''
+    [
+      {
+        "featureType": "poi",
+        "elementType": "labels",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      }
+    ]
+    ''';
+  }
+
+  // PARA SA LIVE TRAFFIC
+  // LIST
+  Widget _buildTrafficLegend() {
+    return Positioned(
+      bottom: 80,
+      right: 16,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTrafficLegendItem("No traffic", Colors.green),
+            _buildTrafficLegendItem("Moderate traffic", Colors.yellow),
+            _buildTrafficLegendItem("Heavy traffic", Colors.red),
+            _buildTrafficLegendItem("Standstill traffic", Colors.red[900]!),
+          ],
+        ),
+      ),
+    );
+  }
+
+// PANG LIST
+  Widget _buildTrafficLegendItem(String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // LIST PARA DUN SA MAPS
+  PopupMenuItem<MapType> _buildMapTypeItem(MapType type, String label, IconData icon) {
+    return PopupMenuItem<MapType>(
+      value: type,
+      child: Row(
+        children: [
+          Icon(icon, size: 20, 
+              color: _currentMapType == type ? Colors.blue : Colors.grey),
+          const SizedBox(width: 12),
+          Text(label),
+        ],
+      ),
+    );
   }
 
   Future<void> _checkFirstTime() async {
@@ -217,14 +349,55 @@ class _HomePageState extends State<HomePage> {
     overlay.insert(_hintOverlay!);
   }
 
+  // PARA DI LANG LUMAYO MASYADO SA ZOOM
+  Future<void> _restrictToPangasinan() async {
+    if (_mapController != null) {
+      await _mapController!.animateCamera(
+        CameraUpdate.newLatLngBounds(_pangasinanBounds, 50),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // FOR MAP AND MAP STYLES
+          Positioned.fill(
+            child: GoogleMap(
+              initialCameraPosition: _defaultCameraPosition,
+              mapType: _currentMapType,
+              myLocationEnabled: isTrackerOn,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              compassEnabled: false,
+              buildingsEnabled: true,
+              tiltGesturesEnabled: true,
+              rotateGesturesEnabled: true,
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              minMaxZoomPreference: const MinMaxZoomPreference(10, 16),
+              trafficEnabled: _showTraffic,
+              onMapCreated: (controller) {
+                _mapController = controller;
+                if (!_mapInitialized) {
+                  controller.setMapStyle(_getMapStyle());
+                  _mapInitialized = true;
+                  _restrictToPangasinan();
+                }
+              },
+              onCameraMove: (position) {
+                final zoom = position.zoom;
+                if (zoom < 10 || zoom > 16) {
+                  _mapController?.animateCamera(
+                    CameraUpdate.zoomTo(zoom.clamp(10, 16).toDouble()),
+                  );
+                }
+              },
+            ),
           ),
+
           Positioned(
             top: 50,
             left: 16,
@@ -354,6 +527,72 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
+          // POPUP NG MAP STYLES
+          Positioned(
+            top: 110,
+            right: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 5,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: PopupMenuButton<MapType>(
+                icon: const Icon(Icons.layers, color: Colors.blue, size: 22),
+                onSelected: _changeMapType,
+                itemBuilder: (context) => [
+                  _buildMapTypeItem(MapType.normal, 'Default', Icons.map),
+                  _buildMapTypeItem(MapType.satellite, 'Satellite', Icons.satellite),
+                  _buildMapTypeItem(MapType.terrain, 'Terrain', Icons.terrain),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 160,
+            right: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 5,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.traffic,
+                  color: _showTraffic ? Colors.blue : Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showTraffic = !_showTraffic;
+                    _saveTrafficPreference(_showTraffic);
+                    if (_mapController != null) {
+                      _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+                    }
+                  });
+                },
+                tooltip: 'Toggle Traffic',
+              ),
+            ),
+          ),
+
+          if (_showTraffic) _buildTrafficLegend(),
+        // END NG POP UP
+
           Positioned(
             bottom: 15,
             left: 20,
@@ -382,6 +621,8 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.black, size: 20),
                     ),
                   ),
+
+                  // FOR LIVE LOCATION
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
