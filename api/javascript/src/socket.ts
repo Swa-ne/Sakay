@@ -3,10 +3,11 @@ import { Server } from "socket.io";
 import http from "http";
 import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
-import { addUserToRedisRealtimeController, addUserToRedisTrackingController, checkUserFromRedisRealtimeController, getUserFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
+import { addBusIDToRedisRealtimeControllerController, addUserToRedisRealtimeController, addUserToRedisTrackingController, checkBusIDFromRedisRealtimeController, checkUserFromRedisRealtimeController, getBusIDFromRedisRealtimeController, getUserFromRedisRealtimeController, removeBusIDFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
 import { getCurrentUserById } from './services/index.services';
 import { getFilesFromAnnouncement } from './services/announcement.services';
 import { getReport } from './services/report.services';
+import { getBusWithUserID } from './services/bus.services';
 
 declare module "socket.io" {
     interface Socket {
@@ -49,15 +50,33 @@ trackingSocket.on("connection", async (socket) => {
 
     // Vehicle tracker
     socket.on('track-my-vehicle', async (location) => {
-        socket.broadcast.emit("update-map", {
-            location, user: socket.user?.user_id
-        });
+        if (socket.user?.user_id) {
+            const bus_id = (await getBusWithUserID(socket.user.user_id)).message;
+            if (bus_id) {
+                if (await checkBusIDFromRedisRealtimeController(bus_id.toString()) === 0) {
+                    await addBusIDToRedisRealtimeControllerController(bus_id.toString(), socket.user.user_id);
+                    socket.broadcast.emit("update-map", {
+                        location, user: socket.user?.user_id
+                    });
+                } else {
+                    socket.emit("vehicle-inuse", {
+                        used_by: await getBusIDFromRedisRealtimeController(bus_id.toString())
+                    });
+                }
+            }
+        }
     });
 
     socket.on('pause-track-my-vehicle', async (location) => {
-        socket.broadcast.emit("track-my-vehicle-stop", {
-            user: socket.user?.user_id
-        });
+        if (socket.user?.user_id) {
+            const bus_id = (await getBusWithUserID(socket.user.user_id)).message;
+            if (bus_id) {
+                removeBusIDFromRedisRealtimeController(bus_id.toString())
+            }
+            socket.broadcast.emit("track-my-vehicle-stop", {
+                user: socket.user?.user_id
+            });
+        }
     });
 
     socket.on("disconnect", async () => {
