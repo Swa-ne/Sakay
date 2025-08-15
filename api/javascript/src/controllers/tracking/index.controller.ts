@@ -1,5 +1,5 @@
 import { UserType } from "../../middlewares/token.authentication"
-import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime, getAdminsFromRedisTracking, checkBusIDFromRedisRealtime, addBusIDToRedisRealtime, removeBusIDFromRedisRealtime } from "../../services/tracking/index.services";
+import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime, getAdminsFromRedisTracking, checkBusIDFromRedisRealtime, addBusIDToRedisRealtime, removeBusIDFromRedisRealtime, getBusIDFromRedisRealtime } from "../../services/tracking/index.services";
 
 export const addUserToRedisTrackingController = async (socket_id: string, user?: UserType) => {
     try {
@@ -93,6 +93,15 @@ export const checkBusIDFromRedisRealtimeController = async (bus_id?: string) => 
     try {
         if (!bus_id) return { error: "User not found" }
         const result = await checkBusIDFromRedisRealtime(bus_id);
+        return result
+    } catch (error) {
+        return null
+    }
+}
+export const getBusIDFromRedisRealtimeController = async (bus_id: string) => {
+    try {
+        if (!bus_id) return null
+        const result = await getBusIDFromRedisRealtime(bus_id)
         return result
     } catch (error) {
         return null

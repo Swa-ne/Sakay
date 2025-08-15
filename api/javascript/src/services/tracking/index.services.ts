@@ -84,3 +84,11 @@ export const checkBusIDFromRedisRealtime = async (bus_id: string) => {
         return null;
     }
 }
+export const getBusIDFromRedisRealtime = async (bus_id: string) => {
+    try {
+        const socket_id = await redis.get(bus_id);
+        return socket_id;
+    } catch (err) {
+        return null;
+    }
+}
