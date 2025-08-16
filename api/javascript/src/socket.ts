@@ -84,6 +84,12 @@ trackingSocket.on("connection", async (socket) => {
             user: socket.user?.user_id
         })
         removeUserFromRedisTrackingController(socket.id, socket.user)
+        if (socket.user?.user_id) {
+            const bus_id = (await getBusWithUserID(socket.user.user_id)).message;
+            if (bus_id) {
+                removeBusIDFromRedisRealtimeController(bus_id.toString())
+            }
+        }
     });
 });
 const realtimeSocket = io.of("/realtime");
