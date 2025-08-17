@@ -70,5 +70,15 @@ class TrackerBloc extends Bloc<TrackerEvent, TrackerState> {
         }
       },
     );
+    on<InUseDriverEvent>(
+      (event, emit) async {
+        try {
+          emit(TrackMeInitializing());
+          emit(InUsedDriverConnection());
+        } catch (e) {
+          emit(const ConnectionError("Connection Error"));
+        }
+      },
+    );
   }
 }
