@@ -102,28 +102,29 @@ class _HomePageState extends State<HomePage> {
   // LIST
   Widget _buildTrafficLegend() {
     return Positioned(
-      bottom: 80,
-      right: 16,
+      bottom: 200,
+      left: 16,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black26,
-              blurRadius: 5,
-              offset: Offset(0, 2),
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficLegendItem("No traffic", Colors.green),
-            _buildTrafficLegendItem("Moderate traffic", Colors.yellow),
-            _buildTrafficLegendItem("Heavy traffic", Colors.red),
-            _buildTrafficLegendItem("Standstill traffic", Colors.red[900]!),
+            _buildTrafficLegendItem("Free flow", Colors.green),
+            _buildTrafficLegendItem("Moderate", Colors.orange),
+            _buildTrafficLegendItem("Heavy", Colors.red),
+            _buildTrafficLegendItem("Standstill", Colors.red.shade900),
           ],
         ),
       ),
@@ -133,37 +134,81 @@ class _HomePageState extends State<HomePage> {
 // PANG LIST
   Widget _buildTrafficLegendItem(String text, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 16,
-            height: 16,
+            width: 12,
+            height: 3,
             decoration: BoxDecoration(
               color: color,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(width: 8),
           Text(
             text,
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // LIST PARA DUN SA MAPS
-  PopupMenuItem<MapType> _buildMapTypeItem(MapType type, String label, IconData icon) {
+  // Map Style Container
+  PopupMenuItem<MapType> _buildMapTypeItem(
+    MapType type,
+    String label,
+    String imagePath,
+  ) {
     return PopupMenuItem<MapType>(
       value: type,
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20, 
-              color: _currentMapType == type ? Colors.blue : Colors.grey),
-          const SizedBox(width: 12),
-          Text(label),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight:
+                  _currentMapType == type ? FontWeight.bold : FontWeight.normal,
+              color: _currentMapType == type ? Colors.blue : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _currentMapType == type
+                    ? Colors.blue
+                    : Colors.grey.shade300,
+                width: _currentMapType == type ? 2 : 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  Color fallbackColor = type == MapType.satellite
+                      ? Colors.green.shade200
+                      : type == MapType.terrain
+                          ? Colors.brown.shade200
+                          : Colors.grey.shade200;
+                  return Container(color: fallbackColor);
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -178,7 +223,7 @@ class _HomePageState extends State<HomePage> {
             title: "Inbox",
             icon: Icons.inbox,
             message:
-                "The inbox is where you can find your chats, messages, and othet communication means within the application",
+                "The inbox is where you can find your chats, messages, and other communication means within the application",
             onDismiss: _dismissInboxHint,
           );
         }
@@ -217,7 +262,7 @@ class _HomePageState extends State<HomePage> {
           title: "Profile",
           icon: Icons.person,
           message:
-              "The profile tab will allow you to customize your preferences, see your priviliges within the application, and provide you with other options for a better, tailored performance",
+              "The profile tab will allow you to customize your preferences, see your privileges within the application, and provide you with other options for a better, tailored performance",
           onDismiss: _dismissProfileHint,
         );
       }
@@ -453,7 +498,7 @@ class _HomePageState extends State<HomePage> {
                             tracker.handleSearchAndRoute(query);
                             // ScaffoldMessenger.of(context).showSnackBar(
                             //   SnackBar(
-                            //       content: Text('Searching for "$query"...')),
+                            //       content: Text('Searching for "$query"...'))),
                             // );
                           }
                         },
@@ -528,60 +573,93 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // POPUP NG MAP STYLES
+          // Map Style Icon
           Positioned(
-            top: 80,
-            right: 16,
+            bottom: 90,
+            left: 16,
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: PopupMenuButton<MapType>(
+                  icon: const Icon(Icons.layers, color: Colors.blue, size: 22),
+                  onSelected: _changeMapType,
+                  color: Colors.white, // anemal
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // container sa likod tangenaaaa
                   ),
-                ],
-              ),
-              child: PopupMenuButton<MapType>(
-                icon: const Icon(Icons.layers, color: Colors.blue, size: 22),
-                onSelected: _changeMapType,
-                itemBuilder: (context) => [
-                  _buildMapTypeItem(MapType.normal, 'Default', Icons.map),
-                  _buildMapTypeItem(MapType.satellite, 'Satellite', Icons.satellite),
-                  _buildMapTypeItem(MapType.terrain, 'Terrain', Icons.terrain),
-                ],
-              ),
-            ),
+                  offset: const Offset(55, -55),
+                  constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<MapType>(
+                      enabled: false,
+                      child: Material(
+                        color:
+                            Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.normal),
+                              child: _buildMapTypeItem(MapType.normal,
+                                      'Default', 'assets/default_map.png')
+                                  .child,
+                            ),
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.satellite),
+                              child: _buildMapTypeItem(MapType.satellite,
+                                      'Satellite', 'assets/satellite_map.png')
+                                  .child,
+                            ),
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.terrain),
+                              child: _buildMapTypeItem(MapType.terrain,
+                                      'Terrain', 'assets/terrain_map.png')
+                                  .child,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
           ),
 
           Positioned(
-            top: 135,
-            right: 16,
+            bottom: 145,
+            left: 16,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: IconButton(
                 icon: Icon(
                   Icons.traffic,
-                  color: _showTraffic ? Colors.blue : Colors.grey,
+                  color: _showTraffic ? Colors.blue : Colors.grey.shade600,
                 ),
                 onPressed: () {
                   setState(() {
                     _showTraffic = !_showTraffic;
                     _saveTrafficPreference(_showTraffic);
                     if (_mapController != null) {
-                      _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+                      _mapController!
+                          .setMapStyle(_showTraffic ? '' : _getMapStyle());
                     }
                   });
                 },
@@ -591,60 +669,69 @@ class _HomePageState extends State<HomePage> {
           ),
 
           if (_showTraffic) _buildTrafficLegend(),
-        // END NG POP UP
 
           Positioned(
-            bottom: 15,
-            left: 20,
-            right: 20,
+            bottom: 10,
+            left: 16,
+            right: 16,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Icon(Icons.location_on,
-                          color: Colors.black, size: 20),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: Colors.blue,
+                      size: 20,
                     ),
                   ),
-
-                  // FOR LIVE LOCATION
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Phinma University of Pangasinan',
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Phinma University of Pangasinan',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '28WV+R2R, Arellano St, Downtown District',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                      ),
-                    ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '28WV+R2R, Arellano St, Downtown District',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 12),
                   InkWell(
-                    // replace na lungs
                     onTap: () async {
                       _trackerBloc.add(isTrackerOn
                           ? StopTrackMeEvent()
@@ -653,18 +740,24 @@ class _HomePageState extends State<HomePage> {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      width: 35,
-                      height: 35,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: isTrackerOn
-                            ? const Color(0xFFFF0000)
-                            : const Color(0xFF00A1F8),
-                        borderRadius: BorderRadius.circular(3),
+                        color: isTrackerOn ? Colors.red : Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isTrackerOn ? Colors.red : Colors.blue)
+                                .withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.location_on,
+                        Icons.my_location,
                         color: Colors.white,
                         size: 20,
                       ),
