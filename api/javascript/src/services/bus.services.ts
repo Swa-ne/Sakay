@@ -104,7 +104,7 @@ export const getBusWithUserID = async (user_id: string) => {
     session.startTransaction();
 
     try {
-        const bus = await UserBusAssigning.findById(user_id).session(session);
+        const bus = await UserBusAssigning.findOne({ user_id }).session(session);
 
         await session.commitTransaction();
         session.endSession();
