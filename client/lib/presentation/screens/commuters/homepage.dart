@@ -399,7 +399,7 @@ class _HomePageState extends State<HomePage> {
           ),
 
           Positioned(
-            top: 50,
+            top: 25,
             left: 16,
             right: 70,
             child: Column(
@@ -496,7 +496,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Positioned(
-            top: 50,
+            top: 25,
             right: 16,
             child: Container(
               decoration: BoxDecoration(
@@ -530,7 +530,7 @@ class _HomePageState extends State<HomePage> {
 
           // POPUP NG MAP STYLES
           Positioned(
-            top: 110,
+            top: 80,
             right: 16,
             child: Container(
               decoration: BoxDecoration(
@@ -557,7 +557,7 @@ class _HomePageState extends State<HomePage> {
           ),
 
           Positioned(
-            top: 160,
+            top: 135,
             right: 16,
             child: Container(
               decoration: BoxDecoration(
