@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
+import 'package:sakay_app/bloc/tracker/tracker_state.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 
 class DriverHomePage extends StatefulWidget {
@@ -23,129 +24,160 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(16.0),
-              border: Border.all(color: Colors.grey),
-            ),
-            child: const ClipRRect(
-              child: Center(
-                child: MyMapWidget(),
-              ),
-            ),
-          ),
-          // Positioned(
-          //   top: 50,
-          //   left: 20,
-          //   right: 20,
-          //   child: Container(
-          //     height: 40,
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       borderRadius: BorderRadius.circular(5),
-          //       border: Border.all(color: Colors.grey.shade300),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.1),
-          //           blurRadius: 4,
-          //           offset: const Offset(0, 2),
-          //         ),
-          //       ],
-          //     ),
-          //     child: const TextField(
-          //       decoration: InputDecoration(
-          //         hintText: 'Search...',
-          //         hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-          //         border: InputBorder.none,
-          //         contentPadding: EdgeInsets.only(top: 2),
-          //         prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          Positioned(
-            bottom: 15,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+    return BlocListener<TrackerBloc, TrackerState>(
+      listener: (context, state) async {
+        if (state is InUsedDriverConnection) {
+          // Ensure tracking is fully stopped and timer is cleared
+          _trackerBloc.add(StopTrackMyVehicleEvent());
+          if (isTrackerOn) {
+            setState(() {
+              isTrackerOn = false;
+            });
+          }
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) {
+              return AlertDialog(
+                title: const Text('Vehicle already in use'),
+                content: const Text(
+                    'Your assigned vehicle is currently being used by another driver. Please contact the administrator for assistance.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(16.0),
+                border: Border.all(color: Colors.grey),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Icon(Icons.location_on,
-                          color: Colors.black, size: 20),
-                    ),
-                  ),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Phinma University of Pangasinan',
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '28WV+R2R, Arellano St, Downtown District',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () async {
-                      _trackerBloc.add(isTrackerOn
-                          ? StopTrackMyVehicleEvent()
-                          : StartTrackMyVehicleEvent());
-                      setState(() {
-                        isTrackerOn = !isTrackerOn;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(50),
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        color: isTrackerOn
-                            ? const Color(0xFFFF0000)
-                            : const Color(0xFF00A1F8),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: const Icon(
-                        Icons.drive_eta,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
+              child: const ClipRRect(
+                child: Center(
+                  child: MyMapWidget(),
+                ),
               ),
             ),
-          ),
-        ],
+            // Positioned(
+            //   top: 50,
+            //   left: 20,
+            //   right: 20,
+            //   child: Container(
+            //     height: 40,
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(5),
+            //       border: Border.all(color: Colors.grey.shade300),
+            //       boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black.withOpacity(0.1),
+            //           blurRadius: 4,
+            //           offset: const Offset(0, 2),
+            //         ),
+            //       ],
+            //     ),
+            //     child: const TextField(
+            //       decoration: InputDecoration(
+            //         hintText: 'Search...',
+            //         hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+            //         border: InputBorder.none,
+            //         contentPadding: EdgeInsets.only(top: 2),
+            //         prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            Positioned(
+              bottom: 15,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(Icons.location_on,
+                            color: Colors.black, size: 20),
+                      ),
+                    ),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Phinma University of Pangasinan',
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          '28WV+R2R, Arellano St, Downtown District',
+                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () async {
+                        _trackerBloc.add(isTrackerOn
+                            ? StopTrackMyVehicleEvent()
+                            : StartTrackMyVehicleEvent());
+                        setState(() {
+                          isTrackerOn = !isTrackerOn;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(50),
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: isTrackerOn
+                              ? const Color(0xFFFF0000)
+                              : const Color(0xFF00A1F8),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: const Icon(
+                          Icons.drive_eta,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
