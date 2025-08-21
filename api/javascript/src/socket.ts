@@ -53,14 +53,15 @@ trackingSocket.on("connection", async (socket) => {
         if (socket.user?.user_id) {
             const bus_id = (await getBusWithUserID(socket.user.user_id)).message;
             if (bus_id) {
-                if (await checkBusIDFromRedisRealtimeController(bus_id.toString()) === 0) {
+                const occupiedBy = await getBusIDFromRedisRealtimeController(bus_id.toString());
+                if (!occupiedBy || occupiedBy === socket.user.user_id) {
                     await addBusIDToRedisRealtimeControllerController(bus_id.toString(), socket.user.user_id);
                     socket.broadcast.emit("update-map", {
                         location, user: socket.user?.user_id
                     });
                 } else {
                     socket.emit("vehicle-inuse", {
-                        used_by: await getBusIDFromRedisRealtimeController(bus_id.toString())
+                        used_by: occupiedBy
                     });
                 }
             }
