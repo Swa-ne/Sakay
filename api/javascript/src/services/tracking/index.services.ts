@@ -79,7 +79,11 @@ export const removeBusIDFromRedisRealtime = async (bus_id: string) => {
 export const checkBusIDFromRedisRealtime = async (bus_id: string) => {
     try {
         const result = await redis.exists(bus_id);
-        return result;
+        let user_id;
+        if (result === 1) {
+            user_id = await redis.get(bus_id)
+        }
+        return user_id;
     } catch (err) {
         return null;
     }
