@@ -8,6 +8,7 @@ import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -444,7 +445,7 @@ class _HomePageState extends State<HomePage> {
           ),
 
           Positioned(
-            top: 25,
+            top: 20,
             left: 16,
             right: 70,
             child: Column(
@@ -540,8 +541,9 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+
           Positioned(
-            top: 25,
+            top: 20,
             right: 16,
             child: Container(
               decoration: BoxDecoration(
@@ -594,7 +596,8 @@ class _HomePageState extends State<HomePage> {
                   onSelected: _changeMapType,
                   color: Colors.white, // anemal
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8), // container sa likod tangenaaaa
+                    borderRadius: BorderRadius.circular(
+                        8), // container sa likod tangenaaaa
                   ),
                   offset: const Offset(55, -55),
                   constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
@@ -602,8 +605,7 @@ class _HomePageState extends State<HomePage> {
                     PopupMenuItem<MapType>(
                       enabled: false,
                       child: Material(
-                        color:
-                            Colors.white,
+                        color: Colors.white,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -669,6 +671,43 @@ class _HomePageState extends State<HomePage> {
           ),
 
           if (_showTraffic) _buildTrafficLegend(),
+
+          // SOS
+          Positioned(
+            bottom: 90,
+            right: 16,
+            child: SizedBox(
+              height: 50,
+              width: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const SosOverlayDialog(),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // 🔴 Make the button red
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'SOS',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
 
           Positioned(
             bottom: 10,
