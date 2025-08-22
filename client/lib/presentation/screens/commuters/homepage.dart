@@ -688,7 +688,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // 🔴 Make the button red
+                  backgroundColor: Colors.red,
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
