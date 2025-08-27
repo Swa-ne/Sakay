@@ -103,8 +103,8 @@ class _HomePageState extends State<HomePage> {
   // LIST
   Widget _buildTrafficLegend() {
     return Positioned(
-      bottom: 200,
-      left: 16,
+      bottom: 110,
+      left: 70,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
             _buildTrafficLegendItem("Free flow", Colors.green),
             _buildTrafficLegendItem("Moderate", Colors.orange),
             _buildTrafficLegendItem("Heavy", Colors.red),
-            _buildTrafficLegendItem("Standstill", Colors.red.shade900),
+            _buildTrafficLegendItem("Full Stop", Colors.red.shade900),
           ],
         ),
       ),
@@ -158,6 +158,164 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  // Bus List Container
+  PopupMenuItem<String> _buildBusMenuItem(
+    BuildContext context,
+    String busNumber,
+    String route,
+    String imagePath, {
+    String? distance,
+    String? estimatedTime,
+  }) {
+    return PopupMenuItem<String>(
+      value: busNumber,
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.of(context).pop(busNumber),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                )
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildBusImage(imagePath),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildBusInfo(
+                        busNumber,
+                        route,
+                        distance,
+                        estimatedTime,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusImage(String imagePath) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFF00A2FF),
+      ),
+      child: ClipRRect(
+        child: Image.asset(
+          'assets/bus.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusInfo(
+    String busNumber,
+    String route,
+    String? distance,
+    String? time,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                busNumber,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  color: Colors.black,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                route,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey.shade600,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: Colors.green.shade600,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    distance ?? "2 km",
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.watch_later_outlined,
+                      color: Colors.blue, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    time ?? "5 mins",
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -599,7 +757,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(
                         8), // container sa likod tangenaaaa
                   ),
-                  offset: const Offset(55, -55),
+                  offset: const Offset(55, -52),
                   constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
                   itemBuilder: (context) => [
                     PopupMenuItem<MapType>(
@@ -635,6 +793,66 @@ class _HomePageState extends State<HomePage> {
                 )),
           ),
 
+          // Bus List Button
+          Positioned(
+            bottom: 200,
+            left: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: PopupMenuButton<String>(
+                icon: const Icon(Icons.bus_alert_outlined,
+                    color: Color(0xFF00A2FF), size: 24),
+                onSelected: (busId) {
+                  print("Selected Bus: $busId");
+                },
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                offset: const Offset(55, -91),
+                constraints: const BoxConstraints(maxWidth: 295),
+                itemBuilder: (context) => [
+                  PopupMenuItem<String>(
+                    enabled: false,
+                    child: Material(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildBusMenuItem(
+                              context,
+                              "001 - ABC - 1234",
+                              "Boundary Marker Lingayen",
+                              "assets/bus_image.png",
+                              distance: "2 km",
+                              estimatedTime: "5 mins"),
+                          const SizedBox(height: 5),
+                          _buildBusMenuItem(context, "002 - XYZ - 5678",
+                              "Dagupan Terminal", "assets/bus_image.png",
+                              distance: "3.5 km", estimatedTime: "8 mins"),
+                          const SizedBox(height: 5),
+                          _buildBusMenuItem(context, "003 - LMN - 9101",
+                              "San Carlos City", "assets/bus_image.png",
+                              distance: "5 km", estimatedTime: "12 mins"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           Positioned(
             bottom: 145,
             left: 16,
@@ -651,9 +869,9 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.traffic,
-                  color: _showTraffic ? Colors.blue : Colors.grey.shade600,
+                  color: Color(0xFF00A2FF),
                 ),
                 onPressed: () {
                   setState(() {
@@ -672,42 +890,42 @@ class _HomePageState extends State<HomePage> {
 
           if (_showTraffic) _buildTrafficLegend(),
 
-          // SOS
-          Positioned(
-            bottom: 90,
-            right: 16,
-            child: SizedBox(
-              height: 50,
-              width: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => const SosOverlayDialog(),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // 🔴 Make the button red
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    'SOS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Temporary Remove - SOS
+          // Positioned(
+          //   bottom: 90,
+          //   right: 16,
+          //   child: SizedBox(
+          //     height: 50,
+          //     width: 50,
+          //     child: ElevatedButton(
+          //       onPressed: () {
+          //         showDialog(
+          //           context: context,
+          //           barrierDismissible: false,
+          //           builder: (context) => const SosOverlayDialog(),
+          //         );
+          //       },
+          //       style: ElevatedButton.styleFrom(
+          //         backgroundColor: Colors.red, // 🔴 Make the button red
+          //         padding: EdgeInsets.zero,
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(12),
+          //         ),
+          //       ),
+          //       child: const FittedBox(
+          //         fit: BoxFit.scaleDown,
+          //         child: Text(
+          //           'SOS',
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontWeight: FontWeight.bold,
+          //             fontSize: 14,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           Positioned(
             bottom: 10,
