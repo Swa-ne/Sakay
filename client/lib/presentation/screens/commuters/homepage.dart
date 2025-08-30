@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
-import 'package:sakay_app/common/widgets/map.dart';
+// import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,11 +33,344 @@ class _HomePageState extends State<HomePage> {
   bool _showProfileHint = false;
   bool isTrackerOn = false;
 
+// PARA DI MA ZOOM OUT MASYADO
+  final CameraPosition _defaultCameraPosition = const CameraPosition(
+    target: LatLng(16.0439, 120.3331),
+    zoom: 14,
+    bearing: 0,
+    tilt: 0,
+  );
+  final LatLngBounds _pangasinanBounds = LatLngBounds(
+    northeast: const LatLng(16.5, 120.8),
+    southwest: const LatLng(15.5, 119.8),
+  );
+
+  MapType _currentMapType = MapType.normal;
+  late SharedPreferences _prefs;
+  bool _mapInitialized = false;
+  GoogleMapController? _mapController;
+  bool _showTraffic = false;
+
   @override
   void initState() {
     super.initState();
+    _initPreferences(); // FOR MAP STYLE PREFERENCE
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
     _checkFirstTime();
+  }
+
+  // PARA SA SHARED PREFERENCES NG MAP STYLE AND LIVE TRAFFIC
+  Future<void> _initPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentMapType = MapType.values[_prefs.getInt('mapType') ?? 0];
+      _showTraffic = _prefs.getBool('showTraffic') ?? false;
+    });
+  }
+
+  Future<void> _saveTrafficPreference(bool showTraffic) async {
+    await _prefs.setBool('showTraffic', showTraffic);
+  }
+
+  void _changeMapType(MapType type) {
+    setState(() {
+      _currentMapType = type;
+    });
+    _prefs.setInt('mapType', type.index);
+  }
+
+  String _getMapStyle() {
+    return '''
+    [
+      {
+        "featureType": "poi",
+        "elementType": "labels",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      }
+    ]
+    ''';
+  }
+
+  // PARA SA LIVE TRAFFIC
+  // LIST
+  Widget _buildTrafficLegend() {
+    return Positioned(
+      bottom: 110,
+      left: 70,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildTrafficLegendItem("Free flow", Colors.green),
+            _buildTrafficLegendItem("Moderate", Colors.orange),
+            _buildTrafficLegendItem("Heavy", Colors.red),
+            _buildTrafficLegendItem("Full Stop", Colors.red.shade900),
+          ],
+        ),
+      ),
+    );
+  }
+
+// PANG LIST
+  Widget _buildTrafficLegendItem(String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 3,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Bus List Container
+  PopupMenuItem<String> _buildBusMenuItem(
+    BuildContext context,
+    String busNumber,
+    String route,
+    String imagePath, {
+    String? distance,
+    String? estimatedTime,
+  }) {
+    return PopupMenuItem<String>(
+      value: busNumber,
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.of(context).pop(busNumber),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                )
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildBusImage(imagePath),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildBusInfo(
+                        busNumber,
+                        route,
+                        distance,
+                        estimatedTime,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusImage(String imagePath) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFF00A2FF),
+      ),
+      child: ClipRRect(
+        child: Image.asset(
+          'assets/bus.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusInfo(
+    String busNumber,
+    String route,
+    String? distance,
+    String? time,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                busNumber,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  color: Colors.black,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                route,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey.shade600,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: Colors.green.shade600,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    distance ?? "2 km",
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.watch_later_outlined,
+                      color: Colors.blue, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    time ?? "5 mins",
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Map Style Container
+  PopupMenuItem<MapType> _buildMapTypeItem(
+    MapType type,
+    String label,
+    String imagePath,
+  ) {
+    return PopupMenuItem<MapType>(
+      value: type,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight:
+                  _currentMapType == type ? FontWeight.bold : FontWeight.normal,
+              color: _currentMapType == type ? Colors.blue : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _currentMapType == type
+                    ? Colors.blue
+                    : Colors.grey.shade300,
+                width: _currentMapType == type ? 2 : 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  Color fallbackColor = type == MapType.satellite
+                      ? Colors.green.shade200
+                      : type == MapType.terrain
+                          ? Colors.brown.shade200
+                          : Colors.grey.shade200;
+                  return Container(color: fallbackColor);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _checkFirstTime() async {
@@ -46,7 +382,7 @@ class _HomePageState extends State<HomePage> {
             title: "Inbox",
             icon: Icons.inbox,
             message:
-                "The inbox is where you can find your chats, messages, and othet communication means within the application",
+                "The inbox is where you can find your chats, messages, and other communication means within the application",
             onDismiss: _dismissInboxHint,
           );
         }
@@ -85,7 +421,7 @@ class _HomePageState extends State<HomePage> {
           title: "Profile",
           icon: Icons.person,
           message:
-              "The profile tab will allow you to customize your preferences, see your priviliges within the application, and provide you with other options for a better, tailored performance",
+              "The profile tab will allow you to customize your preferences, see your privileges within the application, and provide you with other options for a better, tailored performance",
           onDismiss: _dismissProfileHint,
         );
       }
@@ -217,16 +553,57 @@ class _HomePageState extends State<HomePage> {
     overlay.insert(_hintOverlay!);
   }
 
+  // PARA DI LANG LUMAYO MASYADO SA ZOOM
+  Future<void> _restrictToPangasinan() async {
+    if (_mapController != null) {
+      await _mapController!.animateCamera(
+        CameraUpdate.newLatLngBounds(_pangasinanBounds, 50),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // FOR MAP AND MAP STYLES
+          Positioned.fill(
+            child: GoogleMap(
+              initialCameraPosition: _defaultCameraPosition,
+              mapType: _currentMapType,
+              myLocationEnabled: isTrackerOn,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              compassEnabled: false,
+              buildingsEnabled: true,
+              tiltGesturesEnabled: true,
+              rotateGesturesEnabled: true,
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              minMaxZoomPreference: const MinMaxZoomPreference(10, 16),
+              trafficEnabled: _showTraffic,
+              onMapCreated: (controller) {
+                _mapController = controller;
+                if (!_mapInitialized) {
+                  controller.setMapStyle(_getMapStyle());
+                  _mapInitialized = true;
+                  _restrictToPangasinan();
+                }
+              },
+              onCameraMove: (position) {
+                final zoom = position.zoom;
+                if (zoom < 10 || zoom > 16) {
+                  _mapController?.animateCamera(
+                    CameraUpdate.zoomTo(zoom.clamp(10, 16).toDouble()),
+                  );
+                }
+              },
+            ),
           ),
+
           Positioned(
-            top: 50,
+            top: 20,
             left: 16,
             right: 70,
             child: Column(
@@ -280,7 +657,7 @@ class _HomePageState extends State<HomePage> {
                             tracker.handleSearchAndRoute(query);
                             // ScaffoldMessenger.of(context).showSnackBar(
                             //   SnackBar(
-                            //       content: Text('Searching for "$query"...')),
+                            //       content: Text('Searching for "$query"...'))),
                             // );
                           }
                         },
@@ -322,8 +699,9 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+
           Positioned(
-            top: 50,
+            top: 20,
             right: 16,
             child: Container(
               decoration: BoxDecoration(
@@ -354,56 +732,263 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
+          // Map Style Icon
           Positioned(
-            bottom: 15,
-            left: 20,
-            right: 20,
+            bottom: 90,
+            left: 16,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: PopupMenuButton<MapType>(
+                  icon: const Icon(Icons.layers, color: Colors.blue, size: 22),
+                  onSelected: _changeMapType,
+                  color: Colors.white, // anemal
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8), // container sa likod tangenaaaa
+                  ),
+                  offset: const Offset(55, -52),
+                  constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<MapType>(
+                      enabled: false,
+                      child: Material(
+                        color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.normal),
+                              child: _buildMapTypeItem(MapType.normal,
+                                      'Default', 'assets/default_map.png')
+                                  .child,
+                            ),
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.satellite),
+                              child: _buildMapTypeItem(MapType.satellite,
+                                      'Satellite', 'assets/satellite_map.png')
+                                  .child,
+                            ),
+                            GestureDetector(
+                              onTap: () => _changeMapType(MapType.terrain),
+                              child: _buildMapTypeItem(MapType.terrain,
+                                      'Terrain', 'assets/terrain_map.png')
+                                  .child,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ),
+
+          // Bus List Button
+          Positioned(
+            bottom: 200,
+            left: 16,
+            child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: PopupMenuButton<String>(
+                icon: const Icon(Icons.bus_alert_outlined,
+                    color: Color(0xFF00A2FF), size: 24),
+                onSelected: (busId) {
+                  print("Selected Bus: $busId");
+                },
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                offset: const Offset(55, -91),
+                constraints: const BoxConstraints(maxWidth: 295),
+                itemBuilder: (context) => [
+                  PopupMenuItem<String>(
+                    enabled: false,
+                    child: Material(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildBusMenuItem(
+                              context,
+                              "001 - ABC - 1234",
+                              "Boundary Marker Lingayen",
+                              "assets/bus_image.png",
+                              distance: "2 km",
+                              estimatedTime: "5 mins"),
+                          const SizedBox(height: 5),
+                          _buildBusMenuItem(context, "002 - XYZ - 5678",
+                              "Dagupan Terminal", "assets/bus_image.png",
+                              distance: "3.5 km", estimatedTime: "8 mins"),
+                          const SizedBox(height: 5),
+                          _buildBusMenuItem(context, "003 - LMN - 9101",
+                              "San Carlos City", "assets/bus_image.png",
+                              distance: "5 km", estimatedTime: "12 mins"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 145,
+            left: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.traffic,
+                  color: Color(0xFF00A2FF),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showTraffic = !_showTraffic;
+                    _saveTrafficPreference(_showTraffic);
+                    if (_mapController != null) {
+                      _mapController!
+                          .setMapStyle(_showTraffic ? '' : _getMapStyle());
+                    }
+                  });
+                },
+                tooltip: 'Toggle Traffic',
+              ),
+            ),
+          ),
+
+          if (_showTraffic) _buildTrafficLegend(),
+
+          // Temporary Remove - SOS
+          // Positioned(
+          //   bottom: 90,
+          //   right: 16,
+          //   child: SizedBox(
+          //     height: 50,
+          //     width: 50,
+          //     child: ElevatedButton(
+          //       onPressed: () {
+          //         showDialog(
+          //           context: context,
+          //           barrierDismissible: false,
+          //           builder: (context) => const SosOverlayDialog(),
+          //         );
+          //       },
+          //       style: ElevatedButton.styleFrom(
+          //         backgroundColor: Colors.red, // 🔴 Make the button red
+          //         padding: EdgeInsets.zero,
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(12),
+          //         ),
+          //       ),
+          //       child: const FittedBox(
+          //         fit: BoxFit.scaleDown,
+          //         child: Text(
+          //           'SOS',
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontWeight: FontWeight.bold,
+          //             fontSize: 14,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+
+          Positioned(
+            bottom: 10,
+            left: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Icon(Icons.location_on,
-                          color: Colors.black, size: 20),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: Colors.blue,
+                      size: 20,
                     ),
                   ),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Phinma University of Pangasinan',
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Phinma University of Pangasinan',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '28WV+R2R, Arellano St, Downtown District',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                      ),
-                    ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '28WV+R2R, Arellano St, Downtown District',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 12),
                   InkWell(
-                    // replace na lungs
                     onTap: () async {
                       _trackerBloc.add(isTrackerOn
                           ? StopTrackMeEvent()
@@ -412,18 +997,24 @@ class _HomePageState extends State<HomePage> {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      width: 35,
-                      height: 35,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: isTrackerOn
-                            ? const Color(0xFFFF0000)
-                            : const Color(0xFF00A1F8),
-                        borderRadius: BorderRadius.circular(3),
+                        color: isTrackerOn ? Colors.red : Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isTrackerOn ? Colors.red : Colors.blue)
+                                .withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.location_on,
+                        Icons.my_location,
                         color: Colors.white,
                         size: 20,
                       ),
