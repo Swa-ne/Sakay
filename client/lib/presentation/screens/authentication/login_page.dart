@@ -111,12 +111,10 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          'Please, sign in to continue',
-                          style: GoogleFonts.inter(
-                            // might cause an error
-                            fontSize: 13,
-                            fontWeight: FontWeight.normal,
+                        const Text(
+                          "Please, sign in to continue",
+                          style: TextStyle(
+                            fontSize: 15.0,
                             color: Colors.white,
                           ),
                         ),
@@ -180,7 +178,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           ),
                           const SizedBox(height: 15.0),
 
-// Password Field
+                          // Password Field
                           TextField(
                             controller: _passwordController,
                             obscureText: !_isPasswordVisible,

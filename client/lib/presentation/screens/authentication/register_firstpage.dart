@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sakay_app/common/mixins/input_validation.dart';
 import 'package:sakay_app/data/models/sign_up.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignUpPage1 extends StatefulWidget {
   const SignUpPage1({super.key});
@@ -95,11 +96,12 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20.0),
-              const Text(
-                "Sign up",
-                style: TextStyle(
-                  fontSize: 30.0,
+              Text(
+                'Sign in',
+                style: GoogleFonts.inter(
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 0.0),
@@ -128,10 +130,12 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   labelStyle: const TextStyle(fontSize: 13.0),
                   errorText: emailError,
                   prefixIcon: const Icon(Icons.email, color: Color(0xFF00A2FF)),
-                  border: const OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   focusedBorder: const OutlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                        BorderSide(color: Color(0xFF00A2FF), width: 1.0),
                   ),
                 ),
               ),
@@ -167,10 +171,12 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                       });
                     },
                   ),
-                  border: const OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   focusedBorder: const OutlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                        BorderSide(color: Color(0xFF00A2FF), width: 1.0),
                   ),
                 ),
               ),
@@ -252,10 +258,13 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                       });
                     },
                   ),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                     borderSide:
-                        BorderSide(color: Color(0xFF00A2FF), width: 2.0),
+                        const BorderSide(color: Color(0xFF00A2FF), width: 1.0),
                   ),
                 ),
               ),
@@ -284,7 +293,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                 children: [
                   const Text(
                     "Already have an account?  ",
-                    style: TextStyle(fontSize: 14.0),
+                    style: TextStyle(fontSize: 13.0),
                   ),
                   GestureDetector(
                     onTap: () {
