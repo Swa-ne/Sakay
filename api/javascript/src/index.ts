@@ -70,7 +70,7 @@ app.use("/bus", busRoutes)
 app.use("/user", usersRoutes)
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello from your Node.js Express server!');
+    res.send('Hello from your Node.js Express server');
 });
 
 server.listen(port, () => {
