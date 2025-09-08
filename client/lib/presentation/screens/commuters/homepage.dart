@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-// PARA DI MA ZOOM OUT MASYADO
+  // PARA DI MA ZOOM OUT MASYADO
   final CameraPosition _defaultCameraPosition = const CameraPosition(
     target: LatLng(16.0439, 120.3331),
     zoom: 14,
@@ -119,54 +119,57 @@ class _HomePageState extends State<HomePage> {
   // PARA SA LIVE TRAFFIC
   // LIST
   // "Free flow"
-  Widget _buildTrafficLegend() {
+  Widget _buildTrafficLegend(double s, double sw) {
+    // s = scale factor for sizing, sw = screen width
+    final left = sw * 0.44; // keeps relative position across sizes
+    final top = s * 123;
     return Positioned(
-      top: 123,
-      left: 165,
+      top: top,
+      left: left.clamp(12.0, sw - 12.0 - (220 * s / 16)), // keep inside screen
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: s * 12, vertical: s * 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(s * 12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+              blurRadius: s * 6,
+              offset: Offset(0, s * 3),
             ),
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficChip("Free", Colors.green),
-            const SizedBox(width: 8),
-            _buildTrafficChip("light", Colors.orange),
-            const SizedBox(width: 8),
-            _buildTrafficChip("Heavy", Colors.red),
+            _buildTrafficChip("Free", Colors.green, s),
+            SizedBox(width: s * 8),
+            _buildTrafficChip("Light", Colors.orange, s),
+            SizedBox(width: s * 8),
+            _buildTrafficChip("Heavy", Colors.red, s),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrafficChip(String text, Color color) {
+  Widget _buildTrafficChip(String text, Color color, double s) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 10,
-          height: 10,
+          width: s * 10,
+          height: s * 10,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: s * 4),
         Text(
           text,
-          style: const TextStyle(
-            fontSize: 11,
+          style: TextStyle(
+            fontSize: s * 11,
             fontWeight: FontWeight.w500,
             color: Colors.black87,
           ),
@@ -175,7 +178,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-// Bus List Container
+  // Bus List Container
   Widget _buildBusMenuItem(
     BuildContext context,
     String busNumber,
@@ -185,18 +188,21 @@ class _HomePageState extends State<HomePage> {
     String? estimatedTime,
     VoidCallback? onClose,
   }) {
+    final sw = MediaQuery.of(context).size.width;
+    final s = sw / 375;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12 * s),
         onTap: () {
           if (onClose != null) onClose(); // close manually
         },
         child: Container(
-          padding: const EdgeInsets.all(12),
+          width: double.infinity,
+          padding: EdgeInsets.all(12 * s),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12 * s),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
@@ -208,8 +214,8 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildBusImage(imagePath),
-              const SizedBox(width: 16),
+              _buildBusImage(imagePath, s),
+              SizedBox(width: 16 * s),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,6 +225,7 @@ class _HomePageState extends State<HomePage> {
                       route,
                       distance,
                       estimatedTime,
+                      s,
                     ),
                   ],
                 ),
@@ -230,15 +237,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBusImage(String imagePath) {
+  Widget _buildBusImage(String imagePath, double s) {
     return Container(
-      width: 50,
-      height: 50,
+      width: 50 * s,
+      height: 50 * s,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8 * s),
         color: const Color(0xFF00A2FF),
       ),
       child: ClipRRect(
+        borderRadius: BorderRadius.circular(8 * s),
         child: Image.asset(
           'assets/bus.png',
           fit: BoxFit.cover,
@@ -252,6 +260,7 @@ class _HomePageState extends State<HomePage> {
     String route,
     String? distance,
     String? time,
+    double s,
   ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,19 +272,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 busNumber,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 11,
+                  fontSize: 11 * s,
                   color: Colors.black,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4 * s),
               Text(
                 route,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 10 * s,
                   color: Colors.grey.shade600,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -295,30 +304,30 @@ class _HomePageState extends State<HomePage> {
                   Icon(
                     Icons.location_on,
                     color: Colors.green.shade600,
-                    size: 16,
+                    size: 16 * s,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4 * s),
                   Text(
                     distance ?? "2 km",
-                    style: const TextStyle(
-                      fontSize: 9,
+                    style: TextStyle(
+                      fontSize: 9 * s,
                       color: Colors.black87,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4 * s),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.watch_later_outlined,
-                      color: Colors.blue, size: 16),
-                  const SizedBox(width: 4),
+                  Icon(Icons.watch_later_outlined,
+                      color: Colors.blue, size: 16 * s),
+                  SizedBox(width: 4 * s),
                   Text(
                     time ?? "5 mins",
-                    style: const TextStyle(
-                      fontSize: 10,
+                    style: TextStyle(
+                      fontSize: 10 * s,
                       color: Colors.black87,
                       fontWeight: FontWeight.w500,
                     ),
@@ -334,7 +343,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMapTypeCard(MapType type, String label, String assetPath) {
     final bool isSelected = _currentMapType == type;
-
     return InkWell(
       onTap: () {
         _changeMapType(type);
@@ -396,19 +404,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final s = screenWidth / 375;
     return SizedBox(
       width: screenWidth,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              blurRadius: 10 * s,
+              offset: Offset(0, -2 * s),
             ),
           ],
         ),
@@ -416,11 +424,11 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 40,
+              height: 40 * s,
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 40,
+                  SizedBox(
+                    width: 40 * s,
                     child: IgnorePointer(
                       ignoring: true,
                       child: Opacity(
@@ -428,21 +436,21 @@ class _HomePageState extends State<HomePage> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           constraints:
-                              BoxConstraints(minWidth: 40, minHeight: 40),
-                          icon: Icon(Icons.close, size: 20),
+                              BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                          icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
                       ),
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14 * s,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -450,19 +458,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 40 * s,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints:
-                          const BoxConstraints(minWidth: 40, minHeight: 40),
-                      icon: const Icon(Icons.close, size: 20),
+                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                      icon: Icon(Icons.close, size: 20 * s),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16 * s),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -474,7 +482,7 @@ class _HomePageState extends State<HomePage> {
                     'assets/default_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.satellite),
                   child: _buildMapTypeCard(
@@ -483,7 +491,7 @@ class _HomePageState extends State<HomePage> {
                     'assets/satellite_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.terrain),
                   child: _buildMapTypeCard(
@@ -494,7 +502,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24 * s),
           ],
         ),
       ),
@@ -597,8 +605,7 @@ class _HomePageState extends State<HomePage> {
             bottom: bottomPosition - 10, // Adjusted to align above the icon
             left: isProfileHint
                 ? targetX - 200
-                : targetX -
-                    60, // Move left for Profile to keep it inside screen
+                : targetX - 60, // Move left for Profile to keep it inside screen
             child: Material(
               color: Colors.transparent,
               child: Column(
@@ -641,7 +648,7 @@ class _HomePageState extends State<HomePage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                                  borderRadius: BorderRadius.circular(50)),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
                             child: const Text('Got it',
@@ -692,6 +699,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
+    final s = sw / 375; // base scale using 375 as reference width
+
+    // responsive paddings and positions derived from screen width
+    final topButtonOffset = (75 * s).clamp(56.0, 95.0);
+    final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
+    final busListLeft = (63 * s).clamp(48.0, sw - 120.0);
+    final liveTrafficLeft = (155 * s).clamp(110.0, sw - 140.0);
+
     return Scaffold(
         body: GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -739,35 +756,37 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Top search + suggestions area (responsive)
           Positioned(
-            top: 20,
-            left: 16,
-            right: 70,
+            top: 20 * s,
+            left: 16 * s,
+            right: 70 * s,
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: const [
+                    borderRadius: BorderRadius.circular(8 * s),
+                    boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
+                        blurRadius: 5 * s,
+                        offset: Offset(0, 2 * s),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, color: Colors.grey),
-                      const SizedBox(width: 8),
+                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
+                      SizedBox(width: 8 * s),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          style: TextStyle(fontSize: 13 * s),
+                          decoration: InputDecoration(
                             hintText: 'Search for a location...',
-                            hintStyle: TextStyle(fontSize: 13),
+                            hintStyle: TextStyle(fontSize: 13 * s),
                             border: InputBorder.none,
                           ),
                           onChanged: (query) async {
@@ -787,15 +806,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.send, color: Colors.blue),
+                        icon: Icon(Icons.send,
+                            color: Colors.transparent, size: 20 * s),
                         onPressed: () {
                           final query = _searchController.text;
                           if (query.isNotEmpty) {
                             tracker.handleSearchAndRoute(query);
-                            // ScaffoldMessenger.of(context).showSnackBar(
-                            //   SnackBar(
-                            //       content: Text('Searching for "$query"...'))),
-                            // );
                           }
                         },
                       ),
@@ -804,15 +820,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 if (_isSearching && _searchResults.isNotEmpty)
                   Container(
-                    margin: const EdgeInsets.only(top: 8),
+                    margin: EdgeInsets.only(top: 8 * s),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: const [
+                      borderRadius: BorderRadius.circular(8 * s),
+                      boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
-                          blurRadius: 5,
-                          offset: Offset(0, 2),
+                          blurRadius: 5 * s,
+                          offset: Offset(0, 2 * s),
                         ),
                       ],
                     ),
@@ -822,7 +838,8 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final location = _searchResults[index];
                         return ListTile(
-                          title: Text(location['name']),
+                          title: Text(location['name'],
+                              style: TextStyle(fontSize: 13 * s)),
                           onTap: () {
                             _searchController.text = location['name'];
                             setState(() {
@@ -837,32 +854,33 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Top right report button
           Positioned(
-            top: 20,
-            right: 16,
+            top: 20 * s,
+            right: 16 * s,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
+                borderRadius: BorderRadius.circular(8 * s),
+                boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
+                    blurRadius: 5 * s,
+                    offset: Offset(0, 2 * s),
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8 * s),
                 child: Material(
                   color: Colors.white,
                   child: InkWell(
                     onTap: () {
                       _showReportDialog(context);
                     },
-                    child: const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Icon(Icons.warning, color: Colors.red),
+                    child: Padding(
+                      padding: EdgeInsets.all(12.0 * s),
+                      child: Icon(Icons.warning, color: Colors.red, size: 20 * s),
                     ),
                   ),
                 ),
@@ -870,29 +888,29 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Map Preference Button
+          // Map Preference Button (responsive placed)
           Positioned(
-            top: 75,
-            left: 17,
+            top: topButtonOffset,
+            left: mapPrefLeft,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.layers,
-                  color: Color(0xFF4A90E2),
-                  size: 22,
+                  color: const Color(0xFF4A90E2),
+                  size: 22 * s,
                 ),
               ),
             ),
@@ -900,8 +918,8 @@ class _HomePageState extends State<HomePage> {
 
           // Bus List Button
           Positioned(
-            top: 75,
-            left: 65,
+            top: topButtonOffset,
+            left: busListLeft,
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -909,31 +927,30 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.directions_bus,
-                        color: Color(0xFF00A2FF), size: 24),
-                    SizedBox(width: 6),
+                        color: const Color(0xFF00A2FF), size: 22 * s),
+                    SizedBox(width: 6 * s),
                     Text(
                       "Bus List",
                       style: TextStyle(
                         color: Colors.grey,
                         fontWeight: FontWeight.w600,
-                        fontSize: 11,
+                        fontSize: 11 * s,
                       ),
                     ),
                   ],
@@ -942,11 +959,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Bus list overlay & container (responsive width)
           Stack(
             children: [
-              // Your map or background widget here
-
-              // Dimmed background + outside tap detector
               if (_showBusList)
                 Positioned.fill(
                   child: GestureDetector(
@@ -961,26 +976,25 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-              // Bus list container
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                bottom: _showBusList ? 10 : -400,
-                left: 16,
-                right: 16,
+                bottom: _showBusList ? 10 * s : -400 * s,
+                left: 16 * s,
+                right: 16 * s,
                 child: AnimatedOpacity(
                   opacity: _showBusList ? 1 : 0,
                   duration: const Duration(milliseconds: 300),
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12 * s),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12 * s),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                          blurRadius: 8 * s,
+                          offset: Offset(0, 3 * s),
                         ),
                       ],
                     ),
@@ -994,8 +1008,13 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "2 km",
                           estimatedTime: "5 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8 * s),
                         _buildBusMenuItem(
                           context,
                           "002 - XYZ - 5678",
@@ -1003,8 +1022,13 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "3.5 km",
                           estimatedTime: "8 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8 * s),
                         _buildBusMenuItem(
                           context,
                           "003 - LMN - 9101",
@@ -1012,6 +1036,11 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "5 km",
                           estimatedTime: "12 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -1021,32 +1050,30 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button (responsive placed)
           Positioned(
-            top: 75,
-            left: 165,
+            top: topButtonOffset,
+            left: liveTrafficLeft,
             child: GestureDetector(
               onTap: () {
                 setState(() {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
                   if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
+                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
                   }
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
@@ -1062,17 +1089,17 @@ class _HomePageState extends State<HomePage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ).createShader(bounds),
-                      child: const Icon(
+                      child: Icon(
                         Icons.traffic,
-                        size: 24,
+                        size: 22 * s,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Text(
+                    SizedBox(width: 6 * s),
+                    Text(
                       "Live Traffic",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 11 * s,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey,
                       ),
@@ -1083,100 +1110,63 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          if (_showTraffic) _buildTrafficLegend(),
-
-          // Temporary Remove - SOS
-          // Positioned(
-          //   bottom: 90,
-          //   right: 16,
-          //   child: SizedBox(
-          //     height: 50,
-          //     width: 50,
-          //     child: ElevatedButton(
-          //       onPressed: () {
-          //         showDialog(
-          //           context: context,
-          //           barrierDismissible: false,
-          //           builder: (context) => const SosOverlayDialog(),
-          //         );
-          //       },
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Colors.red,
-          //         padding: EdgeInsets.zero,
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(12),
-          //         ),
-          //       ),
-          //       child: const FittedBox(
-          //         fit: BoxFit.scaleDown,
-          //         child: Text(
-          //           'SOS',
-          //           style: TextStyle(
-          //             color: Colors.white,
-          //             fontWeight: FontWeight.bold,
-          //             fontSize: 14,
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          // Show the traffic legend if live traffic is enabled
+          if (_showTraffic) _buildTrafficLegend(s, sw),
 
           // Current Location (moves up smoothly if Bus List is visible)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            bottom: _showBusList ? 280 : 10, // animates smoothly
-            left: 16,
-            right: 16,
+            bottom: _showBusList ? 280 * s : 10 * s, // animates smoothly
+            left: 16 * s,
+            right: 16 * s,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16 * s),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12 * s),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    blurRadius: 8 * s,
+                    offset: Offset(0, 3 * s),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8 * s),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(8 * s),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.location_on,
                       color: Colors.blue,
-                      size: 20,
+                      size: 20 * s,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12 * s),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'Phinma University of Pangasinan',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           '28WV+R2R, Arellano St, Downtown District',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10 * s,
                             color: Colors.grey.shade600,
                           ),
                           maxLines: 2,
@@ -1185,7 +1175,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12 * s),
                   InkWell(
                     onTap: () async {
                       _trackerBloc.add(
@@ -1195,26 +1185,26 @@ class _HomePageState extends State<HomePage> {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(8 * s),
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 40 * s,
+                      height: 40 * s,
                       decoration: BoxDecoration(
                         color: isTrackerOn ? Colors.red : Colors.blue,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8 * s),
                         boxShadow: [
                           BoxShadow(
                             color: (isTrackerOn ? Colors.red : Colors.blue)
                                 .withOpacity(0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            blurRadius: 4 * s,
+                            offset: Offset(0, 2 * s),
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.my_location,
                         color: Colors.white,
-                        size: 20,
+                        size: 20 * s,
                       ),
                     ),
                   ),
