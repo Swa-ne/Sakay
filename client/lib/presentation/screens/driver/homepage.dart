@@ -319,6 +319,15 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final sw = MediaQuery.of(context). size.width;
+    final s = sw / 375;
+
+    // responsive paddings and positions derived from screen width
+    final bottomButtonOffset = (83* s).clamp(56.0, 95.0);
+    final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
+    final liveTrafficLeft = (63 * s).clamp(12.0, sw - 140.0);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -436,8 +445,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
           // Map Preference Button
           Positioned(
-            bottom: 85,
-            left: 17,
+            bottom: bottomButtonOffset,
+            left: mapPrefLeft,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
@@ -464,8 +473,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
           // Live Traffic Button
           Positioned(
-            bottom: 85,
-            left: 65,
+            bottom: bottomButtonOffset,
+            left: liveTrafficLeft,
             child: GestureDetector(
               onTap: () {
                 setState(() {

@@ -241,6 +241,17 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           controller: _passwordController,
           obscureText: !_isPasswordVisible,
           cursorColor: const Color(0xFF00A2FF),
+          onChanged: (text) {
+            if (_debouncePassword?.isActive ?? false) {
+              _debouncePassword?.cancel();
+            }
+            _debouncePassword = Timer(debounceDurationPassword, () async {
+              String? validationError = validatePassword(text);
+              setState(() {
+                passwordError = validationError;
+              });
+            });
+          },
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
             suffixIcon: IconButton(
