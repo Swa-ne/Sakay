@@ -209,19 +209,19 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final s = screenWidth / 375;
     return SizedBox(
       width: screenWidth,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              blurRadius: 10 * s,
+              offset: Offset(0, -2 * s),
             ),
           ],
         ),
@@ -229,33 +229,33 @@ class _DriverHomePageState extends State<DriverHomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 40,
+              height: 40 * s,
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 40,
+                  SizedBox(
+                    width: 40 * s,
                     child: IgnorePointer(
                       ignoring: true,
                       child: Opacity(
                         opacity: 0,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          constraints:
-                              BoxConstraints(minWidth: 40, minHeight: 40),
-                          icon: Icon(Icons.close, size: 20),
+                          constraints: BoxConstraints(
+                              minWidth: 40 * s, minHeight: 40 * s),
+                          icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
                       ),
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14 * s,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -263,21 +263,19 @@ class _DriverHomePageState extends State<DriverHomePage> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 40 * s,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints:
-                          const BoxConstraints(minWidth: 40, minHeight: 40),
-                      icon: const Icon(Icons.close, size: 20),
+                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                      icon: Icon(Icons.close, size: 20 * s),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
-
+            SizedBox(height: 16 * s),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -289,7 +287,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                     'assets/default_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.satellite),
                   child: _buildMapTypeCard(
@@ -298,7 +296,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                     'assets/satellite_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.terrain),
                   child: _buildMapTypeCard(
@@ -309,8 +307,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 ),
               ],
             ),
-
-            const SizedBox(height: 24),
+            SizedBox(height: 24 * s),
           ],
         ),
       ),
@@ -319,12 +316,11 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    final sw = MediaQuery.of(context). size.width;
+    final sw = MediaQuery.of(context).size.width;
     final s = sw / 375;
 
     // responsive paddings and positions derived from screen width
-    final bottomButtonOffset = (83* s).clamp(56.0, 95.0);
+    final bottomButtonOffset = (83 * s).clamp(56.0, 95.0);
     final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
     final liveTrafficLeft = (63 * s).clamp(12.0, sw - 140.0);
 

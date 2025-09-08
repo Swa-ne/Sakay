@@ -135,7 +135,6 @@ class _AdminMapState extends State<AdminMap> {
     );
   }
 
-
   Future<void> _restrictToPangasinan() async {
     if (_mapController != null) {
       await _mapController!.animateCamera(
@@ -184,19 +183,19 @@ class _AdminMapState extends State<AdminMap> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final s = screenWidth / 375;
     return SizedBox(
       width: screenWidth,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              blurRadius: 10 * s,
+              offset: Offset(0, -2 * s),
             ),
           ],
         ),
@@ -204,33 +203,33 @@ class _AdminMapState extends State<AdminMap> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 40,
+              height: 40 * s,
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 40,
+                  SizedBox(
+                    width: 40 * s,
                     child: IgnorePointer(
                       ignoring: true,
                       child: Opacity(
                         opacity: 0,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          constraints:
-                              BoxConstraints(minWidth: 40, minHeight: 40),
-                          icon: Icon(Icons.close, size: 20),
+                          constraints: BoxConstraints(
+                              minWidth: 40 * s, minHeight: 40 * s),
+                          icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
                       ),
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14 * s,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -238,21 +237,19 @@ class _AdminMapState extends State<AdminMap> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 40 * s,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints:
-                          const BoxConstraints(minWidth: 40, minHeight: 40),
-                      icon: const Icon(Icons.close, size: 20),
+                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                      icon: Icon(Icons.close, size: 20 * s),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
-
+            SizedBox(height: 16 * s),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -264,7 +261,7 @@ class _AdminMapState extends State<AdminMap> {
                     'assets/default_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.satellite),
                   child: _buildMapTypeCard(
@@ -273,7 +270,7 @@ class _AdminMapState extends State<AdminMap> {
                     'assets/satellite_map.png',
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20 * s),
                 InkWell(
                   onTap: () => _changeMapType(MapType.terrain),
                   child: _buildMapTypeCard(
@@ -284,8 +281,7 @@ class _AdminMapState extends State<AdminMap> {
                 ),
               ],
             ),
-
-            const SizedBox(height: 24),
+            SizedBox(height: 24 * s),
           ],
         ),
       ),
@@ -318,6 +314,13 @@ class _AdminMapState extends State<AdminMap> {
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final s = sw / 375; // base scale using 375 as reference width
+
+    final topButtonOffset = (65 * s).clamp(56.0, 95.0);
+    final mapPrefLeft = (15 * s).clamp(12.0, sw - 60.0);
+    final liveTrafficLeft = (60 * s).clamp(50.0, sw - 140.0);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -410,37 +413,20 @@ class _AdminMapState extends State<AdminMap> {
 
           // Map Preference Button
           Positioned(
-            top: 65,
-            left: 60,
+            top: topButtonOffset,
+            left: mapPrefLeft,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.layers, color: Color(0xFF4A90E2), size: 22),
-                    SizedBox(width: 6),
-                    Text(
-                      "Map Preference",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 11,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -449,8 +435,8 @@ class _AdminMapState extends State<AdminMap> {
 
           // Live Traffic Button
           Positioned(
-            top: 65,
-            left: 198,
+            top: topButtonOffset,
+            left: liveTrafficLeft,
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -463,18 +449,10 @@ class _AdminMapState extends State<AdminMap> {
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
