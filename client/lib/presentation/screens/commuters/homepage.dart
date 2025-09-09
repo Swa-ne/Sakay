@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
-// import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
@@ -33,7 +33,24 @@ class _HomePageState extends State<HomePage> {
   bool _showProfileHint = false;
   bool isTrackerOn = false;
 
-// PARA DI MA ZOOM OUT MASYADO
+  bool _showBusList = false;
+  bool _isBusListVisisble = false;
+
+  void _toggleBusList() {
+    setState(() {
+      _isBusListVisisble = !_isBusListVisisble;
+    });
+  }
+
+  void _closeBusList() {
+    if (_isBusListVisisble) {
+      setState(() {
+        _isBusListVisisble = false;
+      });
+    }
+  }
+
+  // PARA DI MA ZOOM OUT MASYADO
   final CameraPosition _defaultCameraPosition = const CameraPosition(
     target: LatLng(16.0439, 120.3331),
     zoom: 14,
@@ -101,131 +118,135 @@ class _HomePageState extends State<HomePage> {
 
   // PARA SA LIVE TRAFFIC
   // LIST
-  Widget _buildTrafficLegend() {
+  // "Free flow"
+  Widget _buildTrafficLegend(double s, double sw) {
+    // s = scale factor for sizing, sw = screen width
+    final left = sw * 0.44; // keeps relative position across sizes
+    final top = s * 123;
     return Positioned(
-      bottom: 110,
-      left: 70,
+      top: top,
+      left: left.clamp(12.0, sw - 12.0 - (220 * s / 16)), // keep inside screen
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.symmetric(horizontal: s * 12, vertical: s * 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(s * 12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: s * 6,
+              offset: Offset(0, s * 3),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficLegendItem("Free flow", Colors.green),
-            _buildTrafficLegendItem("Moderate", Colors.orange),
-            _buildTrafficLegendItem("Heavy", Colors.red),
-            _buildTrafficLegendItem("Full Stop", Colors.red.shade900),
+            _buildTrafficChip("Free", Colors.green, s),
+            SizedBox(width: s * 8),
+            _buildTrafficChip("Light", Colors.orange, s),
+            SizedBox(width: s * 8),
+            _buildTrafficChip("Heavy", Colors.red, s),
           ],
         ),
       ),
     );
   }
 
-// PANG LIST
-  Widget _buildTrafficLegendItem(String text, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 12,
-            height: 3,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
+  Widget _buildTrafficChip(String text, Color color, double s) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: s * 10,
+          height: s * 10,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
+        ),
+        SizedBox(width: s * 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: s * 11,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // Bus List Container
-  PopupMenuItem<String> _buildBusMenuItem(
+  Widget _buildBusMenuItem(
     BuildContext context,
     String busNumber,
     String route,
     String imagePath, {
     String? distance,
     String? estimatedTime,
+    VoidCallback? onClose,
   }) {
-    return PopupMenuItem<String>(
-      value: busNumber,
-      padding: EdgeInsets.zero,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => Navigator.of(context).pop(busNumber),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                )
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildBusImage(imagePath),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildBusInfo(
-                        busNumber,
-                        route,
-                        distance,
-                        estimatedTime,
-                      ),
-                    ],
-                  ),
+    final sw = MediaQuery.of(context).size.width;
+    final s = sw / 375;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12 * s),
+        onTap: () {
+          if (onClose != null) onClose(); // close manually
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(12 * s),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12 * s),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              )
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBusImage(imagePath, s),
+              SizedBox(width: 16 * s),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildBusInfo(
+                      busNumber,
+                      route,
+                      distance,
+                      estimatedTime,
+                      s,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBusImage(String imagePath) {
+  Widget _buildBusImage(String imagePath, double s) {
     return Container(
-      width: 50,
-      height: 50,
+      width: 50 * s,
+      height: 50 * s,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8 * s),
         color: const Color(0xFF00A2FF),
       ),
       child: ClipRRect(
+        borderRadius: BorderRadius.circular(8 * s),
         child: Image.asset(
           'assets/bus.png',
           fit: BoxFit.cover,
@@ -239,6 +260,7 @@ class _HomePageState extends State<HomePage> {
     String route,
     String? distance,
     String? time,
+    double s,
   ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,19 +272,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 busNumber,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 11,
+                  fontSize: 11 * s,
                   color: Colors.black,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4 * s),
               Text(
                 route,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 10 * s,
                   color: Colors.grey.shade600,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -282,30 +304,30 @@ class _HomePageState extends State<HomePage> {
                   Icon(
                     Icons.location_on,
                     color: Colors.green.shade600,
-                    size: 16,
+                    size: 16 * s,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4 * s),
                   Text(
                     distance ?? "2 km",
-                    style: const TextStyle(
-                      fontSize: 9,
+                    style: TextStyle(
+                      fontSize: 9 * s,
                       color: Colors.black87,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4 * s),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.watch_later_outlined,
-                      color: Colors.blue, size: 16),
-                  const SizedBox(width: 4),
+                  Icon(Icons.watch_later_outlined,
+                      color: Colors.blue, size: 16 * s),
+                  SizedBox(width: 4 * s),
                   Text(
                     time ?? "5 mins",
-                    style: const TextStyle(
-                      fontSize: 10,
+                    style: TextStyle(
+                      fontSize: 10 * s,
                       color: Colors.black87,
                       fontWeight: FontWeight.w500,
                     ),
@@ -319,56 +341,170 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Map Style Container
-  PopupMenuItem<MapType> _buildMapTypeItem(
-    MapType type,
-    String label,
-    String imagePath,
-  ) {
-    return PopupMenuItem<MapType>(
-      value: type,
+  Widget _buildMapTypeCard(MapType type, String label, String assetPath) {
+    final bool isSelected = _currentMapType == type;
+    return InkWell(
+      onTap: () {
+        _changeMapType(type);
+        Navigator.of(context).pop();
+      },
+      borderRadius: BorderRadius.circular(12),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight:
-                  _currentMapType == type ? FontWeight.bold : FontWeight.normal,
-              color: _currentMapType == type ? Colors.blue : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 6),
           Container(
-            width: 60,
-            height: 60,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: _currentMapType == type
-                    ? Colors.blue
-                    : Colors.grey.shade300,
-                width: _currentMapType == type ? 2 : 1,
-              ),
+              border: isSelected
+                  ? Border.all(color: const Color(0xFF4A90E2), width: 3)
+                  : null,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                imagePath,
+                assetPath,
+                width: 100,
+                height: 100,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  Color fallbackColor = type == MapType.satellite
-                      ? Colors.green.shade200
-                      : type == MapType.terrain
-                          ? Colors.brown.shade200
-                          : Colors.grey.shade200;
-                  return Container(color: fallbackColor);
-                },
               ),
             ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12),
+          ),
         ],
+      ),
+    );
+  }
+
+  void _showMapPreferenceSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 300),
+          padding: MediaQuery.of(context).viewInsets,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: ModalRoute.of(context)!.animation!,
+              curve: Curves.easeOut,
+            )),
+            child: _buildMapPreferenceContent(context),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMapPreferenceContent(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final s = screenWidth / 375;
+    return SizedBox(
+      width: screenWidth,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10 * s,
+              offset: Offset(0, -2 * s),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 40 * s,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 40 * s,
+                    child: IgnorePointer(
+                      ignoring: true,
+                      child: Opacity(
+                        opacity: 0,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints:
+                              BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                          icon: Icon(Icons.close, size: 20 * s),
+                          onPressed: null,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "Map Preference",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14 * s,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40 * s,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints:
+                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                      icon: Icon(Icons.close, size: 20 * s),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16 * s),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () => _changeMapType(MapType.normal),
+                  child: _buildMapTypeCard(
+                    MapType.normal,
+                    'Default',
+                    'assets/default_map.png',
+                  ),
+                ),
+                SizedBox(width: 20 * s),
+                InkWell(
+                  onTap: () => _changeMapType(MapType.satellite),
+                  child: _buildMapTypeCard(
+                    MapType.satellite,
+                    'Satellite',
+                    'assets/satellite_map.png',
+                  ),
+                ),
+                SizedBox(width: 20 * s),
+                InkWell(
+                  onTap: () => _changeMapType(MapType.terrain),
+                  child: _buildMapTypeCard(
+                    MapType.terrain,
+                    'Terrain',
+                    'assets/terrain_map.png',
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24 * s),
+          ],
+        ),
       ),
     );
   }
@@ -469,8 +605,7 @@ class _HomePageState extends State<HomePage> {
             bottom: bottomPosition - 10, // Adjusted to align above the icon
             left: isProfileHint
                 ? targetX - 200
-                : targetX -
-                    60, // Move left for Profile to keep it inside screen
+                : targetX - 60, // Move left for Profile to keep it inside screen
             child: Material(
               color: Colors.transparent,
               child: Column(
@@ -513,7 +648,7 @@ class _HomePageState extends State<HomePage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                                  borderRadius: BorderRadius.circular(50)),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
                             child: const Text('Got it',
@@ -564,73 +699,64 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
+    final s = sw / 375; // base scale using 375 as reference width
+
+    // responsive paddings and positions derived from screen width
+    final topButtonOffset = (75 * s).clamp(56.0, 95.0);
+    final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
+    final busListLeft = (63 * s).clamp(48.0, sw - 120.0);
+    final liveTrafficLeft = (155 * s).clamp(110.0, sw - 140.0);
+
     return Scaffold(
-      body: Stack(
+        body: GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        if (_showBusList) {
+          setState(() {
+            _showBusList = false;
+          });
+        }
+      },
+      child: Stack(
         children: [
           // FOR MAP AND MAP STYLES
-          Positioned.fill(
-            child: GoogleMap(
-              initialCameraPosition: _defaultCameraPosition,
-              mapType: _currentMapType,
-              myLocationEnabled: isTrackerOn,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              compassEnabled: false,
-              buildingsEnabled: true,
-              tiltGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-              scrollGesturesEnabled: true,
-              zoomGesturesEnabled: true,
-              minMaxZoomPreference: const MinMaxZoomPreference(10, 16),
-              trafficEnabled: _showTraffic,
-              onMapCreated: (controller) {
-                _mapController = controller;
-                if (!_mapInitialized) {
-                  controller.setMapStyle(_getMapStyle());
-                  _mapInitialized = true;
-                  _restrictToPangasinan();
-                }
-              },
-              onCameraMove: (position) {
-                final zoom = position.zoom;
-                if (zoom < 10 || zoom > 16) {
-                  _mapController?.animateCamera(
-                    CameraUpdate.zoomTo(zoom.clamp(10, 16).toDouble()),
-                  );
-                }
-              },
-            ),
+          const Positioned.fill(
+            child: MyMapWidget(),
           ),
 
+          // Top search + suggestions area (responsive)
           Positioned(
-            top: 20,
-            left: 16,
-            right: 70,
+            top: 20 * s,
+            left: 16 * s,
+            right: 70 * s,
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: const [
+                    borderRadius: BorderRadius.circular(8 * s),
+                    boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
+                        blurRadius: 5 * s,
+                        offset: Offset(0, 2 * s),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, color: Colors.grey),
-                      const SizedBox(width: 8),
+                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
+                      SizedBox(width: 8 * s),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          style: TextStyle(fontSize: 13 * s),
+                          decoration: InputDecoration(
                             hintText: 'Search for a location...',
-                            hintStyle: TextStyle(fontSize: 13),
+                            hintStyle: TextStyle(fontSize: 13 * s),
                             border: InputBorder.none,
                           ),
                           onChanged: (query) async {
@@ -650,15 +776,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.send, color: Colors.blue),
+                        icon: Icon(Icons.send,
+                            color: Colors.transparent, size: 20 * s),
                         onPressed: () {
                           final query = _searchController.text;
                           if (query.isNotEmpty) {
                             tracker.handleSearchAndRoute(query);
-                            // ScaffoldMessenger.of(context).showSnackBar(
-                            //   SnackBar(
-                            //       content: Text('Searching for "$query"...'))),
-                            // );
                           }
                         },
                       ),
@@ -667,15 +790,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 if (_isSearching && _searchResults.isNotEmpty)
                   Container(
-                    margin: const EdgeInsets.only(top: 8),
+                    margin: EdgeInsets.only(top: 8 * s),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: const [
+                      borderRadius: BorderRadius.circular(8 * s),
+                      boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
-                          blurRadius: 5,
-                          offset: Offset(0, 2),
+                          blurRadius: 5 * s,
+                          offset: Offset(0, 2 * s),
                         ),
                       ],
                     ),
@@ -685,7 +808,8 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final location = _searchResults[index];
                         return ListTile(
-                          title: Text(location['name']),
+                          title: Text(location['name'],
+                              style: TextStyle(fontSize: 13 * s)),
                           onTap: () {
                             _searchController.text = location['name'];
                             setState(() {
@@ -700,32 +824,33 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Top right report button
           Positioned(
-            top: 20,
-            right: 16,
+            top: 20 * s,
+            right: 16 * s,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
+                borderRadius: BorderRadius.circular(8 * s),
+                boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
+                    blurRadius: 5 * s,
+                    offset: Offset(0, 2 * s),
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8 * s),
                 child: Material(
                   color: Colors.white,
                   child: InkWell(
                     onTap: () {
                       _showReportDialog(context);
                     },
-                    child: const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Icon(Icons.warning, color: Colors.red),
+                    child: Padding(
+                      padding: EdgeInsets.all(12.0 * s),
+                      child: Icon(Icons.warning, color: Colors.red, size: 20 * s),
                     ),
                   ),
                 ),
@@ -733,252 +858,285 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Map Style Icon
+          // Map Preference Button (responsive placed)
           Positioned(
-            bottom: 90,
-            left: 16,
-            child: Container(
+            top: topButtonOffset,
+            left: mapPrefLeft,
+            child: GestureDetector(
+              onTap: () => _showMapPreferenceSheet(context),
+              child: Container(
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
-                child: PopupMenuButton<MapType>(
-                  icon: const Icon(Icons.layers, color: Colors.blue, size: 22),
-                  onSelected: _changeMapType,
-                  color: Colors.white, // anemal
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        8), // container sa likod tangenaaaa
-                  ),
-                  offset: const Offset(55, -52),
-                  constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
-                  itemBuilder: (context) => [
-                    PopupMenuItem<MapType>(
-                      enabled: false,
-                      child: Material(
-                        color: Colors.white,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () => _changeMapType(MapType.normal),
-                              child: _buildMapTypeItem(MapType.normal,
-                                      'Default', 'assets/default_map.png')
-                                  .child,
-                            ),
-                            GestureDetector(
-                              onTap: () => _changeMapType(MapType.satellite),
-                              child: _buildMapTypeItem(MapType.satellite,
-                                      'Satellite', 'assets/satellite_map.png')
-                                  .child,
-                            ),
-                            GestureDetector(
-                              onTap: () => _changeMapType(MapType.terrain),
-                              child: _buildMapTypeItem(MapType.terrain,
-                                      'Terrain', 'assets/terrain_map.png')
-                                  .child,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
+                child: Icon(
+                  Icons.layers,
+                  color: const Color(0xFF4A90E2),
+                  size: 22 * s,
+                ),
+              ),
+            ),
           ),
 
           // Bus List Button
           Positioned(
-            bottom: 200,
-            left: 16,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: PopupMenuButton<String>(
-                icon: const Icon(Icons.bus_alert_outlined,
-                    color: Color(0xFF00A2FF), size: 24),
-                onSelected: (busId) {
-                  print("Selected Bus: $busId");
-                },
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            top: topButtonOffset,
+            left: busListLeft,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showBusList = !_showBusList;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(8 * s),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12 * s),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
+                    ),
+                  ],
                 ),
-                offset: const Offset(55, -91),
-                constraints: const BoxConstraints(maxWidth: 295),
-                itemBuilder: (context) => [
-                  PopupMenuItem<String>(
-                    enabled: false,
-                    child: Material(
-                      color: Colors.white,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildBusMenuItem(
-                              context,
-                              "001 - ABC - 1234",
-                              "Boundary Marker Lingayen",
-                              "assets/bus_image.png",
-                              distance: "2 km",
-                              estimatedTime: "5 mins"),
-                          const SizedBox(height: 5),
-                          _buildBusMenuItem(context, "002 - XYZ - 5678",
-                              "Dagupan Terminal", "assets/bus_image.png",
-                              distance: "3.5 km", estimatedTime: "8 mins"),
-                          const SizedBox(height: 5),
-                          _buildBusMenuItem(context, "003 - LMN - 9101",
-                              "San Carlos City", "assets/bus_image.png",
-                              distance: "5 km", estimatedTime: "12 mins"),
-                        ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.directions_bus,
+                        color: const Color(0xFF00A2FF), size: 22 * s),
+                    SizedBox(width: 6 * s),
+                    Text(
+                      "Bus List",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11 * s,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 145,
-            left: 16,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.traffic,
-                  color: Color(0xFF00A2FF),
+                  ],
                 ),
-                onPressed: () {
-                  setState(() {
-                    _showTraffic = !_showTraffic;
-                    _saveTrafficPreference(_showTraffic);
-                    if (_mapController != null) {
-                      _mapController!
-                          .setMapStyle(_showTraffic ? '' : _getMapStyle());
-                    }
-                  });
-                },
-                tooltip: 'Toggle Traffic',
               ),
             ),
           ),
 
-          if (_showTraffic) _buildTrafficLegend(),
+          // Bus list overlay & container (responsive width)
+          Stack(
+            children: [
+              if (_showBusList)
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showBusList = false; // close bus list
+                      });
+                    },
+                    child: Container(
+                      color: Colors.transparent, // transparent overlay
+                    ),
+                  ),
+                ),
 
-          // Temporary Remove - SOS
-          // Positioned(
-          //   bottom: 90,
-          //   right: 16,
-          //   child: SizedBox(
-          //     height: 50,
-          //     width: 50,
-          //     child: ElevatedButton(
-          //       onPressed: () {
-          //         showDialog(
-          //           context: context,
-          //           barrierDismissible: false,
-          //           builder: (context) => const SosOverlayDialog(),
-          //         );
-          //       },
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Colors.red, // 🔴 Make the button red
-          //         padding: EdgeInsets.zero,
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(12),
-          //         ),
-          //       ),
-          //       child: const FittedBox(
-          //         fit: BoxFit.scaleDown,
-          //         child: Text(
-          //           'SOS',
-          //           style: TextStyle(
-          //             color: Colors.white,
-          //             fontWeight: FontWeight.bold,
-          //             fontSize: 14,
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                bottom: _showBusList ? 10 * s : -400 * s,
+                left: 16 * s,
+                right: 16 * s,
+                child: AnimatedOpacity(
+                  opacity: _showBusList ? 1 : 0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Container(
+                    padding: EdgeInsets.all(12 * s),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12 * s),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8 * s,
+                          offset: Offset(0, 3 * s),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildBusMenuItem(
+                          context,
+                          "001 - ABC - 1234",
+                          "Boundary Marker Lingayen",
+                          "assets/bus_image.png",
+                          distance: "2 km",
+                          estimatedTime: "5 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 8 * s),
+                        _buildBusMenuItem(
+                          context,
+                          "002 - XYZ - 5678",
+                          "Dagupan Terminal",
+                          "assets/bus_image.png",
+                          distance: "3.5 km",
+                          estimatedTime: "8 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 8 * s),
+                        _buildBusMenuItem(
+                          context,
+                          "003 - LMN - 9101",
+                          "San Carlos City",
+                          "assets/bus_image.png",
+                          distance: "5 km",
+                          estimatedTime: "12 mins",
+                          onClose: () {
+                            setState(() {
+                              _showBusList = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
 
+          // Live Traffic Button (responsive placed)
           Positioned(
-            bottom: 10,
-            left: 16,
-            right: 16,
+            top: topButtonOffset,
+            left: liveTrafficLeft,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showTraffic = !_showTraffic;
+                  _saveTrafficPreference(_showTraffic);
+                  if (_mapController != null) {
+                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+                  }
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(8 * s),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12 * s),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 112, 112, 112),
+                          Color.fromARGB(255, 204, 204, 204)
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ).createShader(bounds),
+                      child: Icon(
+                        Icons.traffic,
+                        size: 22 * s,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 6 * s),
+                    Text(
+                      "Live Traffic",
+                      style: TextStyle(
+                        fontSize: 11 * s,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Show the traffic legend if live traffic is enabled
+          if (_showTraffic) _buildTrafficLegend(s, sw),
+
+          // Current Location (moves up smoothly if Bus List is visible)
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            bottom: _showBusList ? 280 * s : 10 * s, // animates smoothly
+            left: 16 * s,
+            right: 16 * s,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16 * s),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12 * s),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    blurRadius: 8 * s,
+                    offset: Offset(0, 3 * s),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8 * s),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(8 * s),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.location_on,
                       color: Colors.blue,
-                      size: 20,
+                      size: 20 * s,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12 * s),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'Phinma University of Pangasinan',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           '28WV+R2R, Arellano St, Downtown District',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10 * s,
                             color: Colors.grey.shade600,
                           ),
                           maxLines: 2,
@@ -987,36 +1145,36 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12 * s),
                   InkWell(
                     onTap: () async {
-                      _trackerBloc.add(isTrackerOn
-                          ? StopTrackMeEvent()
-                          : StartTrackMeEvent());
+                      _trackerBloc.add(
+                        isTrackerOn ? StopTrackMeEvent() : StartTrackMeEvent(),
+                      );
                       setState(() {
                         isTrackerOn = !isTrackerOn;
                       });
                     },
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(8 * s),
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 40 * s,
+                      height: 40 * s,
                       decoration: BoxDecoration(
                         color: isTrackerOn ? Colors.red : Colors.blue,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8 * s),
                         boxShadow: [
                           BoxShadow(
                             color: (isTrackerOn ? Colors.red : Colors.blue)
                                 .withOpacity(0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            blurRadius: 4 * s,
+                            offset: Offset(0, 2 * s),
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.my_location,
                         color: Colors.white,
-                        size: 20,
+                        size: 20 * s,
                       ),
                     ),
                   ),
@@ -1026,7 +1184,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
