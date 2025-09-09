@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { assignUserToBus, deleteBus, getBus, getBusses, getBussesAndAllDrivers, postBus, putBus, removeAssignUserToBus } from '../services/bus.services';
+import { assignUserToBus, deleteBus, getBus, getBusses, getBussesAndAllDrivers, getBusWithUserID, postBus, putBus, removeAssignUserToBus } from '../services/bus.services';
 import { UserType } from '../middlewares/token.authentication';
 
 export const postBusController = async (req: Request, res: Response) => {
@@ -58,6 +58,25 @@ export const getBusController = async (req: Request, res: Response) => {
         }
 
         const bus = await getBus(bus_id);
+        if (bus.httpCode === 200) {
+            res.status(bus.httpCode).json({ message: bus.message });
+            return;
+        }
+
+        res.status(bus.httpCode).json({ error: bus.error });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const getBusWithUserIDController = async (req: Request, res: Response) => {
+    try {
+        const { user_id } = req.params;
+        if (!user_id) {
+            res.status(404).json({ error: 'Bus not found' });
+            return;
+        }
+
+        const bus = await getBusWithUserID(user_id);
         if (bus.httpCode === 200) {
             res.status(bus.httpCode).json({ message: bus.message });
             return;
