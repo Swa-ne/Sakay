@@ -327,39 +327,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(
-            child: GoogleMap(
-              initialCameraPosition: _defaultCameraPosition,
-              mapType: _currentMapType,
-              myLocationEnabled: isTrackerOn,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              compassEnabled: false,
-              buildingsEnabled: true,
-              tiltGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-              scrollGesturesEnabled: true,
-              zoomGesturesEnabled: true,
-              minMaxZoomPreference: const MinMaxZoomPreference(10, 16),
-              trafficEnabled: _showTraffic,
-              onMapCreated: (controller) {
-                _mapController = controller;
-                if (!_mapInitialized) {
-                  controller.setMapStyle(_getMapStyle());
-                  _mapInitialized = true;
-                  _restrictToPangasinan();
-                }
-              },
-              onCameraMove: (position) {
-                final zoom = position.zoom;
-                if (zoom < 10 || zoom > 16) {
-                  _mapController?.animateCamera(
-                    CameraUpdate.zoomTo(zoom.clamp(10, 16).toDouble()),
-                  );
-                }
-              },
-            ),
+          const Positioned.fill(
+            child: MyMapWidget(),
           ),
+          
           Positioned(
             bottom: 15,
             left: 20,

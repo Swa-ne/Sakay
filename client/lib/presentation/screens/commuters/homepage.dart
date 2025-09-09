@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
-// import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
@@ -722,38 +722,8 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           // FOR MAP AND MAP STYLES
-          Positioned.fill(
-            child: GoogleMap(
-              initialCameraPosition: _defaultCameraPosition,
-              mapType: _currentMapType,
-              myLocationEnabled: isTrackerOn,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              compassEnabled: false,
-              buildingsEnabled: true,
-              tiltGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-              scrollGesturesEnabled: true,
-              zoomGesturesEnabled: true,
-              minMaxZoomPreference: const MinMaxZoomPreference(10, 16),
-              trafficEnabled: _showTraffic,
-              onMapCreated: (controller) {
-                _mapController = controller;
-                if (!_mapInitialized) {
-                  controller.setMapStyle(_getMapStyle());
-                  _mapInitialized = true;
-                  _restrictToPangasinan();
-                }
-              },
-              onCameraMove: (position) {
-                final zoom = position.zoom;
-                if (zoom < 10 || zoom > 16) {
-                  _mapController?.animateCamera(
-                    CameraUpdate.zoomTo(zoom.clamp(10, 16).toDouble()),
-                  );
-                }
-              },
-            ),
+          const Positioned.fill(
+            child: MyMapWidget(),
           ),
 
           // Top search + suggestions area (responsive)
