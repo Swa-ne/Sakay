@@ -16,6 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
+  bool _acceptedTerms = false;
   bool _isPasswordVisible = false;
   late AuthBloc _authBloc;
   late TextEditingController _emailController;
@@ -38,6 +39,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is EmailNotVerified) {
@@ -66,208 +70,333 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
         }
       },
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
-            children: [
-              Positioned(
-                top: MediaQuery.of(context).size.height * .10,
-                left: 20,
-                child: const Image(
-                  image: AssetImage('assets/bus.png'),
-                  width: 100,
-                  height: 100,
-                ),
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF00A2FF),
+                  Color(0xFFF3F3F3),
+                ],
+                stops: [0.4, 0.3],
               ),
-              Positioned(
-                top: MediaQuery.of(context).size.height * .22,
-                left: 30,
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Sign in',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30,
-                      ),
-                    ),
-                    Text(
-                      "Let's get you started!",
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 170.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 100.0),
-                    // Email Field
-                    TextField(
-                      controller: _emailController,
-                      cursorColor: const Color(0xFF00A2FF),
-                      onChanged: (text) {
-                        if (_debounceEmail?.isActive ?? false)
-                          _debounceEmail?.cancel();
-                        _debounceEmail = Timer(debounceDurationEmail, () async {
-                          String? validationError =
-                              validateEmailOrPhoneNumber(text);
-                          setState(() {
-                            emailError = validationError;
-                          });
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Email or phone number',
-                        labelStyle:
-                            const TextStyle(fontSize: 13, color: Colors.black),
-                        prefixIcon: const Icon(
-                          Icons.email,
-                          color: Color(0xFF00A2FF),
-                        ),
-                        iconColor: const Color(0xFF00A2FF),
-                        border: const OutlineInputBorder(),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Color(0xFF00A2FF), width: 2.0),
-                        ),
-                        errorText: emailError,
-                      ),
-                    ),
-                    const SizedBox(height: 10.0),
-                    // Password Field
-                    TextField(
-                      controller: _passwordController,
-                      cursorColor: const Color(0xFF00A2FF),
-                      onChanged: (text) {
-                        if (_debouncePassword?.isActive ?? false)
-                          _debouncePassword?.cancel();
-                        _debouncePassword =
-                            Timer(debounceDurationPassword, () async {
-                          String? validationError = validatePassword(text);
-                          setState(() {
-                            passwordError = validationError;
-                          });
-                        });
-                      },
-                      obscureText: !_isPasswordVisible,
-                      cursorErrorColor: const Color(0xFF00A2FF),
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle:
-                            const TextStyle(fontSize: 13, color: Colors.black),
-                        prefixIcon: const Icon(
-                          Icons.lock,
-                          color: Color(0xFF00A2FF),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: const Color(0xFF00A2FF),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                        ),
-                        border: const OutlineInputBorder(),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Color(0xFF00A2FF), width: 2.0),
-                        ),
-                        errorText: passwordError,
-                      ),
-                    ),
-                    const SizedBox(height: 5.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        String? isValidEmail =
-                            validateEmailOrPhoneNumber(_emailController.text);
-                        if (isValidEmail != null) {
-                          setState(() {
-                            emailError = isValidEmail;
-                          });
-                          return;
-                        }
-                        String? isValidPassword =
-                            validatePassword(_passwordController.text);
-                        if (isValidPassword != null) {
-                          setState(() {
-                            passwordError = isValidPassword;
-                          });
-                          return;
-                        }
-                        final newUser = LoginUserModel(
-                          user_identifier: _emailController.text,
-                          password: _passwordController.text,
-                        );
-                        _authBloc.add(LoginEvent(newUser));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00A2FF),
-                        minimumSize: const Size(300, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
+            ),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: screenHeight),
+                child: IntrinsicHeight(
+                  child: Stack(
+                    children: [
+                      // Logo
+                      Positioned(
+                        top: screenHeight * 0.05,
+                        left: 0,
+                        right: 0,
+                        child: const Image(
+                          image: AssetImage('assets/lugo.png'),
+                          width: 100,
+                          height: 100,
                         ),
                       ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('Don\'t have an account yet?',
-                            style: TextStyle(fontSize: 13)),
-                        TextButton(
-                          onPressed: () {
-                            context.go('/signup');
-                          },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
+
+                      // Title
+                      Positioned(
+                        top: screenHeight * 0.18,
+                        left: 0,
+                        right: 0,
+                        child: const Column(
+                          children: [
+                            Text(
+                              'Sign in',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Please, sign in to continue',
+                              style: TextStyle(
                                 fontSize: 13,
-                                color: Color(
-                                  0xFF00A2FF,
-                                )),
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Container Form
+                      Positioned(
+                        top: screenHeight * 0.28,
+                        left: screenWidth * 0.05,
+                        right: screenWidth * 0.05,
+                        child: Container(
+                          padding: const EdgeInsets.all(20.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildEmailField(),
+                              const SizedBox(height: 10),
+                              _buildPasswordField(),
+                              _buildForgotAndTerms(),
+                              const SizedBox(height: 15),
+                              _buildLoginButton(),
+                              const SizedBox(height: 20),
+                              const Divider(
+                                color: Colors.grey,
+                                height: 20,
+                                thickness: 0.5,
+                                indent: 80,
+                                endIndent: 80,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRegisterRow(),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEmailField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Email or Phone Number',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: _emailController,
+          cursorColor: const Color(0xFF00A2FF),
+          onChanged: (text) {
+            if (_debounceEmail?.isActive ?? false) _debounceEmail?.cancel();
+            _debounceEmail = Timer(debounceDurationEmail, () async {
+              String? validationError = validateEmailOrPhoneNumber(text);
+              setState(() {
+                emailError = validationError;
+              });
+            });
+          },
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.email, color: Color(0xFF00A2FF)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF00A2FF)),
+            ),
+            errorText: emailError,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Password',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: _passwordController,
+          obscureText: !_isPasswordVisible,
+          cursorColor: const Color(0xFF00A2FF),
+          onChanged: (text) {
+            if (_debouncePassword?.isActive ?? false) {
+              _debouncePassword?.cancel();
+            }
+            _debouncePassword = Timer(debounceDurationPassword, () async {
+              String? validationError = validatePassword(text);
+              setState(() {
+                passwordError = validationError;
+              });
+            });
+          },
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock, color: Color(0xFF00A2FF)),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: const Color(0xFF00A2FF),
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF00A2FF)),
+            ),
+            errorText: passwordError,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildForgotAndTerms() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () {},
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              'Forgot Password?',
+              style: TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Checkbox(
+              value: _acceptedTerms,
+              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+              activeColor: const Color(0xFF00A2FF),
+              onChanged: (value) {
+                setState(() {
+                  _acceptedTerms = value ?? false;
+                });
+              },
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  // open Terms & Conditions page
+                },
+                child: const Text(
+                  'I agree to the Terms & Conditions',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return ElevatedButton(
+      onPressed: () {
+        if (!_acceptedTerms) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.white,
+              content: Text(
+                "You must accept the Terms & Conditions",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          );
+          return;
+        }
+
+        String? isValidEmail =
+            validateEmailOrPhoneNumber(_emailController.text);
+        if (isValidEmail != null) {
+          setState(() {
+            emailError = isValidEmail;
+          });
+          return;
+        }
+        String? isValidPassword = validatePassword(_passwordController.text);
+        if (isValidPassword != null) {
+          setState(() {
+            passwordError = isValidPassword;
+          });
+          return;
+        }
+
+        final newUser = LoginUserModel(
+          user_identifier: _emailController.text,
+          password: _passwordController.text,
+        );
+        _authBloc.add(LoginEvent(newUser));
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF00A2FF),
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50.0),
+        ),
+      ),
+      child: const Text(
+        'Login',
+        style: TextStyle(fontSize: 16, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildRegisterRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text("Don't have an account yet?",
+            style: TextStyle(fontSize: 13)),
+        TextButton(
+          onPressed: () {
+            context.go('/signup');
+          },
+          child: const Text(
+            'Register',
+            style: TextStyle(fontSize: 13, color: Color(0xFF00A2FF)),
+          ),
+        ),
+      ],
     );
   }
 }

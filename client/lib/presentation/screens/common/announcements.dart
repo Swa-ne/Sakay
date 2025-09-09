@@ -27,7 +27,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         title: const Text(
           'Announcements',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -41,7 +41,23 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               Expanded(
                 child: widget.announcements.isEmpty
                     ? const Center(
-                        child: Text("No announcements yet"),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons
+                                  .announcement_outlined,
+                              size: 30,
+                              color: Color.fromARGB(255, 202, 202, 202),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              "No announcements yet",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 14),
+                            ),
+                          ],
+                        ),
                       )
                     : ListView.builder(
                         itemCount: widget.announcements.length,
@@ -64,11 +80,9 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors
-                                    .transparent,
+                                color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color: Colors.grey),
+                                border: Border.all(color: Colors.grey),
                               ),
                               child: Row(
                                 children: [

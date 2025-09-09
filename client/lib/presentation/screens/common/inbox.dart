@@ -81,12 +81,12 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 35,
-                backgroundImage: AssetImage("assets/bus.png"),
+                radius: 15,
+                backgroundImage: AssetImage("assets/lugo.png"),
                 backgroundColor: Colors.transparent,
               ),
               SizedBox(width: 10),
-              Text("Sakay",
+              Text("Admin",
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 15,
@@ -153,7 +153,7 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               color: Colors.white,
               child: Row(
                 children: [
@@ -162,6 +162,8 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                       controller: messageController,
                       decoration: InputDecoration(
                         hintText: "Type a message...",
+                        hintStyle:
+                            const TextStyle(color: Colors.grey, fontSize: 13),
                         filled: true,
                         fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
