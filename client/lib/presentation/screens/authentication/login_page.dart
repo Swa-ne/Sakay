@@ -306,19 +306,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: () {
-        if (!_acceptedTerms) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.white,
-              content: Text(
-                "You must accept the Terms & Conditions",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          );
-          return;
-        }
-
         String? isValidEmail =
             validateEmailOrPhoneNumber(_emailController.text);
         if (isValidEmail != null) {
@@ -327,6 +314,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           });
           return;
         }
+
         String? isValidPassword = validatePassword(_passwordController.text);
         if (isValidPassword != null) {
           setState(() {
