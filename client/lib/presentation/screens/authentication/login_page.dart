@@ -42,6 +42,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is EmailNotVerified) {
@@ -75,18 +77,24 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           child: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF00A2FF),
-                  Color(0xFFF3F3F3),
-                ],
-                stops: [0.4, 0.3],
+                colors: isDark
+                    ? [
+                        Color(0xFF00A2FF),
+                        Color(0xFF2B2B2B),
+                      ]
+                    : [
+                        Color(0xFF00A2FF),
+                        Color(0xFFF3F3F3),
+                      ],
+                stops: const [0.4, 0.3],
               ),
             ),
             child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: screenHeight),
                 child: IntrinsicHeight(
@@ -139,7 +147,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         child: Container(
                           padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDark
+                                ? const Color(0xFF1A1A1A)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
                             boxShadow: [
                               BoxShadow(
@@ -152,22 +162,22 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _buildEmailField(),
+                              _buildEmailField(isDark),
                               const SizedBox(height: 10),
-                              _buildPasswordField(),
+                              _buildPasswordField(isDark),
                               _buildForgotAndTerms(),
                               const SizedBox(height: 20),
                               _buildLoginButton(),
                               const SizedBox(height: 20),
-                              const Divider(
-                                color: Colors.grey,
+                              Divider(
+                                color: isDark ? Colors.white54 : Colors.grey,
                                 height: 20,
                                 thickness: 0.5,
                                 indent: 80,
                                 endIndent: 80,
                               ),
                               const SizedBox(height: 10),
-                              _buildRegisterRow(),
+                              _buildRegisterRow(isDark),
                             ],
                           ),
                         ),
@@ -183,22 +193,23 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailField(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Email or Phone Number',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: Colors.grey,
+            color: isDark ? Colors.white : Colors.grey,
           ),
         ),
         const SizedBox(height: 5),
         TextField(
           controller: _emailController,
           cursorColor: const Color(0xFF00A2FF),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
           onChanged: (text) {
             if (_debounceEmail?.isActive ?? false) _debounceEmail?.cancel();
             _debounceEmail = Timer(debounceDurationEmail, () async {
@@ -210,6 +221,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           },
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.email, color: Color(0xFF00A2FF)),
+            fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey[200],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -218,22 +230,23 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
               borderSide: const BorderSide(color: Color(0xFF00A2FF)),
             ),
             errorText: emailError,
+            errorStyle: TextStyle(color: isDark ? Colors.red[300] : Colors.red),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Password',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: Colors.grey,
+            color: isDark ? Colors.white : Colors.grey,
           ),
         ),
         const SizedBox(height: 5),
@@ -241,10 +254,10 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           controller: _passwordController,
           obscureText: !_isPasswordVisible,
           cursorColor: const Color(0xFF00A2FF),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
           onChanged: (text) {
-            if (_debouncePassword?.isActive ?? false) {
+            if (_debouncePassword?.isActive ?? false)
               _debouncePassword?.cancel();
-            }
             _debouncePassword = Timer(debounceDurationPassword, () async {
               String? validationError = validatePassword(text);
               setState(() {
@@ -265,6 +278,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                 });
               },
             ),
+            fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey[200],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -273,6 +287,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
               borderSide: const BorderSide(color: Color(0xFF00A2FF)),
             ),
             errorText: passwordError,
+            errorStyle: TextStyle(color: isDark ? Colors.red[300] : Colors.red),
           ),
         ),
       ],
@@ -343,12 +358,13 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
     );
   }
 
-  Widget _buildRegisterRow() {
+  Widget _buildRegisterRow(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Don't have an account yet?",
-            style: TextStyle(fontSize: 13)),
+        Text("Don't have an account yet?",
+            style: TextStyle(
+                fontSize: 13, color: isDark ? Colors.white70 : Colors.black)),
         TextButton(
           onPressed: () {
             context.go('/signup');

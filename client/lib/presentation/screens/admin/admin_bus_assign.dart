@@ -35,6 +35,25 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
   BusModel? selectedBus;
   UserModel? selectedDriver;
 
+  Color _getCardColor(BuildContext context, Color originalColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (originalColor == Colors.white && isDark) {
+      return Colors.grey[850]!;
+    }
+    return originalColor;
+  }
+
+  Color _getTextColor(BuildContext context, Color originalColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (originalColor == Colors.black || originalColor == Colors.grey) {
+      return isDark ? Colors.white : originalColor;
+    }
+    if (originalColor == Colors.lightBlue) {
+      return isDark ? Colors.lightBlueAccent : originalColor;
+    }
+    return originalColor;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -314,9 +333,13 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
   }
 
   Widget _buildTabBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? Colors.grey[850]
+            : Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -327,10 +350,12 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
       ),
       child: TabBar(
         controller: _tabController,
-        labelColor: Colors.lightBlue,
-        unselectedLabelColor: Colors.grey,
-        indicatorColor: Colors.lightBlue,
-        labelStyle: const TextStyle(fontSize: 13), // Tab font size set to 13
+        labelColor:
+            isDark ? Colors.white : Colors.lightBlue,
+        unselectedLabelColor:
+            isDark ? Colors.white70 : Colors.grey,
+        indicatorColor: isDark ? Colors.lightBlueAccent : Colors.lightBlue,
+        labelStyle: const TextStyle(fontSize: 13),
         tabs: const [
           Tab(icon: Icon(Icons.directions_bus), text: 'Buses'),
           Tab(icon: Icon(Icons.person), text: 'Drivers'),
@@ -375,7 +400,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
 
   Widget _buildAddBusCard() {
     return Card(
-      color: Colors.white,
+      color: _getCardColor(context, Colors.white),
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -383,49 +408,48 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Add New Bus',
               style: TextStyle(
-                fontSize: 15, // Font size set to 15
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.lightBlue,
+                color: _getTextColor(context, Colors.lightBlue),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _busController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Bus Name/Number',
-                labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
+                labelStyle: TextStyle(
+                    fontSize: 13, color: _getTextColor(context, Colors.grey)),
                 hintText: 'e.g., 001, 002, 003',
-                prefixIcon: Icon(Icons.directions_bus, color: Colors.lightBlue),
+                prefixIcon: Icon(Icons.directions_bus,
+                    color: _getTextColor(context, Colors.lightBlue)),
               ),
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _plateController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Plate Number',
-                labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
+                labelStyle: TextStyle(
+                    fontSize: 13, color: _getTextColor(context, Colors.grey)),
                 hintText: 'e.g., ABC-1234',
-                prefixIcon: Icon(Icons.credit_card, color: Colors.lightBlue),
+                prefixIcon: Icon(Icons.credit_card,
+                    color: _getTextColor(context, Colors.lightBlue)),
               ),
               textCapitalization: TextCapitalization.characters,
-              onChanged: (value) {
-                if (value.length == 3 && !value.contains('-')) {
-                  _plateController.text = value + '-';
-                  _plateController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _plateController.text.length),
-                  );
-                }
-              },
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _addBus,
               icon: const Icon(Icons.add, color: Colors.white, size: 15),
-              label: const Text('Add Bus'),
+              label: const Text(
+                'Add Bus',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -502,22 +526,25 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
   Widget _buildBusCard(BusModel bus) {
     return Card(
       elevation: 2,
-      color: Colors.white,
+      color: _getCardColor(context, Colors.white),
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Container(
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: Colors.lightBlue.withOpacity(0.1),
+            color: _getCardColor(context, Colors.lightBlue.withOpacity(0.1)),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: const Icon(Icons.directions_bus,
-              color: Colors.lightBlue, size: 30),
+          child: Icon(Icons.directions_bus,
+              color: _getTextColor(context, Colors.lightBlue), size: 30),
         ),
         title: Text(
           "${bus.bus_number} - ${bus.plate_number}",
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: _getTextColor(context, Colors.black)),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,18 +552,13 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
             if (bus.current_driver != null && bus.current_driver!.isNotEmpty)
               ...bus.current_driver!.map((driver) => Text(
                     'Driver: ${driver.first_name} ${driver.last_name}',
-                    style: const TextStyle(
-                      color: Colors.green,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.green, fontSize: 13),
                   ))
             else
-              const Text(
+              Text(
                 'No driver assigned',
                 style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
+                    color: _getTextColor(context, Colors.grey), fontSize: 13),
               ),
           ],
         ),
@@ -544,11 +566,13 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.edit, color: Colors.blue),
+              icon:
+                  Icon(Icons.edit, color: _getTextColor(context, Colors.blue)),
               onPressed: () => _editBus(bus),
             ),
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon:
+                  Icon(Icons.delete, color: _getTextColor(context, Colors.red)),
               onPressed: () {
                 _busBloc.add(DeleteBusEvent(bus));
               },
@@ -593,8 +617,10 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
   }
 
   Widget _buildAddDriverCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
-      color: Colors.white,
+      color: isDark ? Colors.grey[850] : Colors.white,
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -604,8 +630,14 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
           children: [
             ElevatedButton.icon(
               onPressed: _addDriver,
-              icon: const Icon(Icons.add, color: Colors.white, size: 25),
-              label: const Text('Add Driver'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue,
+              ),
+              icon: Icon(Icons.add, color: Colors.white, size: 25),
+              label: const Text(
+                'Add Driver',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -617,18 +649,30 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
     for (var bus in buses) {
       if (bus.current_driver != null) {
         if (bus.current_driver!.any((d) => d.id == driver.id)) {
-          return true; // Driver is assigned to at least one bus
+          return true;
         }
       }
     }
-    return false; // Driver is not assigned to any bus
+    return false;
   }
 
   Widget _buildDriverCard(UserModel driver) {
     bool isAssigned = _isDriverAssigned(driver);
+    bool isWhiteCard = true;
+
+    final cardColor = isWhiteCard
+        ? (Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850]
+            : Colors.white)
+        : Colors.white;
+
+    final textColor =
+        Theme.of(context).brightness == Brightness.dark && isWhiteCard
+            ? Colors.white
+            : Colors.black;
 
     return Card(
-      color: Colors.white,
+      color: cardColor,
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -643,7 +687,11 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
         ),
         title: Text(
           "${driver.first_name} ${driver.last_name}",
-          style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 13,
+            color: textColor,
+          ),
         ),
         subtitle: Text(
           isAssigned ? 'Assigned' : 'Available',
@@ -652,10 +700,6 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
             fontSize: 13,
           ),
         ),
-        // trailing: IconButton(
-        //   icon: const Icon(Icons.delete, color: Colors.red),
-        //   onPressed: () => _removeDriver(driver),
-        // ),
       ),
     );
   }
@@ -684,20 +728,43 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
   }
 
   Widget _buildAssignmentForm() {
+    bool isWhiteCard = true;
+
+    final cardColor = isWhiteCard
+        ? (Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850]
+            : Colors.white)
+        : Colors.white;
+
+    final titleColor =
+        Theme.of(context).brightness == Brightness.dark && isWhiteCard
+            ? Colors.white
+            : Colors.lightBlue;
+
+    final labelColor =
+        Theme.of(context).brightness == Brightness.dark && isWhiteCard
+            ? Colors.white70
+            : Colors.grey;
+
+    final dropdownTextColor =
+        Theme.of(context).brightness == Brightness.dark && isWhiteCard
+            ? Colors.white
+            : Colors.black;
+
     return Card(
-      color: Colors.white,
+      color: cardColor,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Assign Driver to Bus',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.lightBlue,
+                color: titleColor,
               ),
             ),
             const SizedBox(height: 16),
@@ -705,7 +772,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
             DropdownButtonFormField<BusModel>(
               decoration: InputDecoration(
                 labelText: 'Select Bus',
-                labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                labelStyle: TextStyle(fontSize: 13, color: labelColor),
                 prefixIcon:
                     const Icon(Icons.directions_bus, color: Colors.lightBlue),
                 border: OutlineInputBorder(
@@ -724,10 +791,10 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
                       const BorderSide(color: Colors.lightBlue, width: 2),
                 ),
               ),
-              value: selectedBus, // Currently selected bus
+              value: selectedBus,
               onChanged: (BusModel? newValue) {
                 setState(() {
-                  selectedBus = newValue; // Update the selected bus
+                  selectedBus = newValue;
                 });
               },
               items: buses.map<DropdownMenuItem<BusModel>>((BusModel bus) {
@@ -735,7 +802,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
                   value: bus,
                   child: Text(
                     "${bus.bus_number} - ${bus.plate_number}",
-                    style: const TextStyle(fontSize: 13),
+                    style: TextStyle(fontSize: 13, color: dropdownTextColor),
                   ),
                 );
               }).toList(),
@@ -745,7 +812,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
             DropdownButtonFormField<UserModel>(
               decoration: InputDecoration(
                 labelText: 'Select Driver',
-                labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                labelStyle: TextStyle(fontSize: 13, color: labelColor),
                 prefixIcon: const Icon(Icons.person, color: Colors.lightBlue),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
@@ -763,10 +830,10 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
                       const BorderSide(color: Colors.lightBlue, width: 2),
                 ),
               ),
-              value: selectedDriver, // Currently selected driver
+              value: selectedDriver,
               onChanged: (UserModel? newValue) {
                 setState(() {
-                  selectedDriver = newValue; // Update the selected driver
+                  selectedDriver = newValue;
                 });
               },
               items:
@@ -775,7 +842,7 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
                   value: driver,
                   child: Text(
                     "${driver.first_name} ${driver.last_name}",
-                    style: const TextStyle(fontSize: 13),
+                    style: TextStyle(fontSize: 13, color: dropdownTextColor),
                   ),
                 );
               }).toList(),
@@ -790,7 +857,10 @@ class _AdminDriverAssignState extends State<AdminDriverAssign>
                 _assignDriver();
               },
               icon: const Icon(Icons.link, color: Colors.white, size: 15),
-              label: const Text('Assign Driver to Bus'),
+              label: const Text(
+                'Assign Driver to Bus',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

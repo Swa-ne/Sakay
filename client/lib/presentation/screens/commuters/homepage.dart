@@ -120,16 +120,17 @@ class _HomePageState extends State<HomePage> {
   // LIST
   // "Free flow"
   Widget _buildTrafficLegend(double s, double sw) {
-    // s = scale factor for sizing, sw = screen width
-    final left = sw * 0.44; // keeps relative position across sizes
+    final left = sw * 0.44;
     final top = s * 123;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Positioned(
       top: top,
-      left: left.clamp(12.0, sw - 12.0 - (220 * s / 16)), // keep inside screen
+      left: left.clamp(12.0, sw - 12.0 - (220 * s / 16)),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: s * 12, vertical: s * 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(s * 12),
           boxShadow: [
             BoxShadow(
@@ -142,18 +143,18 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficChip("Free", Colors.green, s),
+            _buildTrafficChip("Free", Colors.green, s, isDark),
             SizedBox(width: s * 8),
-            _buildTrafficChip("Light", Colors.orange, s),
+            _buildTrafficChip("Light", Colors.orange, s, isDark),
             SizedBox(width: s * 8),
-            _buildTrafficChip("Heavy", Colors.red, s),
+            _buildTrafficChip("Heavy", Colors.red, s, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrafficChip(String text, Color color, double s) {
+  Widget _buildTrafficChip(String text, Color color, double s, bool isDark) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -171,14 +172,14 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
             fontSize: s * 11,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
       ],
     );
   }
 
-  // Bus List Container
+// Bus List Container
   Widget _buildBusMenuItem(
     BuildContext context,
     String busNumber,
@@ -190,6 +191,8 @@ class _HomePageState extends State<HomePage> {
   }) {
     final sw = MediaQuery.of(context).size.width;
     final s = sw / 375;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -201,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           width: double.infinity,
           padding: EdgeInsets.all(12 * s),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? Colors.grey[850] : Colors.white,
             borderRadius: BorderRadius.circular(12 * s),
             boxShadow: const [
               BoxShadow(
@@ -226,6 +229,7 @@ class _HomePageState extends State<HomePage> {
                       distance,
                       estimatedTime,
                       s,
+                      isDark: isDark,
                     ),
                   ],
                 ),
@@ -260,8 +264,12 @@ class _HomePageState extends State<HomePage> {
     String route,
     String? distance,
     String? time,
-    double s,
-  ) {
+    double s, {
+    bool isDark = false,
+  }) {
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.grey.shade600;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -275,7 +283,7 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 11 * s,
-                  color: Colors.black,
+                  color: textColor,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -285,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                 route,
                 style: TextStyle(
                   fontSize: 10 * s,
-                  color: Colors.grey.shade600,
+                  color: secondaryTextColor,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
@@ -311,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                     distance ?? "2 km",
                     style: TextStyle(
                       fontSize: 9 * s,
-                      color: Colors.black87,
+                      color: textColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -328,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                     time ?? "5 mins",
                     style: TextStyle(
                       fontSize: 10 * s,
-                      color: Colors.black87,
+                      color: textColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -341,8 +349,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMapTypeCard(MapType type, String label, String assetPath) {
+  Widget _buildMapTypeCard(MapType type, String label, String assetPath,
+      {required bool isDark}) {
     final bool isSelected = _currentMapType == type;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: () {
         _changeMapType(type);
@@ -353,6 +364,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Container(
             decoration: BoxDecoration(
+              color: isDark ? Colors.grey[800] : Colors.white,
               border: isSelected
                   ? Border.all(color: const Color(0xFF4A90E2), width: 3)
                   : null,
@@ -371,7 +383,10 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 12),
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
           ),
         ],
       ),
@@ -405,12 +420,14 @@ class _HomePageState extends State<HomePage> {
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final s = screenWidth / 375;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       width: screenWidth,
       child: Container(
         padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
           boxShadow: [
             BoxShadow(
@@ -435,8 +452,8 @@ class _HomePageState extends State<HomePage> {
                         opacity: 0,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          constraints:
-                              BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                          constraints: BoxConstraints(
+                              minWidth: 40 * s, minHeight: 40 * s),
                           icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
@@ -452,7 +469,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 14 * s,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
@@ -464,6 +481,7 @@ class _HomePageState extends State<HomePage> {
                       constraints:
                           BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
                       icon: Icon(Icons.close, size: 20 * s),
+                      color: isDark ? Colors.white : Colors.black87,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -480,6 +498,7 @@ class _HomePageState extends State<HomePage> {
                     MapType.normal,
                     'Default',
                     'assets/default_map.png',
+                    isDark: isDark,
                   ),
                 ),
                 SizedBox(width: 20 * s),
@@ -489,6 +508,7 @@ class _HomePageState extends State<HomePage> {
                     MapType.satellite,
                     'Satellite',
                     'assets/satellite_map.png',
+                    isDark: isDark,
                   ),
                 ),
                 SizedBox(width: 20 * s),
@@ -498,6 +518,7 @@ class _HomePageState extends State<HomePage> {
                     MapType.terrain,
                     'Terrain',
                     'assets/terrain_map.png',
+                    isDark: isDark,
                   ),
                 ),
               ],
@@ -580,9 +601,11 @@ class _HomePageState extends State<HomePage> {
   }) {
     final overlay = Overlay.of(context);
     final Size screenSize = MediaQuery.of(context).size;
+
     double targetX = 0;
     double bottomPosition = 80; // Default position
     bool isProfileHint = title == "Profile";
+
     if (title == "Inbox") {
       targetX = screenSize.width * 0.14 + 23;
     } else if (title == "Announcements") {
@@ -590,6 +613,13 @@ class _HomePageState extends State<HomePage> {
     } else if (isProfileHint) {
       targetX = screenSize.width * 0.80; // Adjust to right for Profile
     }
+
+    // Dark mode for white hint container
+    final bool isDarkMode = true; // You can add logic here if needed
+    final containerColor = isDarkMode ? Colors.grey[900] : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black87;
+    final arrowColor = containerColor;
+
     _hintOverlay = OverlayEntry(
       builder: (context) => Stack(
         children: [
@@ -602,10 +632,8 @@ class _HomePageState extends State<HomePage> {
           ),
           // Hint Box
           Positioned(
-            bottom: bottomPosition - 10, // Adjusted to align above the icon
-            left: isProfileHint
-                ? targetX - 200
-                : targetX - 60, // Move left for Profile to keep it inside screen
+            bottom: bottomPosition - 10, // Align above the icon
+            left: isProfileHint ? targetX - 200 : targetX - 60,
             child: Material(
               color: Colors.transparent,
               child: Column(
@@ -615,7 +643,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(12),
                     width: 260,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: containerColor,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(color: Colors.black26, blurRadius: 5)
@@ -628,17 +656,24 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Icon(icon, color: Colors.blue),
                             const SizedBox(width: 8),
-                            Text(title,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: textColor,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 6),
                         Text(
                           message,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 13, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: textColor,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
@@ -651,9 +686,11 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(50)),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
-                            child: const Text('Got it',
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white)),
+                            child: const Text(
+                              'Got it',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
                           ),
                         ),
                       ],
@@ -673,7 +710,7 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           width: 20,
                           height: 12,
-                          color: Colors.white,
+                          color: arrowColor,
                         ),
                       ),
                     ),
@@ -685,6 +722,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+
     overlay.insert(_hintOverlay!);
   }
 
@@ -736,7 +774,9 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12 * s),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[850]
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(8 * s),
                     boxShadow: [
                       BoxShadow(
@@ -748,15 +788,31 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
+                      Icon(Icons.search,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.grey,
+                          size: 20 * s),
                       SizedBox(width: 8 * s),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          style: TextStyle(fontSize: 13 * s),
+                          style: TextStyle(
+                            fontSize: 13 * s,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Search for a location...',
-                            hintStyle: TextStyle(fontSize: 13 * s),
+                            hintStyle: TextStyle(
+                              fontSize: 13 * s,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white54
+                                  : Colors.grey,
+                            ),
                             border: InputBorder.none,
                           ),
                           onChanged: (query) async {
@@ -792,7 +848,9 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     margin: EdgeInsets.only(top: 8 * s),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[850]
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(8 * s),
                       boxShadow: [
                         BoxShadow(
@@ -808,8 +866,16 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final location = _searchResults[index];
                         return ListTile(
-                          title: Text(location['name'],
-                              style: TextStyle(fontSize: 13 * s)),
+                          title: Text(
+                            location['name'],
+                            style: TextStyle(
+                              fontSize: 13 * s,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
                           onTap: () {
                             _searchController.text = location['name'];
                             setState(() {
@@ -830,7 +896,9 @@ class _HomePageState extends State<HomePage> {
             right: 16 * s,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[850]
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(8 * s),
                 boxShadow: [
                   BoxShadow(
@@ -843,14 +911,20 @@ class _HomePageState extends State<HomePage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8 * s),
                 child: Material(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
                   child: InkWell(
                     onTap: () {
                       _showReportDialog(context);
                     },
                     child: Padding(
                       padding: EdgeInsets.all(12.0 * s),
-                      child: Icon(Icons.warning, color: Colors.red, size: 20 * s),
+                      child: Icon(
+                        Icons.warning,
+                        color: Colors.red,
+                        size: 20 * s,
+                      ),
                     ),
                   ),
                 ),
@@ -867,7 +941,9 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(10 * s),
                   boxShadow: [
                     BoxShadow(
@@ -879,7 +955,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: Icon(
                   Icons.layers,
-                  color: const Color(0xFF4A90E2),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : const Color(0xFF00A2FF),
                   size: 22 * s,
                 ),
               ),
@@ -899,7 +977,9 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(12 * s),
                   boxShadow: [
                     BoxShadow(
@@ -912,13 +992,20 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.directions_bus,
-                        color: const Color(0xFF00A2FF), size: 22 * s),
+                    Icon(
+                      Icons.directions_bus,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : const Color(0xFF00A2FF),
+                      size: 22 * s,
+                    ),
                     SizedBox(width: 6 * s),
                     Text(
                       "Bus List",
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.grey,
                         fontWeight: FontWeight.w600,
                         fontSize: 11 * s,
                       ),
@@ -937,7 +1024,7 @@ class _HomePageState extends State<HomePage> {
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _showBusList = false; // close bus list
+                        _showBusList = false;
                       });
                     },
                     child: Container(
@@ -945,7 +1032,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -958,7 +1044,9 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     padding: EdgeInsets.all(12 * s),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[900]
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(12 * s),
                       boxShadow: [
                         BoxShadow(
@@ -1020,7 +1108,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          // Live Traffic Button (responsive placed)
+          // Live Traffic Button
           Positioned(
             top: topButtonOffset,
             left: liveTrafficLeft,
@@ -1030,14 +1118,17 @@ class _HomePageState extends State<HomePage> {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
                   if (_mapController != null) {
-                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+                    _mapController!
+                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
                   }
                 });
               },
               child: Container(
                 padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(12 * s),
                   boxShadow: [
                     BoxShadow(
@@ -1071,7 +1162,9 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                         fontSize: 11 * s,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.grey,
                       ),
                     ),
                   ],
@@ -1083,7 +1176,7 @@ class _HomePageState extends State<HomePage> {
           // Show the traffic legend if live traffic is enabled
           if (_showTraffic) _buildTrafficLegend(s, sw),
 
-          // Current Location (moves up smoothly if Bus List is visible)
+// Current Location (moves up smoothly if Bus List is visible)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -1093,11 +1186,17 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               padding: EdgeInsets.all(16 * s),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(12 * s),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withOpacity(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 0.4
+                          : 0.1,
+                    ),
                     blurRadius: 8 * s,
                     offset: Offset(0, 3 * s),
                   ),
@@ -1128,7 +1227,10 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(
                             fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -1137,7 +1239,10 @@ class _HomePageState extends State<HomePage> {
                           '28WV+R2R, Arellano St, Downtown District',
                           style: TextStyle(
                             fontSize: 10 * s,
-                            color: Colors.grey.shade600,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -1181,7 +1286,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     ));
@@ -1212,6 +1317,8 @@ class ArrowClipper extends CustomClipper<Path> {
 }
 
 void _showReportDialog(BuildContext context) {
+  final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
   showDialog(
     context: context,
     builder: (context) {
@@ -1219,7 +1326,7 @@ void _showReportDialog(BuildContext context) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? Colors.grey[850] : Colors.white,
         contentPadding: EdgeInsets.zero,
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1228,14 +1335,9 @@ void _showReportDialog(BuildContext context) {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFF00A2FF),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
-                  bottomRight: Radius.circular(12),
-                ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00A2FF),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Center(
                 child: Text(
@@ -1253,13 +1355,15 @@ void _showReportDialog(BuildContext context) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         "Select an option",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black),
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -1278,12 +1382,15 @@ void _showReportDialog(BuildContext context) {
                           vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(
+                            color: isDark ? Colors.white54 : Colors.grey),
+                        color: isDark ? Colors.grey[800] : Colors.white,
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.directions_car, color: Colors.black),
-                          SizedBox(width: 8),
+                          Icon(Icons.directions_car,
+                              color: isDark ? Colors.white : Colors.black),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1291,20 +1398,25 @@ void _showReportDialog(BuildContext context) {
                                 Text(
                                   "Incident Report",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   "Send reports about events occurred",
                                   style: TextStyle(
-                                      fontSize: 8, color: Colors.black),
+                                    fontSize: 8,
+                                    color:
+                                        isDark ? Colors.white70 : Colors.black,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           Icon(Icons.arrow_forward_ios,
-                              size: 16, color: Colors.black),
+                              size: 16,
+                              color: isDark ? Colors.white : Colors.black),
                         ],
                       ),
                     ),
@@ -1324,12 +1436,15 @@ void _showReportDialog(BuildContext context) {
                           vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(
+                            color: isDark ? Colors.white54 : Colors.grey),
+                        color: isDark ? Colors.grey[800] : Colors.white,
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.sticky_note_2, color: Colors.black),
-                          SizedBox(width: 8),
+                          Icon(Icons.sticky_note_2,
+                              color: isDark ? Colors.white : Colors.black),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1337,20 +1452,25 @@ void _showReportDialog(BuildContext context) {
                                 Text(
                                   "Performance Report",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   "Analyze key metrics and evaluate progress",
                                   style: TextStyle(
-                                      fontSize: 8, color: Colors.black),
+                                    fontSize: 8,
+                                    color:
+                                        isDark ? Colors.white70 : Colors.black,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           Icon(Icons.arrow_forward_ios,
-                              size: 16, color: Colors.black),
+                              size: 16,
+                              color: isDark ? Colors.white : Colors.black),
                         ],
                       ),
                     ),

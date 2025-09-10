@@ -117,6 +117,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    cursorColor: const Color(0xFF00A2FF), // 👈 cursor color
                     onChanged: (text) {
                       if (_debounceEmail?.isActive ?? false) {
                         _debounceEmail?.cancel();
@@ -132,15 +133,19 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                     decoration: InputDecoration(
                       labelText: 'Email',
                       labelStyle: const TextStyle(fontSize: 13.0),
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF00A2FF),
+                      ),
                       errorText: emailError,
                       prefixIcon:
                           const Icon(Icons.email, color: Color(0xFF00A2FF)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xFF00A2FF), width: 1.0),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF00A2FF), width: 1.0),
                       ),
                     ),
                   ),
@@ -149,6 +154,7 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                   // Password
                   TextField(
                     controller: _passwordController,
+                    cursorColor: const Color(0xFF00A2FF),
                     onChanged: (text) {
                       _validatePassword(text);
                       if (_confirmPasswordController.text.isNotEmpty) {
@@ -162,6 +168,9 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Password',
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF00A2FF),
+                      ),
                       labelStyle: const TextStyle(fontSize: 13.0),
                       prefixIcon:
                           const Icon(Icons.lock, color: Color(0xFF00A2FF)),
@@ -181,13 +190,65 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xFF00A2FF), width: 1.0),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF00A2FF), width: 1.0),
                       ),
                     ),
                   ),
-
+                  const SizedBox(height: 10.0),
+                  // Confirm Password
+                  TextField(
+                    controller: _confirmPasswordController,
+                    cursorColor: const Color(0xFF00A2FF),
+                    onChanged: (text) {
+                      if (_debounceConfirmPassword?.isActive ?? false) {
+                        _debounceConfirmPassword?.cancel();
+                      }
+                      _debounceConfirmPassword =
+                          Timer(debounceDurationConfirmPassword, () async {
+                        String? validationError = validateConfirmPassword(
+                            _passwordController.text, text);
+                        setState(() {
+                          confirmPasswordError = validationError;
+                        });
+                      });
+                    },
+                    obscureText: !_isConfirmPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF00A2FF),
+                      ),
+                      labelStyle: const TextStyle(fontSize: 13.0),
+                      errorText: confirmPasswordError,
+                      prefixIcon:
+                          const Icon(Icons.lock, color: Color(0xFF00A2FF)),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: const Color(0xFF00A2FF),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF00A2FF), width: 1.0),
+                      ),
+                    ),
+                  ),
                   // Password Requirements
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -229,54 +290,6 @@ class _SignUpPageState extends State<SignUpPage1> with InputValidationMixin {
                       ],
                     ),
                   ),
-                  // Confirm Password
-                  TextField(
-                    controller: _confirmPasswordController,
-                    onChanged: (text) {
-                      if (_debounceConfirmPassword?.isActive ?? false) {
-                        _debounceConfirmPassword?.cancel();
-                      }
-                      _debounceConfirmPassword =
-                          Timer(debounceDurationConfirmPassword, () async {
-                        String? validationError = validateConfirmPassword(
-                            _passwordController.text, text);
-                        setState(() {
-                          confirmPasswordError = validationError;
-                        });
-                      });
-                    },
-                    obscureText: !_isConfirmPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      labelStyle: const TextStyle(fontSize: 13.0),
-                      errorText: confirmPasswordError,
-                      prefixIcon:
-                          const Icon(Icons.lock, color: Color(0xFF00A2FF)),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isConfirmPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: const Color(0xFF00A2FF),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isConfirmPasswordVisible =
-                                !_isConfirmPasswordVisible;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF00A2FF), width: 1.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Checkbox(

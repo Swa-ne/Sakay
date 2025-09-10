@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
@@ -14,7 +13,6 @@ import 'package:sakay_app/data/models/user.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/common/announcement_main.dart';
 
-// TODO: cache announcements list
 class AdminAnnouncement extends StatefulWidget {
   final VoidCallback openDrawer;
 
@@ -24,29 +22,21 @@ class AdminAnnouncement extends StatefulWidget {
   _AdminAnnouncementState createState() => _AdminAnnouncementState();
 }
 
-// TODO: add something bago makalipat nag page if may laman ang files, and controllers
 class _AdminAnnouncementState extends State<AdminAnnouncement>
     with InputValidationMixin {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
-
   late AnnouncementBloc _announcementBloc;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _headlineController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
-
   final ScrollController _scrollController = ScrollController();
-
   bool _isButtonLoading = false;
-
   final List<AnnouncementsModel> announcements = [];
-
   final List<File> files = [];
   final ImagePicker _picker = ImagePicker();
   late UserModel _myUserModel;
-
   String _selectedAudience = "EVERYONE";
   final List<String> _audienceOptions = ["DRIVER", "COMMUTER", "EVERYONE"];
-
   int currentPage = 1;
   bool isLoading = false;
 
@@ -232,12 +222,29 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
     }).toList();
   }
 
+  Color getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[850]!
+        : Colors.grey[200]!;
+  }
+
+  Color getTextColor(BuildContext context, {Color lightColor = Colors.black}) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : lightColor;
+  }
+
+  Color getInputFillColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[800]!
+        : Colors.grey[200]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AnnouncementBloc, AnnouncementState>(
       listener: (context, state) {
         if (state is AnnouncementLoading) {
-          // TODO: add lottie??
         } else if (state is SaveAnnouncementSuccess) {
           setState(() {
             announcements.insert(
@@ -299,18 +306,22 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                 Row(
                   children: [
                     IconButton(
-                      icon:
-                          const Icon(Icons.menu, color: Colors.black, size: 25),
+                      icon: Icon(
+                        Icons.menu,
+                        color: getTextColor(context),
+                        size: 25,
+                      ),
                       onPressed: () {
                         widget.openDrawer();
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'Announcements',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: getTextColor(context),
                       ),
                     ),
                   ],
@@ -318,8 +329,11 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                 const SizedBox(height: 12),
                 Expanded(
                   child: announcements.isEmpty
-                      ? const Center(
-                          child: Text("No announcements yet"),
+                      ? Center(
+                          child: Text(
+                            "No announcements yet",
+                            style: TextStyle(color: getTextColor(context)),
+                          ),
                         )
                       : ListView.builder(
                           itemCount: announcements.length,
@@ -341,10 +355,11 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                 );
                               },
                               child: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 4),
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEEEEEE),
+                                  color: getCardColor(context),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -359,22 +374,26 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                         children: [
                                           Text(
                                             announcement.headline,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color: getTextColor(context),
                                             ),
                                           ),
                                           Text(
                                             announcement.content,
-                                            style: const TextStyle(
-                                                color: Color(0xFF888888)),
+                                            style: TextStyle(
+                                                color: getTextColor(
+                                                    context,
+                                                    lightColor:
+                                                        Color(0xFF888888))),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           )
                                         ],
                                       ),
                                     ),
-                                    const Icon(Icons.more_horiz,
-                                        color: Colors.black),
+                                    Icon(Icons.more_horiz,
+                                        color: getTextColor(context)),
                                   ],
                                 ),
                               ),
@@ -394,6 +413,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: getCardColor(context),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
@@ -405,15 +425,19 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                 right: 16.0,
               ),
               height: MediaQuery.of(context).size.height,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              decoration: BoxDecoration(
+                color: getCardColor(context),
+                borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(10)),
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'Post Announcements',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: getTextColor(context)),
                   ),
                   const SizedBox(height: 20),
                   Expanded(
@@ -431,6 +455,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                               contentPadding: const EdgeInsets.all(16),
                               validator: (value) =>
                                   validateHeadline(value ?? ''),
+                              fillColor: getInputFillColor(context),
+                              textColor: getTextColor(context),
                             ),
                             _buildTextField(
                               controller: _contentController,
@@ -441,6 +467,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                               contentPadding: const EdgeInsets.all(16),
                               validator: (value) =>
                                   validateContent(value ?? ''),
+                              fillColor: getInputFillColor(context),
+                              textColor: getTextColor(context),
                             ),
                             const SizedBox(height: 16),
                             SizedBox(
@@ -449,18 +477,19 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                 value: _selectedAudience,
                                 decoration: InputDecoration(
                                   labelText: "Select Audience",
-                                  labelStyle: const TextStyle(
+                                  labelStyle: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                      fontWeight: FontWeight.w500,
+                                      color: getTextColor(context)),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey.shade400),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey.shade400),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey.shade400),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey.shade400),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -469,18 +498,22 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 14, horizontal: 16),
+                                  filled: true,
+                                  fillColor: getInputFillColor(context),
                                 ),
-                                dropdownColor: Colors.white,
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Colors.black54),
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.black87),
+                                dropdownColor: getCardColor(context),
+                                icon: Icon(Icons.arrow_drop_down,
+                                    color: getTextColor(context)),
+                                style: TextStyle(
+                                    fontSize: 16, color: getTextColor(context)),
                                 alignment: Alignment.center,
                                 items: _audienceOptions.map((String option) {
                                   return DropdownMenuItem<String>(
                                     value: option,
                                     child: Text(option,
-                                        style: const TextStyle(fontSize: 16)),
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: getTextColor(context))),
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) {
@@ -511,9 +544,9 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.photo_camera_outlined,
-                                      color: Colors.black,
+                                      color: getTextColor(context),
                                       size: 22,
                                     ),
                                     onPressed: _isButtonLoading
@@ -521,9 +554,9 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                         : () => _openCamera(setState),
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.image_outlined,
-                                      color: Colors.black,
+                                      color: getTextColor(context),
                                       size: 22,
                                     ),
                                     onPressed: _isButtonLoading
@@ -531,9 +564,9 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                         : () => _pickMedia(setState),
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.upload_file_outlined,
-                                      color: Colors.black,
+                                      color: getTextColor(context),
                                       size: 22,
                                     ),
                                     onPressed: _isButtonLoading
@@ -541,13 +574,14 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                         : () => _pickFiles(setState),
                                   ),
                                   if (_isButtonLoading)
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 8.0),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
                                       child: SizedBox(
                                         width: 16,
                                         height: 16,
                                         child: CircularProgressIndicator(
-                                            strokeWidth: 2),
+                                            strokeWidth: 2,
+                                            color: getTextColor(context)),
                                       ),
                                     ),
                                 ],
@@ -611,7 +645,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: getCardColor(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -629,6 +663,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                           : Icon(
                               isVideo ? Icons.movie : Icons.insert_drive_file,
                               size: 30,
+                              color: getTextColor(context),
                             ),
                       const SizedBox(width: 8),
                       SizedBox(
@@ -637,11 +672,13 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                           file.path.split('/').last,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: const TextStyle(fontSize: 12),
+                          style: TextStyle(
+                              fontSize: 12, color: getTextColor(context)),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, size: 20),
+                        icon: Icon(Icons.close,
+                            size: 20, color: getTextColor(context)),
                         onPressed: () {
                           setState(() {
                             files.removeAt(index);
@@ -696,6 +733,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
     EdgeInsetsGeometry contentPadding =
         const EdgeInsets.symmetric(vertical: 16.0),
     String? Function(String?)? validator,
+    Color? fillColor,
+    Color? textColor,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -703,23 +742,24 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
         controller: controller,
         maxLines: maxLines,
         minLines: minLines,
+        style: TextStyle(color: textColor ?? Colors.black),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.grey[200],
+          fillColor: fillColor ?? Colors.grey[200],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide.none,
           ),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
+          labelStyle: TextStyle(
+            color: textColor?.withOpacity(0.7) ?? Colors.grey,
             height: 1.3,
           ),
           labelText: label,
           hintText: hint,
-          hintStyle: const TextStyle(
+          hintStyle: TextStyle(
             fontSize: 14.0,
             fontWeight: FontWeight.w400,
-            color: Colors.grey,
+            color: textColor?.withOpacity(0.6) ?? Colors.grey,
           ),
           contentPadding: contentPadding,
         ),

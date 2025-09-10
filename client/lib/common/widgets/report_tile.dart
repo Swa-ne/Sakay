@@ -9,7 +9,7 @@ class ReportTile extends StatefulWidget {
   const ReportTile({
     super.key,
     required this.report,
-    required this.onTap,
+    required this.onTap, required Color backgroundColor, required Color textColor, required Color iconColor,
   });
 
   @override

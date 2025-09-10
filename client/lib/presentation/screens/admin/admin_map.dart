@@ -80,14 +80,14 @@ class _AdminMapState extends State<AdminMap> {
   }
 
   // "Free flow"
-  Widget _buildTrafficLegend() {
+  Widget _buildTrafficLegend(bool isDark) {
     return Positioned(
       top: 110,
       left: 60,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -100,18 +100,18 @@ class _AdminMapState extends State<AdminMap> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficChip("Free", Colors.green),
+            _buildTrafficChip("Free", Colors.green, isDark),
             const SizedBox(width: 8),
-            _buildTrafficChip("Moderate", Colors.orange),
+            _buildTrafficChip("Moderate", Colors.orange, isDark),
             const SizedBox(width: 8),
-            _buildTrafficChip("Heavy", Colors.red),
+            _buildTrafficChip("Heavy", Colors.red, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrafficChip(String text, Color color) {
+  Widget _buildTrafficChip(String text, Color color, bool isDark) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -126,10 +126,10 @@ class _AdminMapState extends State<AdminMap> {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
       ],
@@ -182,7 +182,7 @@ class _AdminMapState extends State<AdminMap> {
     );
   }
 
-  Widget _buildMapPreferenceContent(BuildContext context) {
+  Widget _buildMapPreferenceContent(BuildContext context, bool isDark) {
     final screenWidth = MediaQuery.of(context).size.width;
     final s = screenWidth / 375;
     return SizedBox(
@@ -190,7 +190,7 @@ class _AdminMapState extends State<AdminMap> {
       child: Container(
         padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
           boxShadow: [
             BoxShadow(
@@ -232,7 +232,7 @@ class _AdminMapState extends State<AdminMap> {
                         style: TextStyle(
                           fontSize: 14 * s,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
@@ -245,6 +245,7 @@ class _AdminMapState extends State<AdminMap> {
                           BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
                       icon: Icon(Icons.close, size: 20 * s),
                       onPressed: () => Navigator.of(context).pop(),
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                 ],
@@ -289,7 +290,7 @@ class _AdminMapState extends State<AdminMap> {
     );
   }
 
-  void _showMapPreferenceSheet(BuildContext context) {
+  void _showMapPreferenceSheet(BuildContext context, bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -306,7 +307,7 @@ class _AdminMapState extends State<AdminMap> {
               parent: ModalRoute.of(context)!.animation!,
               curve: Curves.easeOut,
             )),
-            child: _buildMapPreferenceContent(context),
+            child: _buildMapPreferenceContent(context, isDark),
           ),
         );
       },
@@ -316,18 +317,17 @@ class _AdminMapState extends State<AdminMap> {
   @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
-    final s = sw / 375; // base scale using 375 as reference width
-
+    final s = sw / 375;
     final topButtonOffset = (65 * s).clamp(56.0, 95.0);
     final mapPrefLeft = (15 * s).clamp(12.0, sw - 60.0);
     final liveTrafficLeft = (60 * s).clamp(50.0, sw - 140.0);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
-          ),
+          const Positioned.fill(child: MyMapWidget()),
 
           // Drawer
           Positioned(
@@ -337,13 +337,13 @@ class _AdminMapState extends State<AdminMap> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Builder(
                 builder: (context) {
                   return IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.black, size: 24),
+                    icon: Icon(Icons.menu, color: isDark ? Colors.white : Colors.black, size: 24),
                     onPressed: widget.openDrawer,
                   );
                 },
@@ -359,7 +359,7 @@ class _AdminMapState extends State<AdminMap> {
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade300),
                 boxShadow: [
@@ -370,13 +370,14 @@ class _AdminMapState extends State<AdminMap> {
                   ),
                 ],
               ),
-              child: const TextField(
+              child: TextField(
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                  hintStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 13),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 2),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey, size: 22),
+                  contentPadding: const EdgeInsets.only(top: 2),
+                  prefixIcon: Icon(Icons.search, color: isDark ? Colors.white70 : Colors.grey, size: 22),
                 ),
               ),
             ),
@@ -387,19 +388,14 @@ class _AdminMapState extends State<AdminMap> {
             top: topButtonOffset,
             left: mapPrefLeft,
             child: GestureDetector(
-              onTap: () => _showMapPreferenceSheet(context),
+              onTap: () => _showMapPreferenceSheet(context, isDark),
               child: Container(
                 padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.layers, color: Color(0xFF4A90E2), size: 22),
-                  ],
-                ),
+                child: const Icon(Icons.layers, color: Color(0xFF4A90E2), size: 22),
               ),
             ),
           ),
@@ -414,42 +410,27 @@ class _AdminMapState extends State<AdminMap> {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
                   if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
+                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
                   }
                 });
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 112, 112, 112),
-                          Color.fromARGB(255, 204, 204, 204)
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ).createShader(bounds),
-                      child: const Icon(
-                        Icons.traffic,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                    ),
+                    Icon(Icons.traffic, size: 24, color: isDark ? Colors.white : Colors.grey),
                     const SizedBox(width: 6),
-                    const Text(
+                    Text(
                       "Live Traffic",
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                        color: isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],
@@ -457,7 +438,8 @@ class _AdminMapState extends State<AdminMap> {
               ),
             ),
           ),
-          if (_showTraffic) _buildTrafficLegend(),
+
+          if (_showTraffic) _buildTrafficLegend(isDark),
         ],
       ),
     );

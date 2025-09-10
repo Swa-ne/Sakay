@@ -83,6 +83,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   // "Free flow"
   Widget _buildTrafficLegend() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Positioned(
       bottom: 88,
       left: 183,
@@ -418,22 +419,26 @@ class _DriverHomePageState extends State<DriverHomePage> {
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(10 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.layers,
-                  color: Color(0xFF4A90E2),
-                  size: 22,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : const Color(0xFF00A2FF),
+                  size: 22 * s,
                 ),
               ),
             ),
@@ -455,16 +460,17 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: EdgeInsets.all(8 * s),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(12 * s),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      blurRadius: 8 * s,
+                      offset: Offset(0, 3 * s),
                     ),
                   ],
                 ),
@@ -480,19 +486,21 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ).createShader(bounds),
-                      child: const Icon(
+                      child: Icon(
                         Icons.traffic,
-                        size: 24,
+                        size: 22 * s,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Text(
+                    SizedBox(width: 6 * s),
+                    Text(
                       "Live Traffic",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 11 * s,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.grey,
                       ),
                     ),
                   ],
@@ -509,15 +517,21 @@ class _DriverHomePageState extends State<DriverHomePage> {
             left: 16,
             right: 16,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16 * s),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(12 * s),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    color: Colors.black.withOpacity(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 0.4
+                          : 0.1,
+                    ),
+                    blurRadius: 8 * s,
+                    offset: Offset(0, 3 * s),
                   ),
                 ],
               ),
@@ -541,22 +555,27 @@ class _DriverHomePageState extends State<DriverHomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'Phinma University of Pangasinan',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           '28WV+R2R, Arellano St, Downtown District',
                           style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey.shade600,
+                            fontSize: 10 * s,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

@@ -51,6 +51,11 @@ class _GuideScreenState extends State<GuideScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if background is white to apply dark mode for text
+    final bool isDarkMode = true; // Since background is white, apply dark mode
+    final Color textColor = isDarkMode ? Colors.white : Colors.black87;
+    final Color subtitleColor = isDarkMode ? Colors.white70 : Colors.grey;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -66,7 +71,8 @@ class _GuideScreenState extends State<GuideScreen> {
                 });
               },
               itemBuilder: (context, index) {
-                return Padding(
+                return Container(
+                  color: isDarkMode ? Colors.black : Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -82,18 +88,19 @@ class _GuideScreenState extends State<GuideScreen> {
                       Text(
                         _slides[index]['title']!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 20.0),
                       Text(
                         _slides[index]['description']!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13.0,
-                          color: Colors.grey,
+                          color: subtitleColor,
                         ),
                       ),
                     ],
@@ -106,10 +113,10 @@ class _GuideScreenState extends State<GuideScreen> {
           SmoothPageIndicator(
             controller: _pageController,
             count: _slides.length,
-            effect: const ExpandingDotsEffect(
+            effect: ExpandingDotsEffect(
               dotWidth: 10.0,
               dotHeight: 10.0,
-              activeDotColor: Color(0xFF00A2FF),
+              activeDotColor: const Color(0xFF00A2FF),
               dotColor: Colors.grey,
               spacing: 10.0,
               expansionFactor: 4.0,

@@ -62,9 +62,12 @@ class _EditAccountState extends State<EditAccount>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F3F3),
-      appBar: _buildAppBar(),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: _buildAppBar(theme, colorScheme),
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Form(
@@ -73,9 +76,9 @@ class _EditAccountState extends State<EditAccount>
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                _buildProfileHeader(),
-                _buildFormSection(),
-                _buildActionButtons(),
+                _buildProfileHeader(theme, colorScheme),
+                _buildFormSection(theme, colorScheme),
+                _buildActionButtons(theme, colorScheme),
                 const SizedBox(height: 30),
               ],
             ),
@@ -85,24 +88,26 @@ class _EditAccountState extends State<EditAccount>
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(ThemeData theme, ColorScheme colorScheme) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       titleSpacing: 0,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      systemOverlayStyle: theme.brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       leading: IconButton(
-        icon: const Icon(
+        icon: Icon(
           Icons.arrow_back_ios_new,
-          color: Colors.black87,
+          color: colorScheme.onSurface,
           size: 20,
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
-      title: const Text(
+      title: Text(
         "Edit Profile",
         style: TextStyle(
-          color: Color(0xFF1E293B),
+          color: colorScheme.onSurface,
           fontWeight: FontWeight.w700,
           fontSize: 18,
         ),
@@ -111,7 +116,7 @@ class _EditAccountState extends State<EditAccount>
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(ThemeData theme, ColorScheme colorScheme) {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
@@ -143,7 +148,7 @@ class _EditAccountState extends State<EditAccount>
                 ),
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundColor: Colors.white,
+                  backgroundColor: theme.cardColor,
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl: widget.profile,
@@ -154,24 +159,16 @@ class _EditAccountState extends State<EditAccount>
                       placeholder: (context, url) => Container(
                         width: 100,
                         height: 100,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFE2E8F0), Color(0xFFCBD5E1)],
-                          ),
-                        ),
-                        child: const Icon(Icons.person,
-                            size: 40, color: Color(0xFF64748B)),
+                        color: theme.dividerColor,
+                        child: Icon(Icons.person,
+                            size: 40, color: theme.hintColor),
                       ),
                       errorWidget: (context, url, error) => Container(
                         width: 100,
                         height: 100,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFE2E8F0), Color(0xFFCBD5E1)],
-                          ),
-                        ),
-                        child: const Icon(Icons.person,
-                            size: 40, color: Color(0xFF64748B)),
+                        color: theme.dividerColor,
+                        child: Icon(Icons.person,
+                            size: 40, color: theme.hintColor),
                       ),
                     ),
                   ),
@@ -185,7 +182,7 @@ class _EditAccountState extends State<EditAccount>
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -195,10 +192,10 @@ class _EditAccountState extends State<EditAccount>
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.camera_alt,
                       size: 20,
-                      color: Colors.black,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -241,12 +238,12 @@ class _EditAccountState extends State<EditAccount>
     );
   }
 
-  Widget _buildFormSection() {
+  Widget _buildFormSection(ThemeData theme, ColorScheme colorScheme) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -259,16 +256,17 @@ class _EditAccountState extends State<EditAccount>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Personal Information",
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 20),
           _buildModernInputField(
+            theme: theme,
             controller: _nameController,
             label: 'Full Name',
             icon: Icons.person_outline,
@@ -277,6 +275,7 @@ class _EditAccountState extends State<EditAccount>
           ),
           const SizedBox(height: 16),
           _buildModernInputField(
+            theme: theme,
             controller: _emailController,
             label: 'Email Address',
             icon: Icons.email_outlined,
@@ -291,9 +290,10 @@ class _EditAccountState extends State<EditAccount>
             },
           ),
           const SizedBox(height: 16),
-          _buildPasswordField(),
+          _buildPasswordField(theme),
           const SizedBox(height: 16),
           _buildModernInputField(
+            theme: theme,
             controller: _phoneController,
             label: 'Phone Number',
             icon: Icons.phone_outlined,
@@ -305,6 +305,7 @@ class _EditAccountState extends State<EditAccount>
   }
 
   Widget _buildModernInputField({
+    required ThemeData theme,
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -313,42 +314,43 @@ class _EditAccountState extends State<EditAccount>
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    final colorScheme = theme.colorScheme;
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
       validator: validator,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: Color(0xFF00A2FF)),
+        prefixIcon: Icon(icon, color: const Color(0xFF00A2FF)),
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: theme.inputDecorationTheme.fillColor ??
+            theme.scaffoldBackgroundColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFEF4444)),
-        ),
-        labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        labelStyle: TextStyle(color: theme.hintColor, fontSize: 12),
+        hintStyle: TextStyle(color: theme.hintColor),
       ),
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
     return TextFormField(
       obscureText: !_isPasswordVisible,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Password',
         prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF00A2FF)),
@@ -357,7 +359,7 @@ class _EditAccountState extends State<EditAccount>
             _isPasswordVisible
                 ? Icons.visibility_outlined
                 : Icons.visibility_off_outlined,
-            color: Colors.grey,
+            color: theme.hintColor,
           ),
           onPressed: () {
             setState(() {
@@ -366,25 +368,26 @@ class _EditAccountState extends State<EditAccount>
           },
         ),
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: theme.inputDecorationTheme.fillColor ??
+            theme.scaffoldBackgroundColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
         ),
-        labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+        labelStyle: TextStyle(color: theme.hintColor, fontSize: 12),
       ),
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(ThemeData theme, ColorScheme colorScheme) {
     return Container(
       margin: const EdgeInsets.all(20),
       child: Column(
@@ -428,8 +431,8 @@ class _EditAccountState extends State<EditAccount>
             child: OutlinedButton(
               onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF64748B),
-                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                foregroundColor: theme.hintColor,
+                side: BorderSide(color: theme.dividerColor),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -449,14 +452,17 @@ class _EditAccountState extends State<EditAccount>
   }
 
   void _showImagePickerOptions() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -465,17 +471,17 @@ class _EditAccountState extends State<EditAccount>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: theme.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Change Profile Picture',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 20),
@@ -485,15 +491,15 @@ class _EditAccountState extends State<EditAccount>
                 _buildImageOption(Icons.camera_alt, 'Camera', () {
                   Navigator.pop(context);
                   _showSnackBar('Camera selected');
-                }),
+                }, theme, colorScheme),
                 _buildImageOption(Icons.photo_library, 'Gallery', () {
                   Navigator.pop(context);
                   _showSnackBar('Gallery selected');
-                }),
+                }, theme, colorScheme),
                 _buildImageOption(Icons.delete, 'Remove', () {
                   Navigator.pop(context);
                   _showSnackBar('Profile picture removed');
-                }),
+                }, theme, colorScheme),
               ],
             ),
             const SizedBox(height: 20),
@@ -503,7 +509,8 @@ class _EditAccountState extends State<EditAccount>
     );
   }
 
-  Widget _buildImageOption(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildImageOption(
+      IconData icon, String label, VoidCallback onTap, ThemeData theme, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -511,18 +518,18 @@ class _EditAccountState extends State<EditAccount>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: theme.dividerColor),
             ),
             child: Icon(icon, color: const Color(0xFF00A2FF), size: 24),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF64748B),
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w500,
             ),
           ),

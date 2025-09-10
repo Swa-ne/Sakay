@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sakay_app/core/configs/theme/theme_cubit.dart';
 
 class ThemeCustomizationPage extends StatefulWidget {
   const ThemeCustomizationPage({super.key});
@@ -9,7 +11,6 @@ class ThemeCustomizationPage extends StatefulWidget {
 
 class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
     with TickerProviderStateMixin {
-  bool isDarkMode = false;
   bool isAnnouncementEnabled = true;
   bool isSoundEffectEnabled = true;
   int fontSize = 14;
@@ -41,25 +42,27 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 249, 249, 249),
+        backgroundColor: isDark ? Colors.grey[900] : const Color.fromARGB(255, 249, 249, 249),
         titleSpacing: 0,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Theme Customization',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
         centerTitle: true,
@@ -69,12 +72,8 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 0),
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 249, 249, 249),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : const Color.fromARGB(255, 249, 249, 249),
               ),
               child: FadeTransition(
                 opacity: _fadeAnimation,
@@ -86,63 +85,71 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                       _buildSectionHeader(
                         icon: Icons.palette,
                         title: 'Display Settings',
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildModernOption(
                         icon: Icons.dark_mode,
                         title: 'Dark Mode',
                         subtitle: 'Switch to dark theme',
-                        trailing: _buildModernSwitch(isDarkMode, (value) {
-                          setState(() {
-                            isDarkMode = value;
-                          });
-                        }),
+                        trailing: BlocBuilder<ThemeCubit, ThemeMode>(
+                          builder: (context, themeMode) {
+                            return _buildModernSwitch(themeMode == ThemeMode.dark, (value) {
+                              context.read<ThemeCubit>().toggleTheme(value);
+                            });
+                          },
+                        ),
+                        isDark: isDark,
                       ),
                       _buildModernOption(
                         icon: Icons.text_fields,
                         title: 'Font Size',
                         subtitle: 'Adjust text size: ${fontSize}px',
-                        trailing: _buildFontSizeControls(),
+                        trailing: _buildFontSizeControls(isDark),
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildSectionHeader(
                         icon: Icons.notifications,
                         title: 'Notifications',
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildModernOption(
                         icon: Icons.campaign,
                         title: 'Announcement Alert',
                         subtitle: 'Get notified of updates',
-                        trailing:
-                            _buildModernSwitch(isAnnouncementEnabled, (value) {
+                        trailing: _buildModernSwitch(isAnnouncementEnabled, (value) {
                           setState(() {
                             isAnnouncementEnabled = value;
                           });
                         }),
+                        isDark: isDark,
                       ),
                       _buildModernOption(
                         icon: Icons.volume_up,
                         title: 'Sound Effects',
                         subtitle: 'Enable notification sounds',
-                        trailing:
-                            _buildModernSwitch(isSoundEffectEnabled, (value) {
+                        trailing: _buildModernSwitch(isSoundEffectEnabled, (value) {
                           setState(() {
                             isSoundEffectEnabled = value;
                           });
                         }),
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildSectionHeader(
                         icon: Icons.vibration,
                         title: 'Sound & Vibration',
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildModernOption(
                         icon: Icons.vibration,
                         title: 'Vibration Intensity',
                         subtitle: 'Level: $vibrationIntensity/5',
-                        trailing: _buildVibrationControls(),
+                        trailing: _buildVibrationControls(isDark),
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       _buildSoundVolumeCard('Notification Volume', soundVolume1,
@@ -150,14 +157,14 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                         setState(() {
                           soundVolume1 = value;
                         });
-                      }),
+                      }, isDark),
                       const SizedBox(height: 12),
                       _buildSoundVolumeCard('Media Volume', soundVolume2,
                           (value) {
                         setState(() {
                           soundVolume2 = value;
                         });
-                      }),
+                      }, isDark),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -170,7 +177,7 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
     );
   }
 
-  Widget _buildSectionHeader({required IconData icon, required String title}) {
+  Widget _buildSectionHeader({required IconData icon, required String title, required bool isDark}) {
     return Row(
       children: [
         Container(
@@ -188,10 +195,10 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
         const SizedBox(width: 12),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Colors.grey,
+            color: isDark ? Colors.white : Colors.grey,
           ),
         ),
       ],
@@ -203,14 +210,17 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
     required String title,
     required String subtitle,
     required Widget trailing,
+    required bool isDark,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? Colors.grey[800]! : Colors.grey.shade200,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -240,17 +250,17 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D3748),
+                    color: isDark ? Colors.white : const Color(0xFF2D3748),
                   ),
                 ),
                 Text(
                   subtitle,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade600,
+                    color: isDark ? Colors.white70 : Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -276,10 +286,10 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
     );
   }
 
-  Widget _buildFontSizeControls() {
+  Widget _buildFontSizeControls(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey[800] : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -294,15 +304,16 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                     });
                   }
                 : null,
+            isDark: isDark,
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               fontSize.toString(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF00A2FF),
+                color: const Color(0xFF00A2FF),
               ),
             ),
           ),
@@ -315,16 +326,17 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                     });
                   }
                 : null,
+            isDark: isDark,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVibrationControls() {
+  Widget _buildVibrationControls(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey[800] : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -339,6 +351,7 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                     });
                   }
                 : null,
+            isDark: isDark,
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -360,6 +373,7 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                     });
                   }
                 : null,
+            isDark: isDark,
           ),
         ],
       ),
@@ -369,6 +383,7 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
   Widget _buildControlButton({
     required IconData icon,
     required VoidCallback? onPressed,
+    required bool isDark,
   }) {
     return Material(
       color: Colors.transparent,
@@ -390,13 +405,15 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
   }
 
   Widget _buildSoundVolumeCard(
-      String title, double value, ValueChanged<double> onChanged) {
+      String title, double value, ValueChanged<double> onChanged, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: isDark ? Colors.grey[900] : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? Colors.grey[800]! : Colors.grey.shade200,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,10 +428,10 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3748),
+                  color: isDark ? Colors.white : const Color(0xFF2D3748),
                 ),
               ),
               const Spacer(),
@@ -422,7 +439,7 @@ class _ThemeCustomizationPageState extends State<ThemeCustomizationPage>
                 '${(value * 100).round()}%',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: isDark ? Colors.white70 : Colors.grey.shade600,
                 ),
               ),
             ],

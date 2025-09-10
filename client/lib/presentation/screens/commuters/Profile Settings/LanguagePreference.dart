@@ -44,26 +44,28 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_ios_new,
-          color: Colors.black87,
-          size: 20,
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: isDark ? Colors.white : Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-        title: const Text(
+        title: Text(
           'Language Preference',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
             letterSpacing: 0.5,
           ),
         ),
@@ -76,16 +78,18 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.language_rounded, color: Colors.black54, size: 20),
-                  SizedBox(width: 8),
+                  Icon(Icons.language_rounded,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      size: 20),
+                  const SizedBox(width: 8),
                   Text(
                     'Choose your preferred language',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                 ],
@@ -103,6 +107,7 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
                             'Filipino',
                             selectedLanguage,
                             toggleLanguage,
+                            isDark,
                           ),
                           const SizedBox(height: 12),
                           _modernLanguageTile(
@@ -111,6 +116,7 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
                             'United States',
                             selectedLanguage,
                             toggleLanguage,
+                            isDark,
                           ),
                           const SizedBox(height: 12),
                           _modernLanguageTile(
@@ -119,6 +125,7 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
                             'Chinese',
                             selectedLanguage,
                             toggleLanguage,
+                            isDark,
                           ),
                         ],
                       ),
@@ -198,30 +205,38 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
     String subtitle,
     String? selectedLanguage,
     Function(String) toggleLanguage,
+    bool isDark,
   ) {
     final bool isSelected = selectedLanguage == language;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF00A2FF).withOpacity(0.1) : Colors.white,
+        color: isSelected
+            ? const Color(0xFF00A2FF).withOpacity(0.1)
+            : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? const Color(0xFF00A2FF) : Colors.grey[300]!,
+          color: isSelected
+              ? const Color(0xFF00A2FF)
+              : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
           width: isSelected ? 2 : 1,
         ),
       ),
       child: ListTile(
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(flagUrl, width: 40, height: 40, fit: BoxFit.cover),
+          child:
+              Image.network(flagUrl, width: 40, height: 40, fit: BoxFit.cover),
         ),
         title: Text(
           language,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isSelected ? const Color(0xFF00A2FF) : Colors.black87,
+            color: isSelected
+                ? const Color(0xFF00A2FF)
+                : (isDark ? Colors.white : Colors.black87),
           ),
         ),
         subtitle: Text(
@@ -230,7 +245,7 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
             fontSize: 13,
             color: isSelected
                 ? const Color(0xFF00A2FF).withOpacity(0.7)
-                : Colors.grey[600],
+                : (isDark ? Colors.white70 : Colors.grey[600]),
           ),
         ),
         trailing: isSelected

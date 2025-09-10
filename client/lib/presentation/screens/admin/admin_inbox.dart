@@ -61,25 +61,42 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
     }
   }
 
+  Color getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[850]!
+        : Colors.white;
+  }
+
+  Color getTextColor(BuildContext context, {Color lightColor = Colors.black}) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : lightColor;
+  }
+
+  Color getInputFillColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[800]!
+        : Colors.grey[200]!;
+  }
+
   Widget _buildInboxList() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 8.0,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: TextField(
             decoration: InputDecoration(
               hintText: "Search", // TODO: add functionality
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              prefixIcon: Icon(Icons.search,
+                  color: getTextColor(context, lightColor: Colors.grey)),
               filled: true,
-              fillColor: Colors.grey[200],
+              fillColor: getInputFillColor(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
                 borderSide: BorderSide.none,
               ),
             ),
+            style: TextStyle(color: getTextColor(context)),
           ),
         ),
         Expanded(
@@ -91,72 +108,81 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
               final isRead = inbox.last_message.sender == user_id
                   ? true
                   : inbox.last_message.isRead;
-              return ListTile(
-                leading: CachedNetworkImage(
-                  imageUrl: inbox.user_id.profile,
-                  imageBuilder: (context, imageProvider) => CircleAvatar(
-                    radius: 28,
-                    backgroundImage: imageProvider,
-                  ),
-                  placeholder: (context, url) => const CircleAvatar(
-                    radius: 28,
-                    child: Icon(Icons.person),
-                  ),
-                  errorWidget: (context, url, error) => const CircleAvatar(
-                    radius: 28,
-                    child: Icon(Icons.error),
-                  ),
-                ),
-                title: Text(
-                  "${inbox.user_id.first_name} ${inbox.user_id.last_name}",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: !isRead ? Colors.blue : Colors.black,
-                  ),
-                ),
-                subtitle: Text(
-                  inbox.last_message.sender == user_id
-                      ? "You: ${inbox.last_message.message}"
-                      : inbox.last_message.message,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: !isRead ? FontWeight.bold : FontWeight.normal,
-                    color: !isRead ? Colors.black : Colors.grey,
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      formatDateTime(
-                        inbox.last_message.createdAt,
-                      ),
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+
+              return Container(
+                color: getCardColor(context),
+                child: ListTile(
+                  leading: CachedNetworkImage(
+                    imageUrl: inbox.user_id.profile,
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      radius: 28,
+                      backgroundImage: imageProvider,
                     ),
-                    if (!isRead)
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Icon(Icons.circle, color: Colors.blue, size: 10),
+                    placeholder: (context, url) => const CircleAvatar(
+                      radius: 28,
+                      child: Icon(Icons.person),
+                    ),
+                    errorWidget: (context, url, error) => const CircleAvatar(
+                      radius: 28,
+                      child: Icon(Icons.error),
+                    ),
+                  ),
+                  title: Text(
+                    "${inbox.user_id.first_name} ${inbox.user_id.last_name}",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: !isRead
+                          ? Colors.blue
+                          : getTextColor(context, lightColor: Colors.black),
+                    ),
+                  ),
+                  subtitle: Text(
+                    inbox.last_message.sender == user_id
+                        ? "You: ${inbox.last_message.message}"
+                        : inbox.last_message.message,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight:
+                          !isRead ? FontWeight.bold : FontWeight.normal,
+                      color: !isRead
+                          ? getTextColor(context, lightColor: Colors.black)
+                          : Colors.grey,
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        formatDateTime(inbox.last_message.createdAt),
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: 12),
                       ),
-                  ],
-                ),
-                onTap: () {
-                  setState(() {
-                    _chatBloc.add(IsReadInboxesEvent(inbox.id));
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdminChatPage(
-                          chat_id: inbox.id,
-                          inbox: inbox,
-                          updateInboxList: _updateInboxList,
+                      if (!isRead)
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(Icons.circle,
+                              color: Colors.blue, size: 10),
                         ),
-                      ),
-                    );
-                  });
-                },
+                    ],
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _chatBloc.add(IsReadInboxesEvent(inbox.id));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminChatPage(
+                            chat_id: inbox.id,
+                            inbox: inbox,
+                            updateInboxList: _updateInboxList,
+                          ),
+                        ),
+                      );
+                    });
+                  },
+                ),
               );
             },
           ),
@@ -188,29 +214,29 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
             inboxes.addAll(state.inboxes);
           });
         } else if (state is IsReadInboxError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error)),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.error)));
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: getCardColor(context),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: getCardColor(context),
           elevation: 0,
           automaticallyImplyLeading: false,
           title: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black, size: 25),
+                icon: Icon(Icons.menu, color: getTextColor(context), size: 25),
                 onPressed: widget.openDrawer,
               ),
-              const Text(
+              const SizedBox(width: 8),
+              Text(
                 "Inbox",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: getTextColor(context),
                 ),
               ),
             ],
@@ -243,7 +269,12 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
               return Center(child: Text("Error: ${state.error}"));
             }
             return inboxes.isEmpty
-                ? const Center(child: Text("No messages available"))
+                ? Center(
+                    child: Text(
+                      "No messages available",
+                      style: TextStyle(color: getTextColor(context)),
+                    ),
+                  )
                 : _buildInboxList();
           },
         ),
