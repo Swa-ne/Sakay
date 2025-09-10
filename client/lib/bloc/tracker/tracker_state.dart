@@ -23,6 +23,8 @@ class TrackMeStarted extends TrackerState {}
 
 class TrackMeStopped extends TrackerState {}
 
+class InUsedDriverConnection extends TrackerState {}
+
 class ConnectionError extends TrackerState {
   final String error;
 

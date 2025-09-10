@@ -18,3 +18,5 @@ class StopTrackMeEvent extends TrackerEvent {}
 class ConnectEvent extends TrackerEvent {}
 
 class ConnectDriverEvent extends TrackerEvent {}
+
+class InUseDriverEvent extends TrackerEvent {}

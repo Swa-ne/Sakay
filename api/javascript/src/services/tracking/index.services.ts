@@ -60,3 +60,39 @@ export const checkUserFromRedisRealtime = async (user_id: string) => {
         return null;
     }
 }
+export const addBusIDToRedisRealtime = async (bus_id: string, user_id: string) => {
+    try {
+        await redis.set(bus_id, user_id);
+        return { message: 'Success', httpCode: 200 };
+    } catch (err) {
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const removeBusIDFromRedisRealtime = async (bus_id: string) => {
+    try {
+        await redis.del(bus_id);
+        return { message: 'Success', httpCode: 200 };
+    } catch (err) {
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const checkBusIDFromRedisRealtime = async (bus_id: string) => {
+    try {
+        const result = await redis.exists(bus_id);
+        let user_id;
+        if (result === 1) {
+            user_id = await redis.get(bus_id)
+        }
+        return user_id;
+    } catch (err) {
+        return null;
+    }
+}
+export const getBusIDFromRedisRealtime = async (bus_id: string) => {
+    try {
+        const socket_id = await redis.get(bus_id);
+        return socket_id;
+    } catch (err) {
+        return null;
+    }
+}

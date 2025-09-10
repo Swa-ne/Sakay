@@ -99,6 +99,27 @@ export const getBus = async (bus_id: string) => {
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
+export const getBusWithUserID = async (user_id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const bus = await UserBusAssigning.findOne({ user_id }).session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (!bus) {
+            return { error: 'Driver is not assigned yet.', httpCode: 404 };
+        }
+
+        return { message: bus.bus_id, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
 export const putBus = async (bus_id: string, bus_number: string, plate_number: string) => {
     const session = await startSession();
     session.startTransaction();

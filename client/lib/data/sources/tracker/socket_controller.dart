@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
@@ -115,6 +116,11 @@ class TrackingSocketControllerImpl extends TrackingSocketController {
 
     socket.on('track-me-stop', (data) async {
       await tracker.removeOnePerson(data['user']);
+    });
+
+    socket.on('vehicle-inuse', (data) async {
+      tracker.hideMyLocation();
+      trackerBloc.add(InUseDriverEvent());
     });
   }
 
