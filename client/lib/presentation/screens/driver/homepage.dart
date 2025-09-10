@@ -328,8 +328,12 @@ class _DriverHomePageState extends State<DriverHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // Updated to pass mapType and showTraffic parameters
+          Positioned.fill(
+            child: MyMapWidget(
+              mapType: _currentMapType,
+              showTraffic: _showTraffic,
+            ),
           ),
 
           Positioned(
@@ -439,7 +443,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             ),
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button - Updated to only change state (no direct map controller access)
           Positioned(
             bottom: bottomButtonOffset,
             left: liveTrafficLeft,
@@ -448,10 +452,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 setState(() {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
                 });
               },
               child: Container(

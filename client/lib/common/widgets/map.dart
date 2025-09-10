@@ -5,7 +5,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 
 class MyMapWidget extends StatefulWidget {
-  const MyMapWidget({super.key});
+  final MapType mapType;
+  final bool showTraffic;
+  
+  const MyMapWidget({
+    super.key,
+    required this.mapType,
+    required this.showTraffic,
+  });
 
   @override
   _MyMapScreenState createState() => _MyMapScreenState();
@@ -23,13 +30,42 @@ class _MyMapScreenState extends State<MyMapWidget> {
   }
 
   @override
+  void didUpdateWidget(MyMapWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Update map type when it changes
+    if (oldWidget.mapType != widget.mapType && _mapController.isCompleted) {
+      _mapController.future.then((controller) {
+        // Map type is handled by the mapType parameter in GoogleMap widget
+        setState(() {});
+      });
+    }
+    
+    // Update traffic display when it changes
+    if (oldWidget.showTraffic != widget.showTraffic && _mapController.isCompleted) {
+      _mapController.future.then((controller) {
+        final mapStyle = widget.showTraffic ? '' : '''
+        [
+          {
+            "featureType": "poi",
+            "elementType": "all",
+            "stylers": [
+              { "visibility": "off" }
+            ]
+          }
+        ]''';
+        controller.setMapStyle(mapStyle);
+      });
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    MapType _currentMapType = MapType.normal;
     return SizedBox.expand(
       child: ValueListenableBuilder<Set<Marker>>(
         valueListenable: tracker.markersNotifier,
@@ -45,17 +81,19 @@ class _MyMapScreenState extends State<MyMapWidget> {
                       target: LatLng(16.033410, 120.286585),
                       zoom: 12.0,
                     ),
-                    mapType: _currentMapType,
+                    mapType: widget.mapType,
                     onMapCreated: (GoogleMapController controller) async {
-                      controller.setMapStyle('''[
-                          {
-                            "featureType": "poi",
-                            "elementType": "all",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          }
-                        ]''');
+                      final mapStyle = widget.showTraffic ? '' : '''
+                      [
+                        {
+                          "featureType": "poi",
+                          "elementType": "all",
+                          "stylers": [
+                            { "visibility": "off" }
+                          ]
+                        }
+                      ]''';
+                      controller.setMapStyle(mapStyle);
                       setState(() {
                         tracker.setMap(controller);
                       });
@@ -67,6 +105,7 @@ class _MyMapScreenState extends State<MyMapWidget> {
                     myLocationButtonEnabled: false,
                     markers: markers,
                     polylines: polylines,
+                    trafficEnabled: widget.showTraffic,
                   );
                 },
               );

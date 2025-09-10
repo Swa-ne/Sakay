@@ -325,8 +325,12 @@ class _AdminMapState extends State<AdminMap> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // Updated to pass mapType and showTraffic parameters
+          Positioned.fill(
+            child: MyMapWidget(
+              mapType: _currentMapType,
+              showTraffic: _showTraffic,
+            ),
           ),
 
           // Drawer
@@ -404,7 +408,7 @@ class _AdminMapState extends State<AdminMap> {
             ),
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button - Updated to only change state
           Positioned(
             top: topButtonOffset,
             left: liveTrafficLeft,
@@ -413,10 +417,6 @@ class _AdminMapState extends State<AdminMap> {
                 setState(() {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
                 });
               },
               child: Container(
