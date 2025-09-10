@@ -721,9 +721,12 @@ class _HomePageState extends State<HomePage> {
       },
       child: Stack(
         children: [
-          // FOR MAP AND MAP STYLES
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // FOR MAP AND MAP STYLES - Pass mapType and showTraffic
+          Positioned.fill(
+            child: MyMapWidget(
+              mapType: _currentMapType,
+              showTraffic: _showTraffic,
+            ),
           ),
 
           // Top search + suggestions area (responsive)
@@ -1029,9 +1032,6 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   _showTraffic = !_showTraffic;
                   _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
                 });
               },
               child: Container(
