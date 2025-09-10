@@ -156,7 +156,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                               const SizedBox(height: 10),
                               _buildPasswordField(),
                               _buildForgotAndTerms(),
-                              const SizedBox(height: 15),
+                              const SizedBox(height: 20),
                               _buildLoginButton(),
                               const SizedBox(height: 20),
                               const Divider(
@@ -298,32 +298,6 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
               style: TextStyle(color: Colors.red, fontSize: 12),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Checkbox(
-              value: _acceptedTerms,
-              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-              activeColor: const Color(0xFF00A2FF),
-              onChanged: (value) {
-                setState(() {
-                  _acceptedTerms = value ?? false;
-                });
-              },
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  // open Terms & Conditions page
-                },
-                child: const Text(
-                  'I agree to the Terms & Conditions',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );
