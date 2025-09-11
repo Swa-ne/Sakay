@@ -70,8 +70,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       (event, emit) async {
         try {
           emit(ReportLoading());
-          final reports = await _reportRepo.getAllReports(event.page);
-          emit(GetAllReportsSuccess(reports));
+          final reports = await _reportRepo.getAllReports(event.cursor);
+          emit(GetAllReportsSuccess(reports["reports"], reports["nextCursor"]));
         } catch (e) {
           emit(const GetAllReportsError("Internet Connection Error"));
         }

@@ -29,12 +29,12 @@ class PostPerformancetReportEvent extends ReportEvent {
 }
 
 class GetAllReportsEvent extends ReportEvent {
-  final int page;
+  final String cursor;
 
-  const GetAllReportsEvent(this.page);
+  const GetAllReportsEvent(this.cursor);
 
   @override
-  List<Object> get props => [page];
+  List<Object> get props => [cursor];
 }
 
 class GetReportEvent extends ReportEvent {
