@@ -47,14 +47,14 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
   String _selectedAudience = "EVERYONE";
   final List<String> _audienceOptions = ["DRIVER", "COMMUTER", "EVERYONE"];
 
-  int currentPage = 1;
+  String cursor = "";
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _announcementBloc = BlocProvider.of<AnnouncementBloc>(context);
-    _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
+    _announcementBloc.add(GetAllAnnouncementsEvent(cursor));
     _scrollController.addListener(_onScroll);
     _initializeMyUserModel();
   }
@@ -81,9 +81,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
     if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
         isLoading = true;
-        currentPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
+      _announcementBloc.add(GetAllAnnouncementsEvent(cursor));
     }
   }
 
@@ -263,6 +262,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            cursor = state.cursor;
           });
         } else if (state is SaveAnnouncementError) {
           ScaffoldMessenger.of(context).showSnackBar(

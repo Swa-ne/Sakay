@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
 
   // Announcements
   final List<AnnouncementsModel> announcements = [];
-  int currentAnnouncementPage = 1;
+  String currentAnnouncementCursor = "";
   final ScrollController _scrollAnnouncementController = ScrollController();
   bool isLoadingAnnouncement = false;
 
@@ -55,9 +55,9 @@ class _HomeState extends State<Home> {
         !isLoadingAnnouncement) {
       setState(() {
         isLoadingAnnouncement = true;
-        currentAnnouncementPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     }
   }
 
@@ -100,7 +100,8 @@ class _HomeState extends State<Home> {
     _announcementBloc.stream
         .firstWhere((state) => state is ConnectedAnnouncementRealtimeSocket)
         .then((_) {
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     });
 
     _chatBloc.stream
@@ -163,6 +164,7 @@ class _HomeState extends State<Home> {
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            currentAnnouncementCursor = state.cursor;
             isLoadingAnnouncement = false;
           });
         } else if (state is OnReceiveAnnouncementSuccess) {
@@ -188,68 +190,68 @@ class _HomeState extends State<Home> {
         }
       },
       child: BlocListener<ChatBloc, ChatState>(
-        listener: (context, state) {
-          if (state is ChatLoading) {
-            setState(() => isLoadingMessage = true);
-          } else if (state is GetMessageSuccess) {
-            setState(() {
-              messages.addAll(state.messages);
-              isLoadingMessage = false;
-            });
-          } else if (state is OnReceiveMessageSuccess) {
-            if (_selectedIndex != 1) {
-              showTopNotification(
-                context,
-                icon: Icons.chat_bubble,
-                isUserReply: true,
-                message: state.message.message,
-                imageUrl: state.user.profile,
-              );
-            }
-            if (chat_id == state.message.chat_id) {
+          listener: (context, state) {
+            if (state is ChatLoading) {
+              setState(() => isLoadingMessage = true);
+            } else if (state is GetMessageSuccess) {
               setState(() {
-                messages.insert(0, state.message);
+                messages.addAll(state.messages);
                 isLoadingMessage = false;
               });
+            } else if (state is OnReceiveMessageSuccess) {
+              if (_selectedIndex != 1) {
+                showTopNotification(
+                  context,
+                  icon: Icons.chat_bubble,
+                  isUserReply: true,
+                  message: state.message.message,
+                  imageUrl: state.user.profile,
+                );
+              }
+              if (chat_id == state.message.chat_id) {
+                setState(() {
+                  messages.insert(0, state.message);
+                  isLoadingMessage = false;
+                });
+              }
+            } else if (state is GetMessageError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(state.error), backgroundColor: Colors.red),
+              );
+              setState(() => isLoadingMessage = false);
+            } else if (state is OnReceiveMessageError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(state.error), backgroundColor: Colors.red),
+              );
+              setState(() => isLoadingMessage = false);
             }
-          } else if (state is GetMessageError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error), backgroundColor: Colors.red),
-            );
-            setState(() => isLoadingMessage = false);
-          } else if (state is OnReceiveMessageError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error), backgroundColor: Colors.red),
-            );
-            setState(() => isLoadingMessage = false);
-          }
-        },
-        
-        child: Scaffold(
-          body: pages[_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xFF00A2FF),
-            unselectedItemColor: Colors.grey,
-            showUnselectedLabels: true,
-            type: BottomNavigationBarType.fixed,
-            selectedLabelStyle:
-                const TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
-            unselectedLabelStyle:
-                const TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
-              BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'Inbox'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.campaign), label: 'Announcement'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: 'Profile'),
-            ],
-          )
-        )
-      ),
+          },
+          child: Scaffold(
+              body: pages[_selectedIndex],
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                backgroundColor: Colors.white,
+                selectedItemColor: const Color(0xFF00A2FF),
+                unselectedItemColor: Colors.grey,
+                showUnselectedLabels: true,
+                type: BottomNavigationBarType.fixed,
+                selectedLabelStyle: const TextStyle(
+                    fontSize: 10, fontWeight: FontWeight.normal),
+                unselectedLabelStyle: const TextStyle(
+                    fontSize: 10, fontWeight: FontWeight.normal),
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.inbox), label: 'Inbox'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.campaign), label: 'Announcement'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.person), label: 'Profile'),
+                ],
+              ))),
     );
   }
 }

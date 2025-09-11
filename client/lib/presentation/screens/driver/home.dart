@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
 
   // Announcements
   final List<AnnouncementsModel> announcements = [];
-  int currentAnnouncementPage = 1;
+  String currentAnnouncementCursor = "";
   final ScrollController _scrollAnnouncementController = ScrollController();
   bool isLoadingAnnouncement = false;
 
@@ -62,9 +62,9 @@ class _HomeState extends State<Home> {
         !isLoadingAnnouncement) {
       setState(() {
         isLoadingAnnouncement = true;
-        currentAnnouncementPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     }
   }
 
@@ -105,7 +105,8 @@ class _HomeState extends State<Home> {
     _announcementBloc.stream
         .firstWhere((state) => state is ConnectedAnnouncementRealtimeSocket)
         .then((_) {
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     });
 
     _chatBloc.stream
@@ -168,6 +169,7 @@ class _HomeState extends State<Home> {
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            currentAnnouncementCursor = state.cursor;
             isLoadingAnnouncement = false;
           });
         } else if (state is OnReceiveAnnouncementSuccess) {
