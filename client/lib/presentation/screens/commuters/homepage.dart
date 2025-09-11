@@ -618,10 +618,9 @@ class _HomePageState extends State<HomePage> {
       targetX = screenSize.width * 0.80; // Adjust to right for Profile
     }
 
-    // Dark mode for white hint container
-    final bool isDarkMode = true; // You can add logic here if needed
-    final containerColor = isDarkMode ? Colors.grey[900] : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
+    final theme = Theme.of(context);
+    final containerColor = theme.cardColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black87;
     final arrowColor = containerColor;
 
     _hintOverlay = OverlayEntry(
@@ -988,8 +987,7 @@ class _HomePageState extends State<HomePage> {
                 child: Icon(
                   Icons.layers,
                   color: isDark ? Colors.white : const Color(0xFF00A2FF),
-                  size: MediaQuery.of(context).size.width *
-                      0.06,
+                  size: MediaQuery.of(context).size.width * 0.06,
                 ),
               ),
             ),
@@ -1003,10 +1001,8 @@ class _HomePageState extends State<HomePage> {
               onTap: () => setState(() => _showBusList = !_showBusList),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height *
-                      0.012,
-                  horizontal: MediaQuery.of(context).size.width *
-                      0.035,
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.035,
                 ),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.grey[850] : Colors.white,
@@ -1027,19 +1023,15 @@ class _HomePageState extends State<HomePage> {
                     Icon(
                       Icons.directions_bus,
                       color: isDark ? Colors.white : const Color(0xFF00A2FF),
-                      size: MediaQuery.of(context).size.width *
-                          0.06,
+                      size: MediaQuery.of(context).size.width * 0.06,
                     ),
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width *
-                            0.015),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                     Text(
                       "Bus List",
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.grey,
                         fontWeight: FontWeight.w600,
-                        fontSize: MediaQuery.of(context).size.width *
-                            0.03,
+                        fontSize: MediaQuery.of(context).size.width * 0.03,
                       ),
                     ),
                   ],
@@ -1048,7 +1040,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-            // Bus list overlay & container
+          // Bus list overlay & container
           Stack(
             children: [
               if (_showBusList)
@@ -1169,8 +1161,7 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isDark ? Colors.white : Colors.grey,
+                        color: isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],

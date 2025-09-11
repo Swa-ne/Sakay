@@ -26,68 +26,71 @@ void main() async {
   String accessToken = "${dotenv.env['ACCESS_TOKEN']}";
   MapboxOptions.setAccessToken(accessToken);
 
-  runApp(const MyApp());
+  final themeCubit = ThemeCubit();
+  await themeCubit.loadTheme();
+
+  runApp(MyApp(themeCubit: themeCubit));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeCubit themeCubit;
+  const MyApp({super.key, required this.themeCubit});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => TrackerBloc(TrackingSocketControllerImpl()),
-        ),
-        BlocProvider(
-          create: (context) => AuthBloc(AuthRepoImpl()),
-        ),
-        BlocProvider(
-          create: (context) => ChatBloc(
-            ChatRepoImpl(),
-            RealtimeSocketControllerImpl(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => TrackerBloc(TrackingSocketControllerImpl()),
           ),
-        ),
-        BlocProvider(
-          create: (context) => AnnouncementBloc(
-            AnnouncementRepoImpl(),
-            RealtimeSocketControllerImpl(),
+          BlocProvider(
+            create: (context) => AuthBloc(AuthRepoImpl()),
           ),
-        ),
-        BlocProvider(
-          create: (context) => ReportBloc(
-            ReportRepoImpl(),
-            RealtimeSocketControllerImpl(),
+          BlocProvider(
+            create: (context) => ChatBloc(
+              ChatRepoImpl(),
+              RealtimeSocketControllerImpl(),
+            ),
           ),
-        ),
-        BlocProvider(
-          create: (context) => BusBloc(BusRepoImpl()),
-        ),
-        BlocProvider(
-          create: (context) => ThemeCubit(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Sakay',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: BlocBuilder<ThemeCubit, ThemeMode>(
-          builder: (context, themeMode) {
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeMode,
-              title: 'Sakay',
-              routerConfig: appRouter,
-            );
-          },
+          BlocProvider(
+            create: (context) => AnnouncementBloc(
+              AnnouncementRepoImpl(),
+              RealtimeSocketControllerImpl(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => ReportBloc(
+              ReportRepoImpl(),
+              RealtimeSocketControllerImpl(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => BusBloc(BusRepoImpl()),
+          ),
+          BlocProvider.value(value: themeCubit),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Sakay',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            useMaterial3: true,
+          ),
+          home: BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+                title: 'Sakay',
+                routerConfig: appRouter,
+              );
+            },
+          ),
         ),
       ),
-    ));
+    );
   }
 }

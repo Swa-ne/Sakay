@@ -51,12 +51,12 @@ class _GuideScreenState extends State<GuideScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = true;
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
     final Color subtitleColor = isDarkMode ? Colors.white70 : Colors.grey;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: Column(
         children: [
           const SizedBox(height: 80),
@@ -112,10 +112,10 @@ class _GuideScreenState extends State<GuideScreen> {
           SmoothPageIndicator(
             controller: _pageController,
             count: _slides.length,
-            effect: ExpandingDotsEffect(
+            effect: const ExpandingDotsEffect(
               dotWidth: 10.0,
               dotHeight: 10.0,
-              activeDotColor: const Color(0xFF00A2FF),
+              activeDotColor: Color(0xFF00A2FF),
               dotColor: Colors.grey,
               spacing: 10.0,
               expansionFactor: 4.0,
