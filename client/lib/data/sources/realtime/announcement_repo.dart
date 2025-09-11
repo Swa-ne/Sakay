@@ -7,7 +7,7 @@ abstract class AnnouncementRepo {
     List<File> files,
     AnnouncementsModel announcement,
   );
-  Future<List<AnnouncementsModel>> getAllAnnouncements(int page);
+  Future<Map<String, dynamic>> getAllAnnouncements(String cursor);
   Future<AnnouncementsModel> getAnnouncement(String announcement_id);
   Future<bool> editAnnouncement(
     List<File> files,
