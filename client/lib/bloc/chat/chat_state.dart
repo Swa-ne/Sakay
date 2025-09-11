@@ -93,11 +93,12 @@ class SaveMessageError extends ChatState {
 
 class GetMessageSuccess extends ChatState {
   final List<MessageModel> messages;
+  final String cursor;
 
-  const GetMessageSuccess(this.messages);
+  const GetMessageSuccess(this.messages, this.cursor);
 
   @override
-  List<Object> get props => [messages];
+  List<Object> get props => [messages, cursor];
 }
 
 class GetMessageError extends ChatState {
@@ -130,11 +131,12 @@ class OnReceiveMessageError extends ChatState {
 
 class GetInboxesSuccess extends ChatState {
   final List<InboxModel> inboxes;
+  final String cursor;
 
-  const GetInboxesSuccess(this.inboxes);
+  const GetInboxesSuccess(this.inboxes, this.cursor);
 
   @override
-  List<Object> get props => [inboxes];
+  List<Object> get props => [inboxes, cursor];
 }
 
 class GetInboxesError extends ChatState {
