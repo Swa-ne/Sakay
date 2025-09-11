@@ -51,8 +51,7 @@ class _GuideScreenState extends State<GuideScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if background is white to apply dark mode for text
-    final bool isDarkMode = true; // Since background is white, apply dark mode
+    final bool isDarkMode = true;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
     final Color subtitleColor = isDarkMode ? Colors.white70 : Colors.grey;
 

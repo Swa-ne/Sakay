@@ -73,8 +73,9 @@ class AProfilePageState extends State<ProfilePage> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor:
-            isDark ? Theme.of(context).scaffoldBackgroundColor : const Color.fromARGB(255, 249, 249, 249),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor
+            : const Color.fromARGB(255, 249, 249, 249),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
@@ -159,13 +160,12 @@ class AProfilePageState extends State<ProfilePage> {
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
-                              fadeInDuration:
-                                  const Duration(milliseconds: 300),
+                              fadeInDuration: const Duration(milliseconds: 300),
                               placeholder: (context, url) =>
                                   const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Image.asset('assets/profile.jpg',
-                                      fit: BoxFit.cover),
+                              errorWidget: (context, url, error) => Image.asset(
+                                  'assets/profile.jpg',
+                                  fit: BoxFit.cover),
                             ),
                           ),
                         ),
@@ -251,45 +251,50 @@ class AProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 10.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: [
-                      if (!isDark)
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          offset: const Offset(0, 4),
-                          blurRadius: 12.0,
-                          spreadRadius: 0,
-                        ),
-                    ],
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      _authBloc.add(LogoutEvent());
-                    },
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.logout,
-                            color: Colors.red,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 16.0),
-                          Text(
-                            'Logout',
-                            style: TextStyle(
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.red[400],
-                            ),
-                          ),
-                        ],
+                child: InkWell(
+                  onTap: () {
+                    _authBloc.add(LogoutEvent());
+                  },
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.red[700]?.withOpacity(
+                              0.2) // Dark mode: darker red with opacity
+                          : Colors
+                              .red[50], // Light red background in light mode
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: Colors.red, // Pure red outline
+                        width: 1.5,
                       ),
+                      boxShadow: [
+                        if (!isDark)
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            offset: const Offset(0, 4),
+                            blurRadius: 12.0,
+                          ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.logout,
+                          color: isDark ? Colors.white : Colors.red,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 16.0),
+                        Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.red[400],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -307,7 +312,6 @@ class AProfilePageState extends State<ProfilePage> {
       required IconData icon,
       required List<Widget> children}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = Theme.of(context).cardColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -333,17 +337,8 @@ class AProfilePageState extends State<ProfilePage> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: cardColor,
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
               borderRadius: BorderRadius.circular(16.0),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    offset: const Offset(0, 4),
-                    blurRadius: 12.0,
-                    spreadRadius: 0,
-                  ),
-              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,6 +359,11 @@ class AProfilePageState extends State<ProfilePage> {
     bool isLast = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final iconBackgroundColor = isDark
+        ? const Color(0xFF00A2FF).withOpacity(0.2)
+        : const Color(0xFF00A2FF).withOpacity(0.1);
     final textColor = isDark ? Colors.white : const Color(0xFF2D3748);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF718096);
 
@@ -371,14 +371,15 @@ class AProfilePageState extends State<ProfilePage> {
       onTap: () {
         if (title == 'Account') {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditAccount(
-                  userType: widget.user_type,
-                  fullName: fullName,
-                  profile: profile,
-                ),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditAccount(
+                userType: widget.user_type,
+                fullName: fullName,
+                profile: profile,
+              ),
+            ),
+          );
         } else if (title == 'Language Preference') {
           Navigator.push(
             context,
@@ -388,26 +389,42 @@ class AProfilePageState extends State<ProfilePage> {
           );
         } else if (title == 'Theme Customization') {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ThemeCustomizationPage(),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ThemeCustomizationPage(),
+            ),
+          );
         } else if (title == 'Terms and Conditions') {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const TermsConditions()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const TermsConditions()),
+          );
         } else if (title == 'About') {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AboutPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AboutPage()),
+          );
         }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.1 : 0.04),
+              offset: const Offset(0, 2),
+              blurRadius: 4.0,
+            ),
+          ],
+        ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF00A2FF).withOpacity(0.1),
+                color: iconBackgroundColor,
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Icon(

@@ -25,6 +25,25 @@ class _AdminMapState extends State<AdminMap> {
   GoogleMapController? _mapController;
   bool _showTraffic = false;
 
+  bool _hasRestricted = false;
+
+  void _toggleTraffic() {
+    setState(() {
+      _showTraffic = !_showTraffic;
+    });
+    _prefs.setBool('showTraffic', _showTraffic);
+
+    if (_mapController != null) {
+      _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+    }
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
   final CameraPosition _defaultCameraPosition = const CameraPosition(
     target: LatLng(16.0439, 120.3331),
     zoom: 14,
@@ -144,7 +163,8 @@ class _AdminMapState extends State<AdminMap> {
     }
   }
 
-  Widget _buildMapTypeCard(MapType type, String label, String assetPath) {
+  Widget _buildMapTypeCard(MapType type, String label, String assetPath,
+      {required bool isDark}) {
     final bool isSelected = _currentMapType == type;
 
     return InkWell(
@@ -184,106 +204,106 @@ class _AdminMapState extends State<AdminMap> {
 
   Widget _buildMapPreferenceContent(BuildContext context, bool isDark) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final s = screenWidth / 375;
-    return SizedBox(
-      width: screenWidth,
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return FractionallySizedBox(
+      widthFactor: 1.0,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.02,
+        ),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
+          color: isDark ? Colors.grey[900] : Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(screenWidth * 0.04),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10 * s,
-              offset: Offset(0, -2 * s),
+              blurRadius: screenWidth * 0.025,
+              offset: Offset(0, -screenHeight * 0.003),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header
             SizedBox(
-              height: 40 * s,
+              height: screenHeight * 0.05,
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 40 * s,
-                    child: IgnorePointer(
-                      ignoring: true,
-                      child: Opacity(
-                        opacity: 0,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(
-                              minWidth: 40 * s, minHeight: 40 * s),
-                          icon: Icon(Icons.close, size: 20 * s),
-                          onPressed: null,
-                        ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14 * s,
+                          fontSize: screenWidth * 0.038,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 40 * s,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints:
-                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
-                      icon: Icon(Icons.close, size: 20 * s),
-                      onPressed: () => Navigator.of(context).pop(),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      size: screenWidth * 0.05,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 16 * s),
+
+            SizedBox(height: screenHeight * 0.02),
+
+            // Map Type Buttons Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                InkWell(
-                  onTap: () => _changeMapType(MapType.normal),
-                  child: _buildMapTypeCard(
-                    MapType.normal,
-                    'Default',
-                    'assets/default_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.normal),
+                    child: _buildMapTypeCard(
+                      MapType.normal,
+                      'Default',
+                      'assets/default_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.satellite),
-                  child: _buildMapTypeCard(
-                    MapType.satellite,
-                    'Satellite',
-                    'assets/satellite_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.satellite),
+                    child: _buildMapTypeCard(
+                      MapType.satellite,
+                      'Satellite',
+                      'assets/satellite_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.terrain),
-                  child: _buildMapTypeCard(
-                    MapType.terrain,
-                    'Terrain',
-                    'assets/terrain_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.terrain),
+                    child: _buildMapTypeCard(
+                      MapType.terrain,
+                      'Terrain',
+                      'assets/terrain_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24 * s),
+
+            SizedBox(height: screenHeight * 0.03),
           ],
         ),
       ),
@@ -327,110 +347,191 @@ class _AdminMapState extends State<AdminMap> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: MyMapWidget()),
+          Positioned.fill(
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _mapController = controller;
+                _mapController!.setMapStyle(_getMapStyle());
+                setState(() {
+                  _mapInitialized = true;
+                });
+                if (_showTraffic) {
+                  _mapController!.setMapStyle('');
+                }
+              },
+              initialCameraPosition: _defaultCameraPosition,
+              mapType: _currentMapType,
+              trafficEnabled: _showTraffic,
+              onCameraMove: (CameraPosition position) {
+                if (!_hasRestricted) {
+                  _restrictToPangasinan();
+                  _hasRestricted = true;
+                }
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
+          ),
 
-          // Drawer
+          // Drawer Button (responsive style)
           Positioned(
-            top: 20,
-            left: 15,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Builder(
-                builder: (context) {
-                  return IconButton(
-                    icon: Icon(Icons.menu, color: isDark ? Colors.white : Colors.black, size: 24),
-                    onPressed: widget.openDrawer,
-                  );
-                },
+            top: MediaQuery.of(context).size.height * 0.020,
+            left: MediaQuery.of(context).size.width * 0.040,
+            child: GestureDetector(
+              onTap: widget.openDrawer,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.03,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.025),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.menu,
+                  color: isDark ? Colors.white : Colors.black,
+                  size: MediaQuery.of(context).size.width *
+                      0.06,
+                ),
               ),
             ),
           ),
 
-          // Search Bar
           Positioned(
-            top: 20,
-            left: 60,
-            right: 20,
+            top: MediaQuery.of(context).size.height * 0.02,
+            left: MediaQuery.of(context).size.width * 0.18,
+            right: MediaQuery.of(context).size.width * 0.045,
             child: Container(
-              height: 40,
+              padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.012,
+                horizontal: MediaQuery.of(context).size.width * 0.03,
+              ),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade300),
+                color: isDark ? Colors.grey[850] : Colors.white,
+                borderRadius: BorderRadius.circular(
+                    MediaQuery.of(context).size.width * 0.025),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: MediaQuery.of(context).size.width * 0.02,
+                    offset:
+                        Offset(0, MediaQuery.of(context).size.height * 0.004),
                   ),
                 ],
               ),
-              child: TextField(
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 13),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.only(top: 2),
-                  prefixIcon: Icon(Icons.search, color: isDark ? Colors.white70 : Colors.grey, size: 22),
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.search,
+                    color: isDark ? Colors.white : Colors.grey,
+                    size: MediaQuery.of(context).size.width * 0.06,
+                  ),
+                  SizedBox(width: MediaQuery.of(context).size.width * 0.03),
+                  Expanded(
+                    child: TextField(
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black),
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.grey,
+                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
           // Map Preference Button
           Positioned(
-            top: topButtonOffset,
-            left: mapPrefLeft,
+            top: MediaQuery.of(context).size.height * 0.08,
+            left: MediaQuery.of(context).size.width * 0.040,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context, isDark),
               child: Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.03,
                 ),
-                child: const Icon(Icons.layers, color: Color(0xFF4A90E2), size: 22),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.025),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.layers,
+                  color: isDark ? Colors.white : const Color(0xFF00A2FF),
+                  size: MediaQuery.of(context).size.width *
+                      0.06, // responsive icon size
+                ),
               ),
             ),
           ),
 
           // Live Traffic Button
           Positioned(
-            top: topButtonOffset,
-            left: liveTrafficLeft,
+            top: MediaQuery.of(context).size.height * 0.08,
+            left: MediaQuery.of(context).size.width * 0.18,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showTraffic = !_showTraffic;
-                  _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
-                });
-              },
+              onTap: _toggleTraffic,
               child: Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.035,
+                ),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.03),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.003),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.traffic, size: 24, color: isDark ? Colors.white : Colors.grey),
-                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.traffic,
+                      size: MediaQuery.of(context).size.width * 0.06,
+                      color: isDark ? Colors.white : Colors.grey,
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                     Text(
                       "Live Traffic",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.grey,
+                        color:
+                            isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],

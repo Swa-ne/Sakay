@@ -239,15 +239,19 @@ class _EditAccountState extends State<EditAccount>
   }
 
   Widget _buildFormSection(ThemeData theme, ColorScheme colorScheme) {
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: isDark
+            ? const Color(0xFF1E1E1E)
+            : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 5),
           ),
@@ -261,7 +265,7 @@ class _EditAccountState extends State<EditAccount>
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
+              color: isDark ? Colors.white : colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 20),
@@ -509,8 +513,8 @@ class _EditAccountState extends State<EditAccount>
     );
   }
 
-  Widget _buildImageOption(
-      IconData icon, String label, VoidCallback onTap, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildImageOption(IconData icon, String label, VoidCallback onTap,
+      ThemeData theme, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: onTap,
       child: Column(

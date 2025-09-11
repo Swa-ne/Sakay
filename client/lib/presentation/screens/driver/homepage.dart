@@ -24,6 +24,25 @@ class _DriverHomePageState extends State<DriverHomePage> {
   GoogleMapController? _mapController;
   bool _showTraffic = false;
 
+  bool _hasRestricted = false;
+
+  void _toggleTraffic() {
+    setState(() {
+      _showTraffic = !_showTraffic;
+    });
+    _prefs.setBool('showTraffic', _showTraffic);
+
+    if (_mapController != null) {
+      _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+    }
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
   final CameraPosition _defaultCameraPosition = const CameraPosition(
     target: LatLng(16.0439, 120.3331),
     zoom: 14,
@@ -59,6 +78,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
       _currentMapType = type;
     });
     _prefs.setInt('mapType', type.index);
+
+    if (_mapController != null && mounted) {
+      _mapController!.setMapStyle(_getMapStyle());
+    }
   }
 
   String _getMapStyle() {
@@ -81,16 +104,18 @@ class _DriverHomePageState extends State<DriverHomePage> {
     ''';
   }
 
-  // "Free flow"
+// "Free flow"
   Widget _buildTrafficLegend() {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Positioned(
       bottom: 88,
       left: 183,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:
+              isDark ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -103,18 +128,18 @@ class _DriverHomePageState extends State<DriverHomePage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTrafficChip("Free", Colors.green),
+            _buildTrafficChip("Free", Colors.green, isDark),
             const SizedBox(width: 8),
-            _buildTrafficChip("light", Colors.orange),
+            _buildTrafficChip("Light", Colors.orange, isDark),
             const SizedBox(width: 8),
-            _buildTrafficChip("Heavy", Colors.red),
+            _buildTrafficChip("Heavy", Colors.red, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrafficChip(String text, Color color) {
+  Widget _buildTrafficChip(String text, Color color, bool isDark) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -129,10 +154,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
       ],
@@ -147,7 +172,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
     }
   }
 
-  Widget _buildMapTypeCard(MapType type, String label, String assetPath) {
+  Widget _buildMapTypeCard(MapType type, String label, String assetPath,
+      {required bool isDark}) {
     final bool isSelected = _currentMapType == type;
 
     return InkWell(
@@ -211,105 +237,106 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final s = screenWidth / 375;
-    return SizedBox(
-      width: screenWidth,
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return FractionallySizedBox(
+      widthFactor: 1.0,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.02,
+        ),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
+          color: isDark ? Colors.grey[900] : Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(screenWidth * 0.04),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10 * s,
-              offset: Offset(0, -2 * s),
+              blurRadius: screenWidth * 0.025,
+              offset: Offset(0, -screenHeight * 0.003),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header
             SizedBox(
-              height: 40 * s,
+              height: screenHeight * 0.05,
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 40 * s,
-                    child: IgnorePointer(
-                      ignoring: true,
-                      child: Opacity(
-                        opacity: 0,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(
-                              minWidth: 40 * s, minHeight: 40 * s),
-                          icon: Icon(Icons.close, size: 20 * s),
-                          onPressed: null,
-                        ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.038,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14 * s,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 40 * s,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints:
-                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
-                      icon: Icon(Icons.close, size: 20 * s),
-                      onPressed: () => Navigator.of(context).pop(),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      size: screenWidth * 0.05,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 16 * s),
+
+            SizedBox(height: screenHeight * 0.02),
+
+            // Map Type Buttons Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                InkWell(
-                  onTap: () => _changeMapType(MapType.normal),
-                  child: _buildMapTypeCard(
-                    MapType.normal,
-                    'Default',
-                    'assets/default_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.normal),
+                    child: _buildMapTypeCard(
+                      MapType.normal,
+                      'Default',
+                      'assets/default_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.satellite),
-                  child: _buildMapTypeCard(
-                    MapType.satellite,
-                    'Satellite',
-                    'assets/satellite_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.satellite),
+                    child: _buildMapTypeCard(
+                      MapType.satellite,
+                      'Satellite',
+                      'assets/satellite_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.terrain),
-                  child: _buildMapTypeCard(
-                    MapType.terrain,
-                    'Terrain',
-                    'assets/terrain_map.png',
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.terrain),
+                    child: _buildMapTypeCard(
+                      MapType.terrain,
+                      'Terrain',
+                      'assets/terrain_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24 * s),
+
+            SizedBox(height: screenHeight * 0.03),
           ],
         ),
       ),
@@ -318,6 +345,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     final sw = MediaQuery.of(context).size.width;
     final s = sw / 375;
 
@@ -329,8 +358,31 @@ class _DriverHomePageState extends State<DriverHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MyMapWidget(),
+          Positioned.fill(
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _mapController = controller;
+                _mapController!.setMapStyle(_getMapStyle());
+                setState(() {
+                  _mapInitialized = true;
+                });
+                if (_showTraffic) {
+                  _mapController!.setMapStyle('');
+                }
+              },
+              initialCameraPosition: _defaultCameraPosition,
+              mapType: _currentMapType,
+              trafficEnabled: _showTraffic,
+              onCameraMove: (CameraPosition position) {
+                if (!_hasRestricted) {
+                  _restrictToPangasinan();
+                  _hasRestricted = true;
+                }
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
           ),
 
           Positioned(
@@ -414,31 +466,33 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
           // Map Preference Button
           Positioned(
-            bottom: bottomButtonOffset,
-            left: mapPrefLeft,
+            bottom: MediaQuery.of(context).size.height * 0.11,
+            left: MediaQuery.of(context).size.width * 0.045,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
-                padding: EdgeInsets.all(8 * s),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.03,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[850]
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(10 * s),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.025),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8 * s,
-                      offset: Offset(0, 3 * s),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
                     ),
                   ],
                 ),
                 child: Icon(
                   Icons.layers,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : const Color(0xFF00A2FF),
-                  size: 22 * s,
+                  color: isDark ? Colors.white : const Color(0xFF00A2FF),
+                  size: MediaQuery.of(context).size.width *
+                      0.06,
                 ),
               ),
             ),
@@ -446,61 +500,44 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
           // Live Traffic Button
           Positioned(
-            bottom: bottomButtonOffset,
-            left: liveTrafficLeft,
+            bottom: MediaQuery.of(context).size.height * 0.11,
+            left: MediaQuery.of(context).size.width * 0.18,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showTraffic = !_showTraffic;
-                  _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
-                });
-              },
+              onTap: _toggleTraffic,
               child: Container(
-                padding: EdgeInsets.all(8 * s),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.035,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[850]
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(12 * s),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.03),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8 * s,
-                      offset: Offset(0, 3 * s),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.003),
                     ),
                   ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 112, 112, 112),
-                          Color.fromARGB(255, 204, 204, 204)
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ).createShader(bounds),
-                      child: Icon(
-                        Icons.traffic,
-                        size: 22 * s,
-                        color: Colors.white,
-                      ),
+                    Icon(
+                      Icons.traffic,
+                      size: MediaQuery.of(context).size.width * 0.06,
+                      color: isDark ? Colors.white : Colors.grey,
                     ),
-                    SizedBox(width: 6 * s),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                     Text(
                       "Live Traffic",
                       style: TextStyle(
-                        fontSize: 11 * s,
+                        fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.grey,
+                        color:
+                            isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],

@@ -165,7 +165,8 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
           if (selectedLanguage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Language set to $selectedLanguage successfully!'),
+                content:
+                    Text('Language set to $selectedLanguage successfully!'),
                 backgroundColor: const Color(0xFF00A2FF),
               ),
             );
@@ -214,7 +215,9 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
       decoration: BoxDecoration(
         color: isSelected
             ? const Color(0xFF00A2FF).withOpacity(0.1)
-            : Theme.of(context).cardColor,
+            : (isDark
+                ? const Color(0xFF1E1E1E)
+                : Colors.white), // Dark mode support
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected
@@ -236,7 +239,9 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
             fontWeight: FontWeight.w600,
             color: isSelected
                 ? const Color(0xFF00A2FF)
-                : (isDark ? Colors.white : Colors.black87),
+                : (isDark
+                    ? Colors.white
+                    : Colors.black87), // Text color changes
           ),
         ),
         subtitle: Text(
@@ -245,7 +250,9 @@ class _LanguagePreferencePageState extends State<LanguagePreferencePage>
             fontSize: 13,
             color: isSelected
                 ? const Color(0xFF00A2FF).withOpacity(0.7)
-                : (isDark ? Colors.white70 : Colors.grey[600]),
+                : (isDark
+                    ? Colors.white70
+                    : Colors.grey[600]), // Subtitle adapts
           ),
         ),
         trailing: isSelected

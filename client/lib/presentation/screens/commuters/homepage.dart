@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
-import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
@@ -36,10 +35,16 @@ class _HomePageState extends State<HomePage> {
   bool _showBusList = false;
   bool _isBusListVisisble = false;
 
-  void _toggleBusList() {
+  bool _hasRestricted = false;
+
+  void _toggleTraffic() {
     setState(() {
-      _isBusListVisisble = !_isBusListVisisble;
+      _showTraffic = !_showTraffic;
     });
+    _prefs.setBool('showTraffic', _showTraffic);
+    if (_mapController != null) {
+      _mapController!.setMapStyle(_showTraffic ? '' : _getMapStyle());
+    }
   }
 
   void _closeBusList() {
@@ -94,6 +99,10 @@ class _HomePageState extends State<HomePage> {
       _currentMapType = type;
     });
     _prefs.setInt('mapType', type.index);
+
+    if (_mapController != null && mounted) {
+      _mapController!.setMapStyle(_getMapStyle());
+    }
   }
 
   String _getMapStyle() {
@@ -419,111 +428,106 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final s = screenWidth / 375;
+    final screenHeight = MediaQuery.of(context).size.height;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SizedBox(
-      width: screenWidth,
+    return FractionallySizedBox(
+      widthFactor: 1.0,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.02,
+        ),
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16 * s)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(screenWidth * 0.04),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10 * s,
-              offset: Offset(0, -2 * s),
+              blurRadius: screenWidth * 0.025,
+              offset: Offset(0, -screenHeight * 0.003),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header
             SizedBox(
-              height: 40 * s,
+              height: screenHeight * 0.05,
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 40 * s,
-                    child: IgnorePointer(
-                      ignoring: true,
-                      child: Opacity(
-                        opacity: 0,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(
-                              minWidth: 40 * s, minHeight: 40 * s),
-                          icon: Icon(Icons.close, size: 20 * s),
-                          onPressed: null,
-                        ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
                         "Map Preference",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14 * s,
+                          fontSize: screenWidth * 0.038,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 40 * s,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints:
-                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
-                      icon: Icon(Icons.close, size: 20 * s),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      size: screenWidth * 0.05,
                       color: isDark ? Colors.white : Colors.black87,
-                      onPressed: () => Navigator.of(context).pop(),
                     ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 16 * s),
+
+            SizedBox(height: screenHeight * 0.02),
+
+            // Map Type Buttons Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                InkWell(
-                  onTap: () => _changeMapType(MapType.normal),
-                  child: _buildMapTypeCard(
-                    MapType.normal,
-                    'Default',
-                    'assets/default_map.png',
-                    isDark: isDark,
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.normal),
+                    child: _buildMapTypeCard(
+                      MapType.normal,
+                      'Default',
+                      'assets/default_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.satellite),
-                  child: _buildMapTypeCard(
-                    MapType.satellite,
-                    'Satellite',
-                    'assets/satellite_map.png',
-                    isDark: isDark,
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.satellite),
+                    child: _buildMapTypeCard(
+                      MapType.satellite,
+                      'Satellite',
+                      'assets/satellite_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.terrain),
-                  child: _buildMapTypeCard(
-                    MapType.terrain,
-                    'Terrain',
-                    'assets/terrain_map.png',
-                    isDark: isDark,
+                Flexible(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.terrain),
+                    child: _buildMapTypeCard(
+                      MapType.terrain,
+                      'Terrain',
+                      'assets/terrain_map.png',
+                      isDark: isDark,
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24 * s),
+
+            SizedBox(height: screenHeight * 0.03),
           ],
         ),
       ),
@@ -736,16 +740,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
     final sh = MediaQuery.of(context).size.height;
-    final s = sw / 375; // base scale using 375 as reference width
-
-    // responsive paddings and positions derived from screen width
-    final topButtonOffset = (75 * s).clamp(56.0, 95.0);
-    final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
-    final busListLeft = (63 * s).clamp(48.0, sw - 120.0);
-    final liveTrafficLeft = (155 * s).clamp(110.0, sw - 140.0);
+    final s = sw / 375;
+    final shScale = sh / 812;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
         body: GestureDetector(
@@ -759,9 +765,32 @@ class _HomePageState extends State<HomePage> {
       },
       child: Stack(
         children: [
-          // FOR MAP AND MAP STYLES
-          const Positioned.fill(
-            child: MyMapWidget(),
+          // FOR MAP AND MAP STYLES - FIXED VERSION
+          Positioned.fill(
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _mapController = controller;
+                _mapController!.setMapStyle(_getMapStyle());
+                setState(() {
+                  _mapInitialized = true;
+                });
+                if (_showTraffic) {
+                  _mapController!.setMapStyle('');
+                }
+              },
+              initialCameraPosition: _defaultCameraPosition,
+              mapType: _currentMapType,
+              trafficEnabled: _showTraffic,
+              onCameraMove: (CameraPosition position) {
+                if (!_hasRestricted) {
+                  _restrictToPangasinan();
+                  _hasRestricted = true;
+                }
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
           ),
 
           // Top search + suggestions area (responsive)
@@ -932,60 +961,63 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Map Preference Button (responsive placed)
+          // Map Preference Button - Fully Responsive
           Positioned(
-            top: topButtonOffset,
-            left: mapPrefLeft,
+            top: MediaQuery.of(context).size.height * 0.095,
+            left: MediaQuery.of(context).size.width * 0.04,
             child: GestureDetector(
               onTap: () => _showMapPreferenceSheet(context),
               child: Container(
-                padding: EdgeInsets.all(8 * s),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.03,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[850]
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(10 * s),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.025),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8 * s,
-                      offset: Offset(0, 3 * s),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
                     ),
                   ],
                 ),
                 child: Icon(
                   Icons.layers,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : const Color(0xFF00A2FF),
-                  size: 22 * s,
+                  color: isDark ? Colors.white : const Color(0xFF00A2FF),
+                  size: MediaQuery.of(context).size.width *
+                      0.06,
                 ),
               ),
             ),
           ),
 
-          // Bus List Button
+          // Bus List Button - Fully Responsive
           Positioned(
-            top: topButtonOffset,
-            left: busListLeft,
+            top: MediaQuery.of(context).size.height * 0.095,
+            left: MediaQuery.of(context).size.width * 0.17,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showBusList = !_showBusList;
-                });
-              },
+              onTap: () => setState(() => _showBusList = !_showBusList),
               child: Container(
-                padding: EdgeInsets.all(8 * s),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height *
+                      0.012,
+                  horizontal: MediaQuery.of(context).size.width *
+                      0.035,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[850]
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(12 * s),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.03),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8 * s,
-                      offset: Offset(0, 3 * s),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
                     ),
                   ],
                 ),
@@ -994,20 +1026,20 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Icon(
                       Icons.directions_bus,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : const Color(0xFF00A2FF),
-                      size: 22 * s,
+                      color: isDark ? Colors.white : const Color(0xFF00A2FF),
+                      size: MediaQuery.of(context).size.width *
+                          0.06,
                     ),
-                    SizedBox(width: 6 * s),
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width *
+                            0.015),
                     Text(
                       "Bus List",
                       style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.grey,
+                        color: isDark ? Colors.white : Colors.grey,
                         fontWeight: FontWeight.w600,
-                        fontSize: 11 * s,
+                        fontSize: MediaQuery.of(context).size.width *
+                            0.03,
                       ),
                     ),
                   ],
@@ -1016,43 +1048,44 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Bus list overlay & container (responsive width)
+            // Bus list overlay & container
           Stack(
             children: [
               if (_showBusList)
                 Positioned.fill(
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showBusList = false;
-                      });
-                    },
+                    onTap: () => setState(() => _showBusList = false),
                     child: Container(
-                      color: Colors.transparent, // transparent overlay
+                      color: Colors.transparent,
                     ),
                   ),
                 ),
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                bottom: _showBusList ? 10 * s : -400 * s,
-                left: 16 * s,
-                right: 16 * s,
+                bottom: _showBusList
+                    ? MediaQuery.of(context).size.height * 0.015
+                    : -MediaQuery.of(context).size.height * 0.5,
+                left: MediaQuery.of(context).size.width * 0.04,
+                right: MediaQuery.of(context).size.width * 0.04,
                 child: AnimatedOpacity(
                   opacity: _showBusList ? 1 : 0,
                   duration: const Duration(milliseconds: 300),
                   child: Container(
-                    padding: EdgeInsets.all(12 * s),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.03),
                     decoration: BoxDecoration(
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.grey[900]
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(12 * s),
+                      borderRadius: BorderRadius.circular(
+                          MediaQuery.of(context).size.width * 0.03),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8 * s,
-                          offset: Offset(0, 3 * s),
+                          blurRadius: MediaQuery.of(context).size.width * 0.02,
+                          offset: Offset(
+                              0, MediaQuery.of(context).size.height * 0.004),
                         ),
                       ],
                     ),
@@ -1066,13 +1099,10 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "2 km",
                           estimatedTime: "5 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
+                          onClose: () => setState(() => _showBusList = false),
                         ),
-                        SizedBox(height: 8 * s),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
                         _buildBusMenuItem(
                           context,
                           "002 - XYZ - 5678",
@@ -1080,13 +1110,10 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "3.5 km",
                           estimatedTime: "8 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
+                          onClose: () => setState(() => _showBusList = false),
                         ),
-                        SizedBox(height: 8 * s),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
                         _buildBusMenuItem(
                           context,
                           "003 - LMN - 9101",
@@ -1094,11 +1121,7 @@ class _HomePageState extends State<HomePage> {
                           "assets/bus_image.png",
                           distance: "5 km",
                           estimatedTime: "12 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
+                          onClose: () => setState(() => _showBusList = false),
                         ),
                       ],
                     ),
@@ -1108,63 +1131,46 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button - Fully Responsive - FIXED
           Positioned(
-            top: topButtonOffset,
-            left: liveTrafficLeft,
+            top: MediaQuery.of(context).size.height * 0.095,
+            left: MediaQuery.of(context).size.width * 0.42,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showTraffic = !_showTraffic;
-                  _saveTrafficPreference(_showTraffic);
-                  if (_mapController != null) {
-                    _mapController!
-                        .setMapStyle(_showTraffic ? '' : _getMapStyle());
-                  }
-                });
-              },
+              onTap: _toggleTraffic,
               child: Container(
-                padding: EdgeInsets.all(8 * s),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  horizontal: MediaQuery.of(context).size.width * 0.035,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[850]
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(12 * s),
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(
+                      MediaQuery.of(context).size.width * 0.03),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8 * s,
-                      offset: Offset(0, 3 * s),
+                      blurRadius: MediaQuery.of(context).size.width * 0.02,
+                      offset:
+                          Offset(0, MediaQuery.of(context).size.height * 0.004),
                     ),
                   ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 112, 112, 112),
-                          Color.fromARGB(255, 204, 204, 204)
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ).createShader(bounds),
-                      child: Icon(
-                        Icons.traffic,
-                        size: 22 * s,
-                        color: Colors.white,
-                      ),
+                    Icon(
+                      Icons.traffic,
+                      size: MediaQuery.of(context).size.width * 0.06,
+                      color: isDark ? Colors.white : Colors.grey,
                     ),
-                    SizedBox(width: 6 * s),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                     Text(
                       "Live Traffic",
                       style: TextStyle(
-                        fontSize: 11 * s,
+                        fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.grey,
+                        color:
+                            isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],
