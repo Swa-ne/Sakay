@@ -37,7 +37,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
   late ChatBloc _chatBloc;
   late String user_id;
 
-  int currentPage = 1;
+  String cursor = "";
   bool isLoading = false;
 
   @override
@@ -46,7 +46,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
     _chatBloc = BlocProvider.of<ChatBloc>(context);
     _initializeUserID();
     _scrollController.addListener(_onScroll);
-    _chatBloc.add(GetMessageEvent(widget.chat_id, currentPage));
+    _chatBloc.add(GetMessageEvent(widget.chat_id, cursor));
   }
 
   Future<void> _initializeUserID() async {
@@ -78,9 +78,8 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
     if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
         isLoading = true;
-        currentPage++;
       });
-      _chatBloc.add(GetMessageEvent(widget.chat_id, currentPage));
+      _chatBloc.add(GetMessageEvent(widget.chat_id, cursor));
     }
   }
 
@@ -127,6 +126,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
           } else if (state is GetMessageSuccess) {
             setState(() {
               messages.addAll(state.messages);
+              cursor = state.cursor;
               isLoading = false;
             });
           } else if (state is OnReceiveMessageSuccess) {
