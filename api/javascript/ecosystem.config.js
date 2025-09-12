@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: 'sakay-api-javascript',
-            script: 'dist/index.js',
+            script: './dist/index.js',
             instances: 'max',
             autorestart: true,
             watch: false,
