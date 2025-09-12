@@ -3,7 +3,8 @@ module.exports = {
         {
             name: 'sakay-api-javascript',
             script: './dist/src/index.js',
-            instances: 'max',
+            instances: 1,
+            exec_mode: 'fork',
             autorestart: true,
             watch: false,
             max_memory_restart: '500M',
