@@ -5,11 +5,16 @@ import 'package:sakay_app/data/models/login.dart';
 import 'package:sakay_app/data/models/sign_up.dart';
 import 'package:sakay_app/data/sources/authentication/auth_repo.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
+import 'package:sakay_app/data/sources/realtime/socket_controller.dart';
+import 'package:sakay_app/data/sources/tracker/socket_controller.dart';
 
 final _apiUrl = "${dotenv.env['API_URL']}/authentication";
 
 class AuthRepoImpl extends AuthRepo {
   final TokenControllerImpl _tokenController = TokenControllerImpl();
+  final TrackingSocketController _socketRepo = TrackingSocketControllerImpl();
+  final RealtimeSocketController _socketRealtimeRepo =
+      RealtimeSocketControllerImpl();
 
   @override
   Future<Map<String, dynamic>> login(LoginUserModel user) async {
@@ -281,6 +286,8 @@ class AuthRepoImpl extends AuthRepo {
       _tokenController.removeProfile();
       _tokenController.removeFirstTime();
       _tokenController.removeUserType();
+      _socketRepo.disconnect();
+      _socketRealtimeRepo.disconnect();
       return response_body['message'] == "User logged Out";
     } else {
       throw Exception(response_body['error']);
