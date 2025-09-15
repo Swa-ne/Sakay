@@ -8,7 +8,7 @@ import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart';
+import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart'; // sos
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
   // "Free flow"
   Widget _buildTrafficLegend(double s, double sw) {
     // s = scale factor for sizing, sw = screen width
-    final left = sw * 0.44; // keeps relative position across sizes
+    final left = sw * 0.40; // keeps relative position across sizes
     final top = s * 123;
     return Positioned(
       top: top,
@@ -435,8 +435,8 @@ class _HomePageState extends State<HomePage> {
                         opacity: 0,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          constraints:
-                              BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                          constraints: BoxConstraints(
+                              minWidth: 40 * s, minHeight: 40 * s),
                           icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
@@ -605,7 +605,8 @@ class _HomePageState extends State<HomePage> {
             bottom: bottomPosition - 10, // Adjusted to align above the icon
             left: isProfileHint
                 ? targetX - 200
-                : targetX - 60, // Move left for Profile to keep it inside screen
+                : targetX -
+                    60, // Move left for Profile to keep it inside screen
             child: Material(
               color: Colors.transparent,
               child: Column(
@@ -707,7 +708,7 @@ class _HomePageState extends State<HomePage> {
     final topButtonOffset = (75 * s).clamp(56.0, 95.0);
     final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
     final busListLeft = (63 * s).clamp(48.0, sw - 120.0);
-    final liveTrafficLeft = (155 * s).clamp(110.0, sw - 140.0);
+    final liveTrafficLeft = (150 * s).clamp(110.0, sw - 140.0);
 
     return Scaffold(
         body: GestureDetector(
@@ -729,109 +730,12 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Top search + suggestions area (responsive)
-          Positioned(
-            top: 20 * s,
-            left: 16 * s,
-            right: 70 * s,
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8 * s),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 5 * s,
-                        offset: Offset(0, 2 * s),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
-                      SizedBox(width: 8 * s),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          style: TextStyle(fontSize: 13 * s),
-                          decoration: InputDecoration(
-                            hintText: 'Search for a location...',
-                            hintStyle: TextStyle(fontSize: 13 * s),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (query) async {
-                            if (query.isNotEmpty) {
-                              var result = await tracker.searchLocations(query);
-                              setState(() {
-                                _searchResults = result;
-                                _isSearching = true;
-                              });
-                            } else {
-                              setState(() {
-                                _searchResults = [];
-                                _isSearching = false;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.send,
-                            color: Colors.transparent, size: 20 * s),
-                        onPressed: () {
-                          final query = _searchController.text;
-                          if (query.isNotEmpty) {
-                            tracker.handleSearchAndRoute(query);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isSearching && _searchResults.isNotEmpty)
-                  Container(
-                    margin: EdgeInsets.only(top: 8 * s),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8 * s),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5 * s,
-                          offset: Offset(0, 2 * s),
-                        ),
-                      ],
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final location = _searchResults[index];
-                        return ListTile(
-                          title: Text(location['name'],
-                              style: TextStyle(fontSize: 13 * s)),
-                          onTap: () {
-                            _searchController.text = location['name'];
-                            setState(() {
-                              _isSearching = false;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
           // Top right report button
           Positioned(
             top: 20 * s,
             right: 16 * s,
             child: Container(
+              padding: EdgeInsets.all(2.3 * s),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8 * s),
@@ -853,7 +757,8 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Padding(
                       padding: EdgeInsets.all(12.0 * s),
-                      child: Icon(Icons.warning, color: Colors.red, size: 20 * s),
+                      child:
+                          Icon(Icons.warning, color: Colors.red, size: 20 * s),
                     ),
                   ),
                 ),
@@ -948,7 +853,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -1182,6 +1086,130 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
+          Stack(
+            children: [
+              Positioned(
+                top: 20 * s,
+                left: 16 * s,
+                right: 70 * s,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8 * s),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5 * s,
+                        offset: Offset(0, 2 * s),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
+                      SizedBox(width: 8 * s),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          cursorColor: const Color(0xFF00A2FF),
+                          style: TextStyle(fontSize: 15 * s),
+                          decoration: InputDecoration(
+                            hintText: 'Search for a location...',
+                            hintStyle: TextStyle(fontSize: 13 * s),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (query) async {
+                            if (query.isNotEmpty) {
+                              var result = await tracker.searchLocations(query);
+                              setState(() {
+                                _searchResults = result;
+                                _isSearching = true;
+                              });
+                            } else {
+                              setState(() {
+                                _searchResults = [];
+                                _isSearching = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send,
+                            color: Colors.transparent, size: 20 * s),
+                        onPressed: () {
+                          final query = _searchController.text;
+                          if (query.isNotEmpty) {
+                            tracker.handleSearchAndRoute(query);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (_isSearching && _searchResults.isNotEmpty) ...[
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isSearching = false;
+                      });
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: (25 * s) + (50 * s),
+                  left: 16 * s,
+                  right: 16 * s,
+                  child: Container(
+                    constraints: BoxConstraints(maxHeight: 530 * s),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8 * s),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 5 * s,
+                          offset: Offset(0, 2 * s),
+                        ),
+                      ],
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final location = _searchResults[index];
+                        return ListTile(
+                          visualDensity: const VisualDensity(horizontal: -4),
+                          leading: Icon(
+                            Icons.location_on,
+                            color: Colors.grey,
+                            size: 18 * s,
+                          ),
+                          title: Text(
+                            location['name'],
+                            style: TextStyle(fontSize: 15 * s),
+                          ),
+                          onTap: () {
+                            _searchController.text = location['name'];
+                            setState(() {
+                              _isSearching = false;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          )
         ],
       ),
     ));
