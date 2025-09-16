@@ -390,6 +390,15 @@ class Tracker {
   Uint8List? personImageData;
   ValueNotifier<bool> showMyLocationBool = ValueNotifier(false);
 
+  Color _routeColor = Color(0xFF4285F4); // Google Blue
+  Color _passedRouteColor = Color(0xFFAECBFA); // Light Google Blue
+  int _routeWidth = 6;
+  int _passedRouteWidth = 4;
+
+  Map<String, dynamic>? _currentRoute;
+  LatLng? _lastPosition;
+  List<LatLng> _passedPoints = [];
+
   double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
     const R = 6371e3; // radius of Earth in meters
     double toRad(double value) => value * pi / 180;
@@ -441,6 +450,8 @@ class Tracker {
     ).listen((geolocator.Position position) async {
       LatLng currentLocation = LatLng(position.latitude, position.longitude);
 
+      _updateRouteProgress(currentLocation);
+
       double distanceToLine = _getDistanceToPolyline(currentLocation);
 
       if (distanceToLine > 50) {
@@ -453,25 +464,34 @@ class Tracker {
   void stopTracking() {
     positionStream?.cancel();
     positionStream = null;
+    _currentRoute = null;
+    _passedPoints.clear();
+    polylines.clear();
+    polylineNotifier.value = polylines;
   }
 
   double _getDistanceToPolyline(LatLng currentLocation) {
     double minDistance = double.infinity;
 
-    for (Polyline polyline in polylines) {
-      for (LatLng point in polyline.points) {
-        double distance = geolocator.Geolocator.distanceBetween(
-          currentLocation.latitude,
-          currentLocation.longitude,
-          point.latitude,
-          point.longitude,
-        );
+    if (_currentRoute == null || _currentRoute!['points'] == null) {
+      return minDistance;
+    }
 
-        if (distance < minDistance) {
-          minDistance = distance;
-        }
+    List<LatLng> routePoints = List<LatLng>.from(_currentRoute!['points']);
+
+    for (LatLng point in routePoints) {
+      double distance = geolocator.Geolocator.distanceBetween(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        point.latitude,
+        point.longitude,
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
       }
     }
+
     return minDistance;
   }
 
@@ -497,92 +517,285 @@ class Tracker {
   }
 
   Future<List<Map<String, dynamic>>> searchLocations(String query) async {
-    String url = 'https://places.googleapis.com/v1/places:searchText';
+    final String lowercaseQuery = query.toLowerCase();
+    final List<Map<String, dynamic>> allResults = [];
 
-    var response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey!,
-        'X-Goog-FieldMask':
-            'places.displayName,places.formattedAddress,places.priceLevel'
-      },
-      body: json.encode({"textQuery": query}),
-    );
-    var data = jsonDecode(response.body);
+    final List<Map<String, dynamic>> allowedResults = allowedDestinations
+        .where((destination) =>
+            destination['name'].toLowerCase().contains(lowercaseQuery))
+        .map((destination) => {
+              ...destination,
+              'isAllowedDestination': true,
+              'type': 'route_stop',
+            })
+        .toList();
 
-    if (data != null) {
-      List<dynamic> results = data['places'];
-      return results.map((result) {
-        return {
-          'name': result['displayName']['text'],
-          // 'lat': result['geometry']['location']['lat'],
-          // 'lng': result['geometry']['location']['lng'],
-        };
-      }).toList();
-    } else {
-      print('Error: ${data['status']}');
-      return [];
+    allResults.addAll(allowedResults);
+
+    try {
+      String url = 'https://places.googleapis.com/v1/places:searchText';
+
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey!,
+          'X-Goog-FieldMask':
+              'places.displayName,places.formattedAddress,places.location,places.priceLevel'
+        },
+        body: json.encode({
+          "textQuery": query,
+          "locationBias": {
+            "circle": {
+              "center": {"latitude": 16.0439, "longitude": 120.3331},
+              "radius": 50000.0
+            }
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        if (data != null && data['places'] != null) {
+          List<dynamic> placesResults = data['places'];
+
+          for (var result in placesResults) {
+            final placeName = result['displayName']['text'];
+            final placeLat = result['location'] != null
+                ? result['location']['latitude']
+                : null;
+            final placeLng = result['location'] != null
+                ? result['location']['longitude']
+                : null;
+
+            bool isNearRoute = false;
+            if (placeLat != null && placeLng != null) {
+              for (var allowed in allowedDestinations) {
+                final distance = haversineDistance(
+                    placeLat, placeLng, allowed['lat'], allowed['lng']);
+                if (distance < 1000) {
+                  isNearRoute = true;
+                  break;
+                }
+              }
+            }
+
+            allResults.add({
+              'name': placeName,
+              'lat': placeLat,
+              'lng': placeLng,
+              'isAllowedDestination': false,
+              'isNearRoute': isNearRoute,
+              'type': isNearRoute ? 'near_route' : 'other',
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Google Places search error: $e');
     }
+
+    allResults.sort((a, b) {
+      if (a['isAllowedDestination'] == true &&
+          b['isAllowedDestination'] != true) return -1;
+      if (a['isAllowedDestination'] != true &&
+          b['isAllowedDestination'] == true) return 1;
+      if (a['isNearRoute'] == true && b['isNearRoute'] != true) return -1;
+      if (a['isNearRoute'] != true && b['isNearRoute'] == true) return 1;
+      return 0;
+    });
+
+    return allResults;
   }
 
   Future<void> handleSearchAndRoute(String destination) async {
-    LatLng destinationLatLng = await _getLatLngFromAddress(destination);
-    Map<String, dynamic>? closestAllowedDestination =
-        getClosestAllowedDestination(destinationLatLng);
+    try {
+      LatLng destinationLatLng = await _getLatLngFromAddress(destination);
+      Map<String, dynamic>? closestAllowedDestination =
+          getClosestAllowedDestination(destinationLatLng);
 
-    if (closestAllowedDestination == null) {
-      print('Destination is not within allowed route');
-      return;
+      if (closestAllowedDestination == null) {
+        print('Destination is not within allowed route');
+        return;
+      }
+
+      Location position = await getLocationandSpeed();
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      LatLng closestLatLng = LatLng(
+        closestAllowedDestination['lat'],
+        closestAllowedDestination['lng'],
+      );
+
+      print('Closest destination: ${closestAllowedDestination['name']}');
+
+      // Clear previous route data
+      _passedPoints.clear();
+
+      await getRouteAndETA(currentLocation, closestLatLng);
+      startTracking(closestLatLng);
+    } catch (e) {
+      print('Error handling search and route: $e');
     }
-
-    Location position = await getLocationandSpeed();
-    LatLng currentLocation = LatLng(position.latitude, position.longitude);
-    LatLng closestLatLng = LatLng(
-      closestAllowedDestination['lat'],
-      closestAllowedDestination['lng'],
-    );
-
-    print('Closest destination: ${closestAllowedDestination['name']}');
-
-    await getRouteAndETA(currentLocation, closestLatLng);
-
-    startTracking(closestLatLng);
   }
 
   Future<void> getRouteAndETA(LatLng origin, LatLng destination) async {
-    print(
-        "taetae ${origin.latitude} ${origin.longitude} ${destination.latitude} ${destination.longitude}");
-    String url =
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=transit&transit_mode=bus&key=$apiKey';
+    String url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}'
+        '&destination=${destination.latitude},${destination.longitude}'
+        '&mode=driving'
+        '&alternatives=true'
+        '&key=$apiKey';
 
-    var response = await http.get(Uri.parse(url));
-    var data = jsonDecode(response.body);
-    if (data['status'] == 'OK') {
-      List<PointLatLng> points = PolylinePoints()
-          .decodePolyline(data['routes'][0]['overview_polyline']['points']);
-      _createPolylines(points);
+    try {
+      var response = await http.get(Uri.parse(url));
+      var data = jsonDecode(response.body);
 
-      String duration = data['routes'][0]['legs'][0]['duration']['text'];
-      print('ETA: $duration');
-    } else {
-      print('Error: ${data['status']}');
+      if (data['status'] == 'OK') {
+        // Get the best route
+        var route = data['routes'][0];
+
+        // Decode the overview polyline
+        List<PointLatLng> points = PolylinePoints()
+            .decodePolyline(route['overview_polyline']['points']);
+
+        // Create the main route polyline
+        _createRoutePolylines(points, destination);
+
+        // Get ETA and distance
+        String duration = route['legs'][0]['duration']['text'];
+        String distance = route['legs'][0]['distance']['text'];
+
+        print('ETA: $duration, Distance: $distance');
+
+        // Store route information for tracking
+        _currentRoute = {
+          'points': points.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+          'destination': destination,
+          'startTime': DateTime.now(),
+        };
+
+        // Reset passed points
+        _passedPoints.clear();
+      } else {
+        print('Error: ${data['status']} - ${data['error_message']}');
+      }
+    } catch (e) {
+      print('Route API error: $e');
     }
   }
 
-  void _createPolylines(List<PointLatLng> points) {
+  void _createRoutePolylines(List<PointLatLng> points, LatLng destination) {
     List<LatLng> polylineCoordinates =
         points.map((point) => LatLng(point.latitude, point.longitude)).toList();
 
-    Polyline polyline = Polyline(
-      polylineId: PolylineId('route'),
-      color: Colors.blue,
-      width: 5,
+    // Main route polyline (Google Maps style)
+    Polyline mainRoute = Polyline(
+      polylineId: PolylineId('main_route'),
+      color: _routeColor,
+      width: _routeWidth,
       points: polylineCoordinates,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+      jointType: JointType.round,
+    );
+
+    // Destination marker
+    Marker destinationMarker = Marker(
+      markerId: MarkerId('destination'),
+      position: destination,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      infoWindow: InfoWindow(title: 'Destination'),
     );
 
     polylines.clear();
-    polylines.add(polyline);
+    markersNotifier.value.clear();
+
+    polylines.add(mainRoute);
+    markersNotifier.value.add(destinationMarker);
+
+    polylineNotifier.value = polylines;
+    markersNotifier.notifyListeners();
+  }
+
+  void _updateRouteProgress(LatLng currentPosition) {
+    if (_currentRoute == null || _currentRoute!['points'] == null) return;
+
+    List<LatLng> allPoints = List<LatLng>.from(_currentRoute!['points']);
+
+    // Find the closest point on the route to current position
+    int closestIndex = _findClosestPointIndex(currentPosition, allPoints);
+
+    if (closestIndex != -1) {
+      // Mark all points up to the closest index as passed
+      for (int i = 0; i <= closestIndex; i++) {
+        if (!_passedPoints.contains(allPoints[i])) {
+          _passedPoints.add(allPoints[i]);
+        }
+      }
+
+      // Update the polylines to show passed vs remaining route
+      _updateRouteVisualization(allPoints);
+    }
+  }
+
+  int _findClosestPointIndex(LatLng position, List<LatLng> points) {
+    double minDistance = double.infinity;
+    int closestIndex = -1;
+
+    for (int i = 0; i < points.length; i++) {
+      double distance = geolocator.Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        points[i].latitude,
+        points[i].longitude,
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
+
+    return closestIndex;
+  }
+
+  void _updateRouteVisualization(List<LatLng> allPoints) {
+    // Separate passed and remaining points
+    List<LatLng> passedPoints = _passedPoints.toSet().toList();
+    List<LatLng> remainingPoints =
+        allPoints.where((point) => !_passedPoints.contains(point)).toList();
+
+    polylines.clear();
+
+    // Create passed route polyline (lighter color)
+    if (passedPoints.length > 1) {
+      Polyline passedRoute = Polyline(
+        polylineId: PolylineId('passed_route'),
+        color: _passedRouteColor,
+        width: _passedRouteWidth,
+        points: passedPoints,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+      );
+      polylines.add(passedRoute);
+    }
+
+    // Create remaining route polyline (main color)
+    if (remainingPoints.length > 1) {
+      Polyline remainingRoute = Polyline(
+        polylineId: PolylineId('remaining_route'),
+        color: _routeColor,
+        width: _routeWidth,
+        points: remainingPoints,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+      );
+      polylines.add(remainingRoute);
+    }
+
     polylineNotifier.value = polylines;
   }
 
