@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
+import 'package:sakay_app/presentation/screens/commuters/alarm_system.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -25,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final TokenControllerImpl _tokenController = TokenControllerImpl();
   final Tracker tracker = Tracker();
+  final FocusNode _searchFocusNode = FocusNode();
 
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
@@ -86,6 +89,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _locationUpdateTimer.cancel();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -152,8 +156,8 @@ class _HomePageState extends State<HomePage> {
   // "Free flow"
   Widget _buildTrafficLegend(double s, double sw) {
     // s = scale factor for sizing, sw = screen width
-    final left = sw * 0.44; // keeps relative position across sizes
-    final top = s * 123;
+    final left = sw * 0.39;
+    final top = s * 119;
     return Positioned(
       top: top,
       left: left.clamp(12.0, sw - 12.0 - (220 * s / 16)), // keep inside screen
@@ -435,10 +439,17 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMapPreferenceContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final s = screenWidth / 375;
-    return SizedBox(
-      width: screenWidth,
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+    final s = shortestSide / 375;
+
+    return WillPopScope(
+      onWillPop: () async {
+        _searchFocusNode.unfocus();
+        FocusScope.of(context).unfocus();
+        return true;
+      },
       child: Container(
+        width: double.infinity,
         padding: EdgeInsets.fromLTRB(16 * s, 16 * s, 16 * s, 24 * s),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -467,13 +478,20 @@ class _HomePageState extends State<HomePage> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           constraints: BoxConstraints(
-                              minWidth: 40 * s, minHeight: 40 * s),
+                            minWidth: 40 * s,
+                            minHeight: 40 * s,
+                          ),
                           icon: Icon(Icons.close, size: 20 * s),
-                          onPressed: null,
+                          onPressed: () {
+                            _searchFocusNode.unfocus();
+                            FocusScope.of(context).unfocus();
+                            Navigator.of(context).pop();
+                          },
                         ),
                       ),
                     ),
                   ),
+                  // Title
                   Expanded(
                     child: Center(
                       child: Text(
@@ -481,58 +499,74 @@ class _HomePageState extends State<HomePage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14 * s,
+                          fontSize: max(12.0, 14 * s),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
                     ),
                   ),
+                  // Close button
                   SizedBox(
                     width: 40 * s,
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      constraints:
-                          BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                      constraints: BoxConstraints(
+                        minWidth: 40 * s,
+                        minHeight: 40 * s,
+                      ),
                       icon: Icon(Icons.close, size: 20 * s),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        _searchFocusNode.unfocus();
+                        FocusScope.of(context).unfocus();
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
                 ],
               ),
             ),
+
             SizedBox(height: 16 * s),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                InkWell(
-                  onTap: () => _changeMapType(MapType.normal),
-                  child: _buildMapTypeCard(
-                    MapType.normal,
-                    'Default',
-                    'assets/default_map.png',
+                Expanded(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.normal),
+                    child: _buildMapTypeCard(
+                      MapType.normal,
+                      'Default',
+                      'assets/default_map.png',
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.satellite),
-                  child: _buildMapTypeCard(
-                    MapType.satellite,
-                    'Satellite',
-                    'assets/satellite_map.png',
+                SizedBox(width: 12 * s),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.satellite),
+                    child: _buildMapTypeCard(
+                      MapType.satellite,
+                      'Satellite',
+                      'assets/satellite_map.png',
+                    ),
                   ),
                 ),
-                SizedBox(width: 20 * s),
-                InkWell(
-                  onTap: () => _changeMapType(MapType.terrain),
-                  child: _buildMapTypeCard(
-                    MapType.terrain,
-                    'Terrain',
-                    'assets/terrain_map.png',
+                SizedBox(width: 12 * s),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => _changeMapType(MapType.terrain),
+                    child: _buildMapTypeCard(
+                      MapType.terrain,
+                      'Terrain',
+                      'assets/terrain_map.png',
+                    ),
                   ),
                 ),
               ],
             ),
+
             SizedBox(height: 24 * s),
           ],
         ),
@@ -729,6 +763,43 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Widget _buildCompactVolumeControl(
+      String title, double value, Function(double) onChanged, double s) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13 * s,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        SizedBox(height: 6 * s),
+        SliderTheme(
+          data: SliderThemeData(
+            trackHeight: 4 * s,
+            thumbShape: RoundSliderThumbShape(
+              enabledThumbRadius: 8 * s,
+            ),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 12 * s),
+            activeTrackColor: Color(0xFF00A2FF),
+            inactiveTrackColor: Colors.grey.shade300,
+            thumbColor: Color(0xFF00A2FF),
+          ),
+          child: Slider(
+            value: value,
+            onChanged: onChanged,
+            min: 0,
+            max: 1,
+            divisions: 10,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
@@ -738,8 +809,8 @@ class _HomePageState extends State<HomePage> {
     // responsive paddings and positions derived from screen width
     final topButtonOffset = (75 * s).clamp(56.0, 95.0);
     final mapPrefLeft = (17 * s).clamp(12.0, sw - 60.0);
-    final busListLeft = (63 * s).clamp(48.0, sw - 120.0);
-    final liveTrafficLeft = (155 * s).clamp(110.0, sw - 140.0);
+    final busListLeft = (61 * s).clamp(48.0, sw - 120.0);
+    final liveTrafficLeft = (146 * s).clamp(110.0, sw - 140.0);
 
     return Scaffold(
         body: GestureDetector(
@@ -758,104 +829,6 @@ class _HomePageState extends State<HomePage> {
             child: MyMapWidget(
               mapType: _currentMapType,
               showTraffic: _showTraffic,
-            ),
-          ),
-
-          // Top search + suggestions area (responsive)
-          Positioned(
-            top: 20 * s,
-            left: 16 * s,
-            right: 70 * s,
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8 * s),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 5 * s,
-                        offset: Offset(0, 2 * s),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.grey, size: 20 * s),
-                      SizedBox(width: 8 * s),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          style: TextStyle(fontSize: 13 * s),
-                          decoration: InputDecoration(
-                            hintText: 'Search for a location...',
-                            hintStyle: TextStyle(fontSize: 13 * s),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (query) async {
-                            if (query.isNotEmpty) {
-                              var result = await tracker.searchLocations(query);
-                              setState(() {
-                                _searchResults = result;
-                                _isSearching = true;
-                              });
-                            } else {
-                              setState(() {
-                                _searchResults = [];
-                                _isSearching = false;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon:
-                            Icon(Icons.send, color: Colors.black, size: 20 * s),
-                        onPressed: () {
-                          final query = _searchController.text;
-                          if (query.isNotEmpty) {
-                            tracker.handleSearchAndRoute(query);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isSearching && _searchResults.isNotEmpty)
-                  Container(
-                    margin: EdgeInsets.only(top: 8 * s),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8 * s),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5 * s,
-                          offset: Offset(0, 2 * s),
-                        ),
-                      ],
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final location = _searchResults[index];
-                        return ListTile(
-                          title: Text(location['name'],
-                              style: TextStyle(fontSize: 13 * s)),
-                          onTap: () {
-                            _searchController.text = location['name'];
-                            setState(() {
-                              _isSearching = false;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-              ],
             ),
           ),
 
@@ -884,7 +857,7 @@ class _HomePageState extends State<HomePage> {
                       _showReportDialog(context);
                     },
                     child: Padding(
-                      padding: EdgeInsets.all(12.0 * s),
+                      padding: EdgeInsets.all(15.0 * s),
                       child:
                           Icon(Icons.warning, color: Colors.red, size: 20 * s),
                     ),
@@ -1168,7 +1141,7 @@ class _HomePageState extends State<HomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            bottom: _showBusList ? 280 * s : 10 * s, // animates smoothly
+            bottom: _showBusList ? 293 * s : 10 * s,
             left: 16 * s,
             right: 16 * s,
             child: Container(
@@ -1231,6 +1204,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(width: 12 * s),
+                  AlarmSystem(
+                    isTrackerOn: isTrackerOn,
+                    s: s,
+                  ),
                   InkWell(
                     onTap: () async {
                       _trackerBloc.add(
@@ -1242,7 +1219,6 @@ class _HomePageState extends State<HomePage> {
 
                       // Update destination immediately when turning on tracker
                       if (!isTrackerOn) {
-                        // This will flip to true after the toggle
                         try {
                           Location position =
                               await tracker.getLocationandSpeed();
@@ -1250,7 +1226,9 @@ class _HomePageState extends State<HomePage> {
                             _currentLocation =
                                 LatLng(position.latitude, position.longitude);
                             _nearestDestination = tracker.getNearestDestination(
-                                position.latitude, position.longitude);
+                              position.latitude,
+                              position.longitude,
+                            );
                           });
                         } catch (e) {
                           print("Error getting location: $e");
@@ -1283,6 +1261,147 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+          ),
+
+          // Top search + suggestions area (responsive)
+          Stack(
+            children: [
+              Positioned(
+                top: 20 * s,
+                left: 16 * s,
+                right: 70 * s,
+                child: Container(
+                  padding: EdgeInsets.only(left: 1 * s),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8 * s),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5 * s,
+                        offset: Offset(0, 2 * s),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _isSearching ? Icons.arrow_back : Icons.search,
+                          color: Colors.grey,
+                          size: 20 * s,
+                        ),
+                        onPressed: () {
+                          if (_isSearching) {
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              _isSearching = false;
+                              _searchController.clear();
+                              _searchResults = [];
+                            });
+                          }
+                        },
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          cursorColor: const Color(0xFF00A2FF),
+                          style: TextStyle(fontSize: 13 * s),
+                          decoration: InputDecoration(
+                            hintText: 'Search for a location...',
+                            hintStyle: TextStyle(fontSize: 13 * s),
+                            border: InputBorder.none,
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _isSearching = true;
+                            });
+                          },
+                          onChanged: (query) async {
+                            if (query.isNotEmpty) {
+                              var result = await tracker.searchLocations(query);
+                              setState(() {
+                                _searchResults = result;
+                                _isSearching = true;
+                              });
+                            } else {
+                              setState(() {
+                                _searchResults = [];
+                                _isSearching = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      if (_isSearching)
+                        IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.black,
+                            size: 20 * s,
+                          ),
+                          onPressed: () {
+                            final query = _searchController.text;
+                            if (query.isNotEmpty) {
+                              tracker.handleSearchAndRoute(query);
+                            }
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              if (_isSearching && _searchResults.isNotEmpty) ...[
+                Positioned(
+                  top: (25 * s) + (50 * s),
+                  left: 16 * s,
+                  right: 16 * s,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5 * s),
+                    constraints: BoxConstraints(maxHeight: 530 * s),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8 * s),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 3 * s,
+                          offset: Offset(0, 1 * s),
+                        ),
+                      ],
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final location = _searchResults[index];
+                        return ListTile(
+                          leading: Icon(
+                            Icons.location_on,
+                            color: const Color(0xFF00A2FF),
+                            size: 18 * s,
+                          ),
+                          title: Text(
+                            location['name'],
+                            style: TextStyle(fontSize: 13 * s),
+                          ),
+                          onTap: () {
+                            _searchController.text = location['name'];
+
+                            FocusScope.of(context).unfocus();
+
+                            setState(() {
+                              _isSearching = false;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
