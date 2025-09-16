@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
@@ -67,6 +70,9 @@ class _HomePageState extends State<HomePage> {
   bool _mapInitialized = false;
   GoogleMapController? _mapController;
   bool _showTraffic = false;
+  LatLng? _currentLocation;
+  String _nearestDestination = "Turn on location";
+  late Timer _locationUpdateTimer;
 
   @override
   void initState() {
@@ -74,6 +80,31 @@ class _HomePageState extends State<HomePage> {
     _initPreferences(); // FOR MAP STYLE PREFERENCE
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
     _checkFirstTime();
+    _setupLocationListener();
+  }
+
+  @override
+  void dispose() {
+    _locationUpdateTimer.cancel();
+    super.dispose();
+  }
+
+  void _setupLocationListener() {
+    // Set up a periodic timer to update the nearest destination
+    _locationUpdateTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      if (isTrackerOn) {
+        try {
+          Location position = await tracker.getLocationandSpeed();
+          setState(() {
+            _currentLocation = LatLng(position.latitude, position.longitude);
+            _nearestDestination = tracker.getNearestDestination(
+                position.latitude, position.longitude);
+          });
+        } catch (e) {
+          print("Error getting location: $e");
+        }
+      }
+    });
   }
 
   // PARA SA SHARED PREFERENCES NG MAP STYLE AND LIVE TRAFFIC
@@ -435,8 +466,8 @@ class _HomePageState extends State<HomePage> {
                         opacity: 0,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          constraints:
-                              BoxConstraints(minWidth: 40 * s, minHeight: 40 * s),
+                          constraints: BoxConstraints(
+                              minWidth: 40 * s, minHeight: 40 * s),
                           icon: Icon(Icons.close, size: 20 * s),
                           onPressed: null,
                         ),
@@ -605,7 +636,8 @@ class _HomePageState extends State<HomePage> {
             bottom: bottomPosition - 10, // Adjusted to align above the icon
             left: isProfileHint
                 ? targetX - 200
-                : targetX - 60, // Move left for Profile to keep it inside screen
+                : targetX -
+                    60, // Move left for Profile to keep it inside screen
             child: Material(
               color: Colors.transparent,
               child: Column(
@@ -779,8 +811,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.send,
-                            color: Colors.transparent, size: 20 * s),
+                        icon:
+                            Icon(Icons.send, color: Colors.black, size: 20 * s),
                         onPressed: () {
                           final query = _searchController.text;
                           if (query.isNotEmpty) {
@@ -853,7 +885,8 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Padding(
                       padding: EdgeInsets.all(12.0 * s),
-                      child: Icon(Icons.warning, color: Colors.red, size: 20 * s),
+                      child:
+                          Icon(Icons.warning, color: Colors.red, size: 20 * s),
                     ),
                   ),
                 ),
@@ -948,7 +981,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -971,55 +1003,104 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildBusMenuItem(
-                          context,
-                          "001 - ABC - 1234",
-                          "Boundary Marker Lingayen",
-                          "assets/bus_image.png",
-                          distance: "2 km",
-                          estimatedTime: "5 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height *
+                          .32, // half the screen
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildBusMenuItem(
+                              context,
+                              "001 - ABC - 1234",
+                              "Boundary Marker Lingayen",
+                              "assets/bus_image.png",
+                              distance: "2 km",
+                              estimatedTime: "5 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                            _buildBusMenuItem(
+                              context,
+                              "002 - XYZ - 5678",
+                              "Dagupan Terminal",
+                              "assets/bus_image.png",
+                              distance: "3.5 km",
+                              estimatedTime: "8 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                            _buildBusMenuItem(
+                              context,
+                              "003 - LMN - 9101",
+                              "San Carlos City",
+                              "assets/bus_image.png",
+                              distance: "5 km",
+                              estimatedTime: "12 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                            _buildBusMenuItem(
+                              context,
+                              "004 - ABC - 1234",
+                              "Boundary Marker Lingayen",
+                              "assets/bus_image.png",
+                              distance: "2 km",
+                              estimatedTime: "5 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                            _buildBusMenuItem(
+                              context,
+                              "005 - XYZ - 5678",
+                              "Dagupan Terminal",
+                              "assets/bus_image.png",
+                              distance: "3.5 km",
+                              estimatedTime: "8 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                            _buildBusMenuItem(
+                              context,
+                              "006 - LMN - 9101",
+                              "San Carlos City",
+                              "assets/bus_image.png",
+                              distance: "5 km",
+                              estimatedTime: "12 mins",
+                              onClose: () {
+                                setState(() {
+                                  _showBusList = false;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 8 * s),
+                          ],
                         ),
-                        SizedBox(height: 8 * s),
-                        _buildBusMenuItem(
-                          context,
-                          "002 - XYZ - 5678",
-                          "Dagupan Terminal",
-                          "assets/bus_image.png",
-                          distance: "3.5 km",
-                          estimatedTime: "8 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
-                        ),
-                        SizedBox(height: 8 * s),
-                        _buildBusMenuItem(
-                          context,
-                          "003 - LMN - 9101",
-                          "San Carlos City",
-                          "assets/bus_image.png",
-                          distance: "5 km",
-                          estimatedTime: "12 mins",
-                          onClose: () {
-                            setState(() {
-                              _showBusList = false;
-                            });
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              )
             ],
           ),
 
@@ -1124,7 +1205,9 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Phinma University of Pangasinan',
+                          isTrackerOn
+                              ? _nearestDestination
+                              : "Turn on location",
                           style: TextStyle(
                             fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
@@ -1134,7 +1217,9 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          '28WV+R2R, Arellano St, Downtown District',
+                          isTrackerOn
+                              ? '' // TODO: real
+                              : "Turn on your tracker to let drivers know your location",
                           style: TextStyle(
                             fontSize: 10 * s,
                             color: Colors.grey.shade600,
@@ -1154,6 +1239,23 @@ class _HomePageState extends State<HomePage> {
                       setState(() {
                         isTrackerOn = !isTrackerOn;
                       });
+
+                      // Update destination immediately when turning on tracker
+                      if (!isTrackerOn) {
+                        // This will flip to true after the toggle
+                        try {
+                          Location position =
+                              await tracker.getLocationandSpeed();
+                          setState(() {
+                            _currentLocation =
+                                LatLng(position.latitude, position.longitude);
+                            _nearestDestination = tracker.getNearestDestination(
+                                position.latitude, position.longitude);
+                          });
+                        } catch (e) {
+                          print("Error getting location: $e");
+                        }
+                      }
                     },
                     borderRadius: BorderRadius.circular(8 * s),
                     child: Container(
