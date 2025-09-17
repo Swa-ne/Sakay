@@ -45,6 +45,7 @@ class TrackingSocketControllerImpl extends TrackingSocketController {
 
   @override
   Future<void> connect() async {
+    _tokenController.removeTrackerOn();
     socket = IO.io(_apiUrl, <String, dynamic>{
       'transports': ['websocket'],
       'auth': {
