@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 
 class AlarmSystem extends StatelessWidget {
   final bool isTrackerOn;
@@ -68,20 +69,20 @@ class AlarmSystem extends StatelessWidget {
 
 class AlarmSettings {
   final String km;
-  final double ringVolume;
+  final double vibrate;
   final double alarmVolume;
-  final bool vibrate;
+  final bool alarm;
 
   AlarmSettings({
     required this.km,
-    required this.ringVolume,
-    required this.alarmVolume,
     required this.vibrate,
+    required this.alarmVolume,
+    required this.alarm,
   });
 
   @override
   String toString() =>
-      "KM: $km, Ring: $ringVolume, Alarm: $alarmVolume, Vibrate: $vibrate";
+      "KM: $km, Vibrate: $vibrate, Alarm: $alarmVolume, Alarm: $alarm";
 }
 
 class CustomDialogContainer extends StatelessWidget {
@@ -163,9 +164,39 @@ class AlarmSettingsDialog extends StatefulWidget {
 
 class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
   final TextEditingController kmController = TextEditingController();
-  double ringVolume = 0.5;
+  final TokenControllerImpl _tokenController = TokenControllerImpl();
+  double vibrate = 3;
   double alarmVolume = 0.7;
-  bool vibrate = true;
+  bool alarm = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAlarmSettings();
+  }
+
+  Future<void> _loadAlarmSettings() async {
+    try {
+      final km = await _tokenController.getAlarmDistance();
+      final vib = await _tokenController.getVibrate();
+      final vol = await _tokenController.getAlarmVolume();
+      final isAlarm = await _tokenController.getAlarmOn();
+
+      setState(() {
+        kmController.text = km;
+        vibrate = double.tryParse(vib) ?? 3.0;
+        alarmVolume = double.tryParse(vol) ?? 0.7;
+        alarm = isAlarm == "1";
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      debugPrint("Error loading alarm settings: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -177,6 +208,21 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
   Widget build(BuildContext context) {
     final s = widget.s;
     final mediaQuery = MediaQuery.of(context);
+
+    if (_isLoading) {
+      return CustomDialogContainer(
+        widthFactor: 0.3,
+        heightFactor: 0.75,
+        minWidth: 80,
+        maxWidth: 200,
+        minHeight: 450,
+        maxHeight: 450,
+        borderRadius: 8 * s,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -203,26 +249,22 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
                       _buildDistanceInput(s, responsiveScale),
                       SizedBox(height: 4 * s * responsiveScale),
                       _buildDistanceHint(s, responsiveScale),
-                      SizedBox(height: 12 * s * responsiveScale),
-                      _buildSoundSelection(s, responsiveScale),
-                      SizedBox(height: 12 * s * responsiveScale),
-                      _buildVolumeControl(
-                        "Ring Volume",
-                        ringVolume,
-                        (v) => setState(() => ringVolume = v),
-                        s,
-                        responsiveScale,
-                      ),
                       SizedBox(height: 10 * s * responsiveScale),
-                      _buildVolumeControl(
-                        "Alarm Volume",
-                        alarmVolume,
-                        (v) => setState(() => alarmVolume = v),
-                        s,
-                        responsiveScale,
-                      ),
-                      SizedBox(height: 10 * s * responsiveScale),
-                      _buildVibrateToggle(s, responsiveScale),
+                      _buildVibrationIntensityControl(s, responsiveScale),
+                      SizedBox(height: 12 * s * responsiveScale),
+                      _buildAlarmToggle(s, responsiveScale),
+                      if (alarm) ...[
+                        SizedBox(height: 10 * s * responsiveScale),
+                        _buildSoundSelection(s, responsiveScale),
+                        SizedBox(height: 10 * s * responsiveScale),
+                        _buildVolumeControl(
+                          "Alarm Volume",
+                          alarmVolume,
+                          (v) => setState(() => alarmVolume = v),
+                          s,
+                          responsiveScale,
+                        ),
+                      ],
                       SizedBox(height: 16 * s * responsiveScale),
                       _buildActionButtons(s, responsiveScale),
                     ],
@@ -261,6 +303,80 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
           ),
         ),
       );
+
+  Widget _buildVibrationIntensityControl(double s, double responsiveScale) {
+    return Container(
+      padding: EdgeInsets.all(10 * s * responsiveScale),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8 * s * responsiveScale),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1 * s * responsiveScale,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Vibration Intensity",
+            style: TextStyle(
+              fontSize: 13 * s * responsiveScale,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade800,
+            ),
+          ),
+          SizedBox(height: 8 * s * responsiveScale),
+          Row(
+            children: [
+              Expanded(
+                child: SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 4 * s * responsiveScale,
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: 8 * s * responsiveScale,
+                    ),
+                    overlayShape: RoundSliderOverlayShape(
+                      overlayRadius: 12 * s * responsiveScale,
+                    ),
+                    activeTrackColor: const Color(0xFF00A2FF),
+                    inactiveTrackColor: Colors.grey.shade300,
+                    thumbColor: const Color(0xFF00A2FF),
+                  ),
+                  child: Slider(
+                    value: vibrate,
+                    onChanged: (value) => setState(() => vibrate = value),
+                    min: 1,
+                    max: 5,
+                    divisions: 4,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8 * s * responsiveScale),
+              Container(
+                width: 30 * s * responsiveScale,
+                height: 30 * s * responsiveScale,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00A2FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6 * s * responsiveScale),
+                ),
+                child: Center(
+                  child: Text(
+                    vibrate.toInt().toString(),
+                    style: TextStyle(
+                      fontSize: 14 * s * responsiveScale,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF00A2FF),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildDistanceInput(double s, double responsiveScale) => Container(
         padding: EdgeInsets.symmetric(
@@ -428,7 +544,7 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
         ],
       );
 
-  Widget _buildVibrateToggle(double s, double responsiveScale) => Container(
+  Widget _buildAlarmToggle(double s, double responsiveScale) => Container(
         padding: EdgeInsets.all(10 * s * responsiveScale),
         decoration: BoxDecoration(
           color: Colors.grey.shade50,
@@ -448,7 +564,7 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
             SizedBox(width: 8 * s * responsiveScale),
             Expanded(
               child: Text(
-                "Vibrate",
+                "Alarm",
                 style: TextStyle(
                   fontSize: 13 * s * responsiveScale,
                   fontWeight: FontWeight.w500,
@@ -456,9 +572,9 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
               ),
             ),
             Switch(
-              value: vibrate,
+              value: alarm,
               activeColor: const Color(0xFF00A2FF),
-              onChanged: (v) => setState(() => vibrate = v),
+              onChanged: (v) => setState(() => alarm = v),
             ),
           ],
         ),
@@ -503,11 +619,15 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             onPressed: () {
+              _tokenController.updateAlarmDistance(kmController.text);
+              _tokenController.updateVibrate(vibrate.toString());
+              _tokenController.updateAlarmVolume(alarmVolume.toString());
+              _tokenController.updateAlarmOn(alarm ? "1" : "0");
               widget.onSave(AlarmSettings(
                 km: kmController.text,
-                ringVolume: ringVolume,
-                alarmVolume: alarmVolume,
                 vibrate: vibrate,
+                alarmVolume: alarmVolume,
+                alarm: alarm,
               ));
             },
             child: Text(
