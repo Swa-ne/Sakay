@@ -7,13 +7,15 @@ import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
 import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/common/widgets/tracker_required.dart';
+import 'package:sakay_app/common/widgets/near_destination.dart';
+import 'package:sakay_app/common/widgets/at_destination.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/alarm_system.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -77,13 +79,23 @@ class _HomePageState extends State<HomePage> {
   String _nearestDestination = "Turn on location";
   late Timer _locationUpdateTimer;
 
+  bool _showAlreadyAtDestination = false;
+  String _currentDestinationName = "";
+
   @override
   void initState() {
     super.initState();
     _initPreferences(); // FOR MAP STYLE PREFERENCE
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+    _tokenController.getTrackerOn().then((trackerOn) {
+      isTrackerOn = trackerOn == "1";
+    });
     _checkFirstTime();
     _setupLocationListener();
+    tracker.setDestinationApproachingCallback(_showDestinationApproachingPopup);
+    tracker.setAlreadyAtDestinationCallback(showAlreadyAtDestination);
+
+    _loadVibrationLevel();
   }
 
   @override
@@ -91,6 +103,19 @@ class _HomePageState extends State<HomePage> {
     _locationUpdateTimer.cancel();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadVibrationLevel() async {
+    try {
+      String vibrateLevel = await _tokenController.getVibrate();
+      if (vibrateLevel.isNotEmpty) {
+        int level = int.tryParse(vibrateLevel) ?? 3;
+        tracker.setVibrationLevel(level);
+      }
+    } catch (e) {
+      print('Error loading vibration level: $e');
+      tracker.setVibrationLevel(3);
+    }
   }
 
   void _setupLocationListener() {
@@ -526,9 +551,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-
             SizedBox(height: 16 * s),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -566,7 +589,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-
             SizedBox(height: 24 * s),
           ],
         ),
@@ -800,6 +822,39 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showTrackerRequiredPopup(double s) {
+    showDialog(
+      context: context,
+      builder: (context) => TrackerRequiredPopup(s: s),
+    );
+  }
+
+  void _showDestinationApproachingPopup(String destinationName) {
+    final s = MediaQuery.of(context).size.width / 375;
+    showDialog(
+      context: context,
+      builder: (context) => DestinationApproachingPopup(
+        s: s,
+        destinationName: destinationName,
+      ),
+    );
+  }
+
+  void showAlreadyAtDestination(String destinationName) {
+    setState(() {
+      _showAlreadyAtDestination = true;
+      _currentDestinationName = destinationName;
+    });
+
+    Future.delayed(Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _showAlreadyAtDestination = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
@@ -824,6 +879,16 @@ class _HomePageState extends State<HomePage> {
       },
       child: Stack(
         children: [
+          if (_showAlreadyAtDestination)
+            AlreadyAtDestinationWidget(
+              s: s,
+              destinationName: _currentDestinationName,
+              onClose: () {
+                setState(() {
+                  _showAlreadyAtDestination = false;
+                });
+              },
+            ),
           // FOR MAP AND MAP STYLES - Pass mapType and showTraffic
           Positioned.fill(
             child: MyMapWidget(
@@ -1195,7 +1260,7 @@ class _HomePageState extends State<HomePage> {
                               : "Turn on your tracker to let drivers know your location",
                           style: TextStyle(
                             fontSize: 10 * s,
-                            color: Colors.grey.shade600,
+                            color: const Color.fromARGB(255, 218, 157, 157),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -1216,8 +1281,7 @@ class _HomePageState extends State<HomePage> {
                       setState(() {
                         isTrackerOn = !isTrackerOn;
                       });
-
-                      // Update destination immediately when turning on tracker
+                      _tokenController.updateTrackerOn(isTrackerOn ? "1" : "0");
                       if (!isTrackerOn) {
                         try {
                           Location position =
@@ -1344,7 +1408,11 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             final query = _searchController.text;
                             if (query.isNotEmpty) {
-                              tracker.handleSearchAndRoute(query);
+                              if (isTrackerOn) {
+                                tracker.handleSearchAndRoute(query);
+                              } else {
+                                _showTrackerRequiredPopup(s);
+                              }
                             }
                           },
                         ),
@@ -1394,6 +1462,14 @@ class _HomePageState extends State<HomePage> {
                             setState(() {
                               _isSearching = false;
                             });
+                            final query = location['name'];
+                            if (query.isNotEmpty) {
+                              if (isTrackerOn) {
+                                tracker.handleSearchAndRoute(query);
+                              } else {
+                                _showTrackerRequiredPopup(s);
+                              }
+                            }
                           },
                         );
                       },
