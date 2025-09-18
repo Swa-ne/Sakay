@@ -760,12 +760,12 @@ class Tracker {
         return;
       }
     }
-    geolocator.Position position =
-        await geolocator.Geolocator.getCurrentPosition();
-    googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(
-      LatLng(position.latitude, position.longitude),
-      14,
-    ));
+    // geolocator.Position position =
+    //     await geolocator.Geolocator.getCurrentPosition();
+    // googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(
+    //   LatLng(position.latitude, position.longitude),
+    //   14,
+    // ));
     showMyLocationBool.value = true;
   }
 
@@ -830,9 +830,9 @@ class Tracker {
 
     bussesData[bus] = busData.copyWith(
         lat: lat.toDouble(), lng: lng.toDouble(), speed: speed);
-    bussesDataNotifier.value = {...bussesData};
     busses[bus] = updatedMarker;
     _updateMarkers();
+    bussesDataNotifier.value = {...bussesData};
   }
 
   Future<void> removeOneBus(String bus) async {
