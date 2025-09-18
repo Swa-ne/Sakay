@@ -58,7 +58,7 @@ trackingSocket.on("connection", async (socket) => {
                     await addBusIDToRedisRealtimeControllerController(bus_id.toString(), socket.user.user_id);
                     const bus = await getBus(bus_id.toString());
                     socket.broadcast.emit("update-map", {
-                        location, user: socket.user?.user_id, bus
+                        location, user: socket.user?.user_id, bus: bus.message
                     });
                 } else {
                     socket.emit("vehicle-inuse", {
