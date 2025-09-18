@@ -10,6 +10,7 @@ import 'package:sakay_app/common/widgets/map.dart';
 import 'package:sakay_app/common/widgets/tracker_required.dart';
 import 'package:sakay_app/common/widgets/near_destination.dart';
 import 'package:sakay_app/common/widgets/at_destination.dart';
+import 'package:sakay_app/data/models/bus.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/alarm_system.dart';
@@ -17,6 +18,7 @@ import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -82,6 +84,9 @@ class _HomePageState extends State<HomePage> {
   bool _showAlreadyAtDestination = false;
   String _currentDestinationName = "";
 
+  List<BusModel> _availableBuses = [];
+  late ValueListenableBuilder<Map<String, BusModel>> _busListBuilder;
+
   @override
   void initState() {
     super.initState();
@@ -94,15 +99,23 @@ class _HomePageState extends State<HomePage> {
     _setupLocationListener();
     tracker.setDestinationApproachingCallback(_showDestinationApproachingPopup);
     tracker.setAlreadyAtDestinationCallback(showAlreadyAtDestination);
+    tracker.bussesDataNotifier.addListener(_updateBusList);
 
     _loadVibrationLevel();
   }
 
   @override
   void dispose() {
+    tracker.bussesDataNotifier.removeListener(_updateBusList);
     _locationUpdateTimer.cancel();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  void _updateBusList() {
+    setState(() {
+      _availableBuses = tracker.bussesDataNotifier.value.values.toList();
+    });
   }
 
   Future<void> _loadVibrationLevel() async {
@@ -855,6 +868,113 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Map<String, String> _calculateBusDistanceAndTime(
+      BusModel bus, LatLng? userLocation) {
+    if (userLocation == null || bus.lat == null || bus.lng == null) {
+      return {'distance': 'N/A', 'time': 'N/A'};
+    }
+
+    double distance = geolocator.Geolocator.distanceBetween(
+      userLocation.latitude,
+      userLocation.longitude,
+      bus.lat!,
+      bus.lng!,
+    );
+
+    double distanceKm = distance / 1000;
+
+    String time;
+    if (bus.speed != null && bus.speed! > 0) {
+      double timeHours = distanceKm / bus.speed!.round();
+      double timeMinutes = timeHours * 60;
+
+      if (timeMinutes < 1) {
+        time = "<1 min";
+      } else {
+        time = "${timeMinutes.ceil()} mins";
+      }
+    } else {
+      double timeHours = distanceKm / 30;
+      double timeMinutes = timeHours * 60;
+
+      if (timeMinutes < 1) {
+        time = "<1 min";
+      } else {
+        time = "${timeMinutes.ceil()} mins";
+      }
+    }
+
+    String formattedDistance;
+    if (distance < 1000) {
+      formattedDistance = "${distance.round()} m";
+    } else {
+      formattedDistance = "${distanceKm.toStringAsFixed(1)} km";
+    }
+
+    return {'distance': formattedDistance, 'time': time};
+  }
+
+  Widget _buildBusListContent(double s) {
+    if (_availableBuses.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.directions_bus_outlined,
+              size: 40 * s,
+              color: Colors.grey.shade400,
+            ),
+            SizedBox(height: 12 * s),
+            Text(
+              'No buses available',
+              style: TextStyle(
+                fontSize: 16 * s,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 8 * s),
+            Text(
+              'Buses will appear here when they\nare active on your route',
+              style: TextStyle(
+                fontSize: 12 * s,
+                color: Colors.grey.shade500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: _availableBuses.map((bus) {
+          final routeInfo =
+              tracker.getNearestDestination(bus.lat ?? 0.0, bus.lng ?? 0.0);
+          final distanceTime =
+              _calculateBusDistanceAndTime(bus, _currentLocation);
+
+          return _buildBusMenuItem(
+            context,
+            "${bus.bus_number} - ${bus.plate_number}",
+            routeInfo,
+            "assets/bus.png",
+            distance: distanceTime['distance'],
+            estimatedTime: distanceTime['time'],
+            onClose: () {
+              setState(() {
+                _showBusList = false;
+              });
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
@@ -1044,97 +1164,7 @@ class _HomePageState extends State<HomePage> {
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height *
                           .32, // half the screen
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildBusMenuItem(
-                              context,
-                              "001 - ABC - 1234",
-                              "Boundary Marker Lingayen",
-                              "assets/bus_image.png",
-                              distance: "2 km",
-                              estimatedTime: "5 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                            _buildBusMenuItem(
-                              context,
-                              "002 - XYZ - 5678",
-                              "Dagupan Terminal",
-                              "assets/bus_image.png",
-                              distance: "3.5 km",
-                              estimatedTime: "8 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                            _buildBusMenuItem(
-                              context,
-                              "003 - LMN - 9101",
-                              "San Carlos City",
-                              "assets/bus_image.png",
-                              distance: "5 km",
-                              estimatedTime: "12 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                            _buildBusMenuItem(
-                              context,
-                              "004 - ABC - 1234",
-                              "Boundary Marker Lingayen",
-                              "assets/bus_image.png",
-                              distance: "2 km",
-                              estimatedTime: "5 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                            _buildBusMenuItem(
-                              context,
-                              "005 - XYZ - 5678",
-                              "Dagupan Terminal",
-                              "assets/bus_image.png",
-                              distance: "3.5 km",
-                              estimatedTime: "8 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                            _buildBusMenuItem(
-                              context,
-                              "006 - LMN - 9101",
-                              "San Carlos City",
-                              "assets/bus_image.png",
-                              distance: "5 km",
-                              estimatedTime: "12 mins",
-                              onClose: () {
-                                setState(() {
-                                  _showBusList = false;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 8 * s),
-                          ],
-                        ),
-                      ),
+                      child: _buildBusListContent(s),
                     ),
                   ),
                 ),
