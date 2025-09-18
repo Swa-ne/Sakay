@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sakay_app/data/models/bus.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/constant/allowed_points.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
@@ -29,6 +30,9 @@ class Tracker {
 
   StreamSubscription<geolocator.Position>? positionStream;
   GoogleMapController? googleMapController;
+  Map<String, BusModel> bussesData = HashMap();
+  ValueNotifier<Map<String, BusModel>> bussesDataNotifier =
+      ValueNotifier<Map<String, BusModel>>({});
   Map<String, Marker> busses = HashMap();
   Map<String, Marker> people = HashMap();
   Set<Polyline> polylines = {};
@@ -108,7 +112,12 @@ class Tracker {
     return nearest["name"];
   }
 
-  void startTracking(LatLng destination) {
+  void startTracking(LatLng destination) async {
+    bool hasPermission = await getPermission();
+    if (!hasPermission) {
+      print("Location permission not granted. Cannot start tracking.");
+      return;
+    }
     _checkInitialDistance(destination).then((isWithin2km) {
       if (isWithin2km) {
         print(
@@ -452,6 +461,12 @@ class Tracker {
         return;
       }
 
+      bool hasPermission = await getPermission();
+      if (!hasPermission) {
+        print("Location permission not granted. Cannot get current location.");
+        return;
+      }
+
       Location position = await getLocationandSpeed();
       LatLng currentLocation = LatLng(position.latitude, position.longitude);
       LatLng closestLatLng = LatLng(
@@ -705,7 +720,13 @@ class Tracker {
   }
 
   Future<bool> getPermission() async {
-    var status = await Permission.locationWhenInUse.request();
+    var status = await Permission.locationWhenInUse.status;
+    if (status.isGranted) {
+      return true;
+    }
+
+    status = await Permission.locationWhenInUse.request();
+
     if (status.isGranted) {
       loc.Location location = loc.Location();
       if (!await location.serviceEnabled()) {
@@ -723,6 +744,13 @@ class Tracker {
   }
 
   showMyLocation() async {
+    // Check and request permission first
+    bool hasPermission = await getPermission();
+    if (!hasPermission) {
+      print("Location permission not granted.");
+      return;
+    }
+
     bool serviceEnabled =
         await geolocator.Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -732,12 +760,12 @@ class Tracker {
         return;
       }
     }
-    // geolocator.Position position =
-    //     await geolocator.Geolocator.getCurrentPosition();
-    // googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(
-    //   LatLng(position.latitude, position.longitude),
-    //   14,
-    // ));
+    geolocator.Position position =
+        await geolocator.Geolocator.getCurrentPosition();
+    googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(
+      LatLng(position.latitude, position.longitude),
+      14,
+    ));
     showMyLocationBool.value = true;
   }
 
@@ -765,7 +793,8 @@ class Tracker {
     markersNotifier.notifyListeners();
   }
 
-  Future<void> createOneBus(String bus, num lng, num lat, double speed) async {
+  Future<void> createOneBus(
+      String bus, num lng, num lat, double speed, BusModel busData) async {
     if (googleMapController == null || carImageData == null) return;
 
     final marker = Marker(
@@ -780,12 +809,15 @@ class Tracker {
         googleMapController?.showMarkerInfoWindow(MarkerId(bus));
       },
     );
-
+    bussesData[bus] = busData.copyWith(
+        lat: lat.toDouble(), lng: lng.toDouble(), speed: speed);
+    bussesDataNotifier.value = {...bussesData};
     busses[bus] = marker;
     _updateMarkers();
   }
 
-  Future<void> updateOneBus(String bus, num lng, num lat, double speed) async {
+  Future<void> updateOneBus(
+      String bus, num lng, num lat, double speed, BusModel busData) async {
     if (googleMapController == null || !busses.containsKey(bus)) return;
 
     final updatedMarker = busses[bus]!.copyWith(
@@ -796,12 +828,17 @@ class Tracker {
       ),
     );
 
+    bussesData[bus] = busData.copyWith(
+        lat: lat.toDouble(), lng: lng.toDouble(), speed: speed);
+    bussesDataNotifier.value = {...bussesData};
     busses[bus] = updatedMarker;
     _updateMarkers();
   }
 
   Future<void> removeOneBus(String bus) async {
     if (googleMapController == null || !busses.containsKey(bus)) return;
+    bussesData.remove(bus);
+    bussesDataNotifier.value = {...bussesData};
     busses.remove(bus);
     _updateMarkers();
   }

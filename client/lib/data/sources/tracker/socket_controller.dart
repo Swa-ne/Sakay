@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
+import 'package:sakay_app/data/models/bus.dart';
 import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -69,6 +70,7 @@ class TrackingSocketControllerImpl extends TrackingSocketController {
             busLoc.longitude,
             busLoc.latitude,
             busLoc.speed,
+            BusModel.fromJson(data['bus']),
           );
           pendingCreations.remove(data['user']);
         }
@@ -78,6 +80,7 @@ class TrackingSocketControllerImpl extends TrackingSocketController {
           busLoc.longitude,
           busLoc.latitude,
           busLoc.speed,
+          BusModel.fromJson(data['bus']),
         );
       }
     });
