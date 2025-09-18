@@ -142,6 +142,12 @@ class _HomePageState extends State<HomePage> {
             _nearestDestination = tracker.getNearestDestination(
                 position.latitude, position.longitude);
           });
+
+          if (_mapController != null && isTrackerOn) {
+            _mapController!.animateCamera(
+              CameraUpdate.newLatLng(_currentLocation!),
+            );
+          }
         } catch (e) {
           print("Error getting location: $e");
         }
@@ -885,7 +891,8 @@ class _HomePageState extends State<HomePage> {
 
     String time;
     if (bus.speed != null && bus.speed! > 0) {
-      double timeHours = distanceKm / bus.speed!.round();
+      int effectiveSpeed = bus.speed! < 1 ? 1 : bus.speed!.round();
+      double timeHours = distanceKm / effectiveSpeed;
       double timeMinutes = timeHours * 60;
 
       if (timeMinutes < 1) {
