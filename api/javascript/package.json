@@ -1,11 +1,11 @@
 {
     "name": "api",
     "version": "1.0.0",
-    "main": "index.ts",
+    "main": "dist/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "npx tsc",
-        "start": "ts-node server/index.ts",
+        "start": "pm2-runtime ecosystem.config.js --env PROD",
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
     },
     "author": "",
@@ -13,9 +13,10 @@
     "description": "",
     "dependencies": {
         "@types/multer": "^1.4.12",
-        "axios": "^1.7.9",
+        "axios": "^1.12.1",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.20.3",
+        "brace-expansion": "^4.0.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "date-fns": "^4.1.0",
@@ -24,9 +25,11 @@
         "express-rate-limit": "^7.5.0",
         "firebase": "^11.3.1",
         "firebase-admin": "^13.1.0",
+        "form-data": "^4.0.4",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.9.5",
         "multer": "^1.4.5-lts.1",
+        "pm2": "^6.0.10",
         "redis": "^4.7.0",
         "socket.io": "^4.8.1"
     },

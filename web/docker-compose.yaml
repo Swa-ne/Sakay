@@ -1,0 +1,19 @@
+services:
+    nextjs:
+        build:
+            context: .
+            dockerfile: Dockerfile.next
+        ports:
+            - '3000'
+        env_file: .env
+        restart: always
+
+    nginx:
+        build:
+            context: .
+            dockerfile: Dockerfile.nginx
+        container_name: sakay-nginx-server
+        ports:
+            - '5000:8080'
+        depends_on:
+            - nextjs

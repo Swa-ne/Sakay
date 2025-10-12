@@ -9,6 +9,8 @@ class BusModel extends Equatable {
   final UserModel? today_driver;
   final double? speed;
   final double? milage;
+  final double? lat;
+  final double? lng;
 
   const BusModel({
     this.id,
@@ -18,6 +20,8 @@ class BusModel extends Equatable {
     this.today_driver,
     this.speed,
     this.milage,
+    this.lat,
+    this.lng,
   });
 
   factory BusModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +47,8 @@ class BusModel extends Equatable {
           : null,
       speed: parseDouble(json['speed']),
       milage: parseDouble(json['milage']),
+      lat: parseDouble(json['lat']),
+      lng: parseDouble(json['lng']),
     );
   }
 
@@ -55,6 +61,8 @@ class BusModel extends Equatable {
       'today_driver': today_driver,
       'speed': speed,
       'milage': milage,
+      'lat': lat,
+      'lng': lng,
     };
   }
 
@@ -66,6 +74,8 @@ class BusModel extends Equatable {
     UserModel? today_driver,
     double? speed,
     double? milage,
+    double? lat,
+    double? lng,
   }) {
     return BusModel(
       id: id ?? this.id,
@@ -75,6 +85,8 @@ class BusModel extends Equatable {
       today_driver: today_driver ?? this.today_driver,
       speed: speed ?? this.speed,
       milage: milage ?? this.milage,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
     );
   }
 

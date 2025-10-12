@@ -7,7 +7,7 @@ import { addBusIDToRedisRealtimeControllerController, addUserToRedisRealtimeCont
 import { getCurrentUserById } from './services/index.services';
 import { getFilesFromAnnouncement } from './services/announcement.services';
 import { getReport } from './services/report.services';
-import { getBusWithUserID } from './services/bus.services';
+import { getBus, getBusWithUserID } from './services/bus.services';
 
 declare module "socket.io" {
     interface Socket {
@@ -56,8 +56,9 @@ trackingSocket.on("connection", async (socket) => {
                 const occupiedBy = await getBusIDFromRedisRealtimeController(bus_id.toString());
                 if (!occupiedBy || occupiedBy === socket.user.user_id) {
                     await addBusIDToRedisRealtimeControllerController(bus_id.toString(), socket.user.user_id);
+                    const bus = await getBus(bus_id.toString());
                     socket.broadcast.emit("update-map", {
-                        location, user: socket.user?.user_id
+                        location, user: socket.user?.user_id, bus: bus.message
                     });
                 } else {
                     socket.emit("vehicle-inuse", {
@@ -75,7 +76,7 @@ trackingSocket.on("connection", async (socket) => {
                 removeBusIDFromRedisRealtimeController(bus_id.toString())
             }
             socket.broadcast.emit("track-my-vehicle-stop", {
-                user: socket.user?.user_id
+                user: socket.user?.user_id, bus: bus_id
             });
         }
     });

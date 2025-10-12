@@ -27,12 +27,12 @@ class SaveMessageEvent extends ChatEvent {
 
 class GetMessageEvent extends ChatEvent {
   final String chat_id;
-  final int page;
+  final String cursor;
 
-  const GetMessageEvent(this.chat_id, this.page);
+  const GetMessageEvent(this.chat_id, this.cursor);
 
   @override
-  List<Object> get props => [chat_id, page];
+  List<Object> get props => [chat_id, cursor];
 }
 
 class GetReceiverDetailsEvent extends ChatEvent {
@@ -64,12 +64,12 @@ class OnReceiveMessageEvent extends ChatEvent {
 }
 
 class GetInboxesEvent extends ChatEvent {
-  final int page;
+  final String cursor;
 
-  const GetInboxesEvent(this.page);
+  const GetInboxesEvent(this.cursor);
 
   @override
-  List<Object> get props => [page];
+  List<Object> get props => [cursor];
 }
 
 class IsReadInboxesEvent extends ChatEvent {

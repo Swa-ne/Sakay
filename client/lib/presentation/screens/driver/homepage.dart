@@ -114,8 +114,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color:
-              isDark ? Colors.grey[850] : Colors.white,
+          color: isDark ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -358,30 +357,11 @@ class _DriverHomePageState extends State<DriverHomePage> {
     return Scaffold(
       body: Stack(
         children: [
+          // Updated to pass mapType and showTraffic parameters
           Positioned.fill(
-            child: GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-                _mapController!.setMapStyle(_getMapStyle());
-                setState(() {
-                  _mapInitialized = true;
-                });
-                if (_showTraffic) {
-                  _mapController!.setMapStyle('');
-                }
-              },
-              initialCameraPosition: _defaultCameraPosition,
+            child: MyMapWidget(
               mapType: _currentMapType,
-              trafficEnabled: _showTraffic,
-              onCameraMove: (CameraPosition position) {
-                if (!_hasRestricted) {
-                  _restrictToPangasinan();
-                  _hasRestricted = true;
-                }
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
+              showTraffic: _showTraffic,
             ),
           ),
 
@@ -491,14 +471,13 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 child: Icon(
                   Icons.layers,
                   color: isDark ? Colors.white : const Color(0xFF00A2FF),
-                  size: MediaQuery.of(context).size.width *
-                      0.06,
+                  size: MediaQuery.of(context).size.width * 0.06,
                 ),
               ),
             ),
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button - Updated to only change state (no direct map controller access)
           Positioned(
             bottom: MediaQuery.of(context).size.height * 0.11,
             left: MediaQuery.of(context).size.width * 0.18,
@@ -536,8 +515,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isDark ? Colors.white : Colors.grey,
+                        color: isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],

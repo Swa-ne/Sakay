@@ -8,6 +8,11 @@ abstract class TokenController {
   Future<void> updateEmail(String email);
   Future<void> updateProfile(String profile);
   Future<void> updateFirstTime(String toggle);
+  Future<void> updateTrackerOn(String toggle);
+  Future<void> updateAlarmDistance(String km);
+  Future<void> updateAlarmOn(String toggle);
+  Future<void> updateAlarmVolume(String vol);
+  Future<void> updateVibrate(String vib);
   Future<void> removeRefreshToken();
   Future<void> removeAccessToken();
   Future<void> removeUserID();
@@ -17,6 +22,11 @@ abstract class TokenController {
   Future<void> removeEmail();
   Future<void> removeProfile();
   Future<void> removeFirstTime();
+  Future<void> removeTrackerOn();
+  Future<void> removeAlarmDistance();
+  Future<void> removeAlarmOn();
+  Future<void> removeAlarmVolume();
+  Future<void> removeVibrate();
   Future<String> getRefreshToken();
   Future<String> getAccessToken();
   Future<String> getUserID();
@@ -26,5 +36,10 @@ abstract class TokenController {
   Future<String> getEmail();
   Future<String> getProfile();
   Future<String> getFirstTime();
+  Future<String> getTrackerOn();
+  Future<String> getAlarmDistance();
+  Future<String> getAlarmOn();
+  Future<String> getAlarmVolume();
+  Future<String> getVibrate();
   String? extractRefreshToken(String refresh_token);
 }

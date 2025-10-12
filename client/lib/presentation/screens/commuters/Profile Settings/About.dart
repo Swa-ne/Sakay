@@ -26,7 +26,6 @@ class AboutPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: Column(
         children: [
           Container(
@@ -136,11 +135,11 @@ class AboutPage extends StatelessWidget {
                         SizedBox(height: 20),
                         _TeamMember(
                           name: 'Lance Manaois',
-                          position: 'Project Manager & Lead Developer',
+                          position: 'Project Manager & Full-stack Developer',
                         ),
                         _TeamMember(
                           name: 'Stephen Bautista',
-                          position: 'Full-stack Developer & Team Manager',
+                          position: 'Lead Developer & Full-stack Developer',
                         ),
                         _TeamMember(
                           name: 'Jaspher Tania',

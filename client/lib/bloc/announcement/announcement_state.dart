@@ -101,11 +101,12 @@ class GetAnnouncementError extends AnnouncementState {
 
 class GetAllAnnouncementsSuccess extends AnnouncementState {
   final List<AnnouncementsModel> announcements;
+  final String cursor;
 
-  const GetAllAnnouncementsSuccess(this.announcements);
+  const GetAllAnnouncementsSuccess(this.announcements, this.cursor);
 
   @override
-  List<Object> get props => [announcements];
+  List<Object> get props => [announcements, cursor];
 }
 
 class GetAllAnnouncementsError extends AnnouncementState {

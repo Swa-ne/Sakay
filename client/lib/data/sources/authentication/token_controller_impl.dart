@@ -57,6 +57,31 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> updateTrackerOn(String toggle) async {
+    await _storage.write(key: "Tracker On", value: toggle);
+  }
+
+  @override
+  Future<void> updateAlarmDistance(String km) async {
+    await _storage.write(key: "Alarm Distance", value: km);
+  }
+
+  @override
+  Future<void> updateAlarmOn(String toggle) async {
+    await _storage.write(key: "Alarm On", value: toggle);
+  }
+
+  @override
+  Future<void> updateAlarmVolume(String vol) async {
+    await _storage.write(key: "Alarm Volume", value: vol);
+  }
+
+  @override
+  Future<void> updateVibrate(String vib) async {
+    await _storage.write(key: "Vibrate", value: vib);
+  }
+
+  @override
   Future<void> removeRefreshToken() async {
     await _storage.delete(key: "Refresh Token");
   }
@@ -102,6 +127,31 @@ class TokenControllerImpl extends TokenController {
   }
 
   @override
+  Future<void> removeTrackerOn() async {
+    await _storage.delete(key: "Tracker On");
+  }
+
+  @override
+  Future<void> removeAlarmDistance() async {
+    await _storage.delete(key: "Alarm Distance");
+  }
+
+  @override
+  Future<void> removeAlarmOn() async {
+    await _storage.delete(key: "Alarm On");
+  }
+
+  @override
+  Future<void> removeAlarmVolume() async {
+    await _storage.delete(key: "Alarm Volume");
+  }
+
+  @override
+  Future<void> removeVibrate() async {
+    await _storage.delete(key: "Vibrate");
+  }
+
+  @override
   Future<String> getRefreshToken() async {
     return await _storage.read(key: "Refresh Token") ?? "";
   }
@@ -144,6 +194,31 @@ class TokenControllerImpl extends TokenController {
   @override
   Future<String> getFirstTime() async {
     return await _storage.read(key: "First Time") ?? "";
+  }
+
+  @override
+  Future<String> getTrackerOn() async {
+    return await _storage.read(key: "Tracker On") ?? "";
+  }
+
+  @override
+  Future<String> getAlarmDistance() async {
+    return await _storage.read(key: "Alarm Distance") ?? "0";
+  }
+
+  @override
+  Future<String> getAlarmOn() async {
+    return await _storage.read(key: "Alarm On") ?? "0";
+  }
+
+  @override
+  Future<String> getAlarmVolume() async {
+    return await _storage.read(key: "Alarm Volume") ?? "0.7";
+  }
+
+  @override
+  Future<String> getVibrate() async {
+    return await _storage.read(key: "Vibrate") ?? "3";
   }
 
   @override
