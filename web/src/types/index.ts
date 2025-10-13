@@ -36,7 +36,7 @@ export interface Account {
     name: string;
     role: Role;
     assignedUnitId?: string | null;
-    phone_number: string;
+    phone_number?: string;
     profile_picture_url: string;
 }
 
