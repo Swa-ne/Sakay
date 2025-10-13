@@ -2,12 +2,19 @@
 import Map from '@/components/map';
 import UnitsContainer from '@/components/unitsContainer';
 import useTracker from '@/hooks/useTracker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingPage from './loading.page';
 
 export default function HomePage() {
     const [map, setMap] = useState<google.maps.Map | null>(null);
-    const { busses, polylines, loading } = useTracker(map);
+    const { busses, polylines, loading, refreshBusses, disconnectTrackingSocket } = useTracker(map);
+
+    useEffect(() => {
+        refreshBusses();
+        return () => {
+            disconnectTrackingSocket();
+        };
+    }, []);
 
     if (loading) return <LoadingPage />;
 
