@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sakay_app/bloc/authentication/auth_bloc.dart';
 import 'package:sakay_app/bloc/authentication/auth_event.dart';
 import 'package:sakay_app/bloc/authentication/auth_state.dart';
+import 'package:sakay_app/core/configs/theme/theme_cubit.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
 import 'package:sakay_app/presentation/screens/commuters/Profile%20Settings/About.dart';
 import 'package:sakay_app/presentation/screens/commuters/Profile%20Settings/EditAccount.dart';
@@ -209,20 +210,129 @@ class AProfilePageState extends State<ProfilePage> {
                     isFirst: true,
                   ),
                   _buildDivider(isDark),
-                  _buildGroupedSettingsOption(
-                    context,
-                    Icons.language,
-                    'Language Preference',
-                    'Select the language that best fits your needs',
+                  // _buildGroupedSettingsOption(
+                  //   context,
+                  //   Icons.language,
+                  //   'Language Preference',
+                  //   'Select the language that best fits your needs',
+                  // ),
+                  // _buildDivider(isDark),
+
+                  BlocBuilder<ThemeCubit, ThemeMode>(
+                    builder: (context, themeMode) {
+                      final isDarkMode = themeMode == ThemeMode.dark;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 16.0),
+                        decoration: BoxDecoration(
+                          color:
+                              isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black.withOpacity(isDark ? 0.1 : 0.04),
+                              offset: const Offset(0, 2),
+                              blurRadius: 4.0,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00A2FF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: const Icon(
+                                Icons.dark_mode,
+                                color: Color(0xFF00A2FF),
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 16.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Dark Mode',
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF2D3748),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Switch between light and dark themes',
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white70
+                                          : const Color(0xFF718096),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                context
+                                    .read<ThemeCubit>()
+                                    .toggleTheme(!isDarkMode);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                width: 46,
+                                height: 26,
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? const Color(0xFF00A2FF)
+                                      : Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Align(
+                                  alignment: isDarkMode
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 250),
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.15),
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                  _buildDivider(isDark),
-                  _buildGroupedSettingsOption(
-                    context,
-                    Icons.palette,
-                    'Theme Customization',
-                    'Adjust the app\'s appearance to suit your style',
-                    isLast: true,
-                  ),
+
+                  // _buildDivider(isDark),
+
+                  // _buildGroupedSettingsOption(
+                  //   context,
+                  //   Icons.palette,
+                  //   'Theme Customization',
+                  //   'Adjust the app\'s appearance to suit your style',
+                  //   isLast: true,
+                  // ),
                 ],
               ),
               const SizedBox(height: 20.0),
