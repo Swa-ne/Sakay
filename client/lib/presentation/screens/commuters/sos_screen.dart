@@ -12,11 +12,11 @@ class SosOverlayDialog extends StatefulWidget {
 class _SosOverlayDialogState extends State<SosOverlayDialog>
     with SingleTickerProviderStateMixin {
   bool _isHolding = false;
-  int _holdSeconds = 10;
+  int _holdSeconds = 5;
   Timer? _holdTimer;
 
   bool _isConfirming = false;
-  int _confirmSeconds = 10;
+  int _confirmSeconds = 5;
   Timer? _confirmTimer;
   double _cancelProgress = 0.0;
 
@@ -50,17 +50,9 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
 
       setState(() {});
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("🚨 SOS has been sent to the authorities"),
-        ),
-      );
-
       debugPrint("SOS Triggered and sent to admins!");
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Failed to send SOS: $e")),
-      );
+      debugPrint(" Failed to send SOS: $e");
     }
 
     await Future.delayed(const Duration(seconds: 2));
@@ -72,7 +64,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
 
     setState(() {
       _isHolding = true;
-      _holdSeconds = 10;
+      _holdSeconds = 5;
     });
 
     _holdTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -97,7 +89,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
 
     setState(() {
       _isHolding = false;
-      _holdSeconds = 10;
+      _holdSeconds = 5;
     });
   }
 
@@ -105,7 +97,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     _confirmTimer?.cancel();
     setState(() {
       _isConfirming = true;
-      _confirmSeconds = 10;
+      _confirmSeconds = 5;
       _cancelProgress = 0.0;
     });
 
@@ -128,7 +120,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     _confirmTimer?.cancel();
     setState(() {
       _isConfirming = false;
-      _confirmSeconds = 10;
+      _confirmSeconds = 5;
       _cancelProgress = 0.0;
     });
     if (showSnack) {
@@ -142,15 +134,10 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     _holdTimer?.cancel();
     _confirmTimer?.cancel();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("🚨 SOS has been sent to the authorities"),
-      ),
-    );
+    debugPrint("SOS Triggered and sent to admins!");
 
     SosNotifier().triggerSOS("Commuter A");
 
-    debugPrint("SOS Triggered and sent to admins!");
     Navigator.pop(context);
   }
 

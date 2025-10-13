@@ -1260,41 +1260,41 @@ class _HomePageState extends State<HomePage> {
           if (_showTraffic) _buildTrafficLegend(s, sw),
 
           // SOS Button
-          Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.11,
-            left: MediaQuery.of(context).size.width * 0.04,
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => const SosOverlayDialog(),
-                );
-              },
-              child: Container(
-                padding:
-                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.035),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(
-                      MediaQuery.of(context).size.width * 0.03),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.red.withOpacity(0.3),
-                      blurRadius: MediaQuery.of(context).size.width * 0.02,
-                      offset:
-                          Offset(0, MediaQuery.of(context).size.height * 0.004),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.sos,
-                  color: Colors.white,
-                  size: MediaQuery.of(context).size.width * 0.06,
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: MediaQuery.of(context).size.height * 0.11,
+          //   left: MediaQuery.of(context).size.width * 0.04,
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       showDialog(
+          //         context: context,
+          //         barrierDismissible: false,
+          //         builder: (context) => const SosOverlayDialog(),
+          //       );
+          //     },
+          //     child: Container(
+          //       padding:
+          //           EdgeInsets.all(MediaQuery.of(context).size.width * 0.035),
+          //       decoration: BoxDecoration(
+          //         color: Colors.red,
+          //         borderRadius: BorderRadius.circular(
+          //             MediaQuery.of(context).size.width * 0.03),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.red.withOpacity(0.3),
+          //             blurRadius: MediaQuery.of(context).size.width * 0.02,
+          //             offset:
+          //                 Offset(0, MediaQuery.of(context).size.height * 0.004),
+          //           ),
+          //         ],
+          //       ),
+          //       child: Icon(
+          //         Icons.sos,
+          //         color: Colors.white,
+          //         size: MediaQuery.of(context).size.width * 0.06,
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           // Current Location (moves up smoothly if Bus List is visible)
           AnimatedPositioned(
