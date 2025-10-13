@@ -51,8 +51,12 @@ class _GuideScreenState extends State<GuideScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color textColor = isDarkMode ? Colors.white : Colors.black87;
+    final Color subtitleColor = isDarkMode ? Colors.white70 : Colors.grey;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: Column(
         children: [
           const SizedBox(height: 80),
@@ -66,7 +70,8 @@ class _GuideScreenState extends State<GuideScreen> {
                 });
               },
               itemBuilder: (context, index) {
-                return Padding(
+                return Container(
+                  color: isDarkMode ? Colors.black : Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -82,18 +87,19 @@ class _GuideScreenState extends State<GuideScreen> {
                       Text(
                         _slides[index]['title']!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 20.0),
                       Text(
                         _slides[index]['description']!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13.0,
-                          color: Colors.grey,
+                          color: subtitleColor,
                         ),
                       ),
                     ],

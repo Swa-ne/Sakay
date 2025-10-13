@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sakay_app/data/models/announcement.dart';
 import 'package:sakay_app/presentation/screens/common/announcement_main.dart';
 
-// TODO: add refresh callback
 class AnnouncementsScreen extends StatefulWidget {
   final List<AnnouncementsModel> announcements;
   final ScrollController scrollAnnouncementController;
@@ -22,13 +21,18 @@ class AnnouncementsScreen extends StatefulWidget {
 class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        centerTitle: true,
+        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        title: Text(
           'Announcements',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
       ),
@@ -40,21 +44,24 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             children: [
               Expanded(
                 child: widget.announcements.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons
-                                  .announcement_outlined,
+                              Icons.announcement_outlined,
                               size: 30,
-                              color: Color.fromARGB(255, 202, 202, 202),
+                              color: isDark
+                                  ? Colors.white70
+                                  : const Color.fromARGB(255, 202, 202, 202),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               "No announcements yet",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14),
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.grey,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
@@ -69,8 +76,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      AnnouncementDetailScreen(
+                                  builder: (context) => AnnouncementDetailScreen(
                                     announcement: announcement,
                                   ),
                                 ),
@@ -80,44 +86,54 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: isDark
+                                    ? const Color(0xFF2C2C2C)
+                                    : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey),
+                                border: Border.all(
+                                  color: isDark ? Colors.white24 : Colors.grey,
+                                ),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.campaign,
-                                      color: Color(0xFF00A3FF)),
+                                  Icon(
+                                    Icons.campaign,
+                                    color: const Color(0xFF00A3FF),
+                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           announcement.headline,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark ? Colors.white : Colors.black,
+                                          ),
                                         ),
                                         Text(
                                           announcement.content,
-                                          style: const TextStyle(
-                                              color: Color(0xFF888888)),
+                                          style: TextStyle(
+                                            color: isDark ? Colors.white70 : const Color(0xFF888888),
+                                          ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
-                                  const Icon(Icons.more_horiz,
-                                      color: Colors.black),
+                                  Icon(
+                                    Icons.more_horiz,
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
                                 ],
                               ),
                             ),
                           );
                         },
                       ),
-              )
+              ),
             ],
           ),
         ),

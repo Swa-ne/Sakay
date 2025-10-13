@@ -14,14 +14,23 @@ const useManageAccounts = () => {
     const hasLoadedUnits = useRef(false);
     const [currentRole, setCurrentRole] = useState<string | null>(null);
 
-    const [total, setTotal] = useState<number>(1)
-    const [commuterCount, setCommuterCount] = useState<number>(1)
-    const [driverCount, setDriverCount] = useState<number>(1)
-    const [adminCount, setAdminCount] = useState<number>(1)
+    // const [total, setTotal] = useState<number>(1)
+    // const [commuterCount, setCommuterCount] = useState<number>(1)
+    // const [driverCount, setDriverCount] = useState<number>(1)
+    // const [adminCount, setAdminCount] = useState<number>(1)
 
     const accounts = useManageStore((state) => state.accounts);
     const units = useManageStore((state) => state.units);
+    const total = useManageStore((state) => state.total);
+    const commuterCount = useManageStore((state) => state.commuterCount);
+    const driverCount = useManageStore((state) => state.driverCount);
+    const adminCount = useManageStore((state) => state.adminCount);
     const setAccounts = useManageStore((state) => state.setAccounts);
+
+    const setTotal = useManageStore((state) => state.setTotal);
+    const setCommuterCount = useManageStore((state) => state.setCommuterCount);
+    const setDriverCount = useManageStore((state) => state.setDriverCount);
+    const setAdminCount = useManageStore((state) => state.setAdminCount);
 
     const setUnits = useManageStore((state) => state.setUnits);
 

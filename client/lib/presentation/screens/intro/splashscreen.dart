@@ -72,8 +72,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -81,8 +83,16 @@ class _SplashScreenState extends State<SplashScreen> {
             Image.asset(
               'assets/lugo.png',
               height: 150.0,
+              color: isDarkMode ? Colors.white : null,
             ),
             const SizedBox(height: 20.0),
+            Text(
+              "Loading...",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+                fontSize: 16,
+              ),
+            ),
           ],
         ),
       ),

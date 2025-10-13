@@ -55,6 +55,8 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<ChatBloc, ChatState>(
       listener: (context, state) {
         if (state is SaveMessageSuccess) {
@@ -75,23 +77,29 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 1,
-          title: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 15,
-                backgroundImage: AssetImage("assets/lugo.png"),
-                backgroundColor: Colors.transparent,
-              ),
-              SizedBox(width: 10),
-              Text("Admin",
+          backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          elevation: 0,
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircleAvatar(
+                  radius: 15,
+                  backgroundImage: AssetImage("assets/lugo.png"),
+                  backgroundColor: Colors.transparent,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  "Admin",
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold)),
-            ],
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         body: Column(
@@ -134,7 +142,10 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                             child: Text(
                               formatDate(widget.messages[index].createdAt),
                               style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 12),
+                                color:
+                                    isDark ? Colors.white70 : Colors.grey[600],
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),
@@ -145,6 +156,7 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                           widget.messages[index].message,
                           isMe,
                           formattedTime,
+                          isDark: isDark,
                         ),
                       ),
                     ],
@@ -154,18 +166,26 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              color: Colors.white,
+              color: isDark
+                  ? const Color(0xFF1A1A1A)
+                  : Colors.white,
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: messageController,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Type a message...",
-                        hintStyle:
-                            const TextStyle(color: Colors.grey, fontSize: 13),
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.grey,
+                          fontSize: 13,
+                        ),
                         filled: true,
-                        fillColor: Colors.grey[200],
+                        fillColor:
+                            isDark ? const Color(0xFF2C2C2C) : Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
@@ -174,7 +194,7 @@ class _InboxScreenState extends State<InboxScreen> with Convertion {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.send, color: Colors.blue),
+                    icon: const Icon(Icons.send, color: Color(0xFF00A2FF)),
                     onPressed: sendMessage,
                   ),
                 ],

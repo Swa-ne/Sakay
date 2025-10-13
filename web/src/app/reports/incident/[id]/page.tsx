@@ -21,7 +21,7 @@ const IncidentPage = () => {
         }
     }, [id, setReportID]);
 
-    if (loading) return <LoadingPage />;
+    // if (loading) return <LoadingPage />;
     if (error) return <div>Error: {error}</div>;
     if (!report) return <div>Report not found</div>;
 

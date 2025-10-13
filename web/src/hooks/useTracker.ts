@@ -3,7 +3,7 @@ import { getAllBussesAndDriver } from '@/service/bus';
 import { useAuthStore } from '@/stores';
 import { LatLngLiteral, BusInformation } from '@/types';
 import { getNearestDestination } from '@/utils/latlng.util';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const TRACKING_API_URL = `${process.env.NEXT_PUBLIC_API_URL}/tracking`;
@@ -12,11 +12,13 @@ let socket: Socket | null = null;
 const pendingCreations = new Set<string>();
 
 const TERMINAL_POINT = {
-    lat: 16.025179,
-    lng: 120.253171
+    lat: 16.004627,
+    lng: 120.223597,
 }
 
 const useTracker = (map: google.maps.Map | null = null) => {
+    const bussesRef = useRef<Map<string, BusInformation>>(new Map());
+
     const [busses, setBusses] = useState<Map<string, BusInformation>>(new Map());
     const [polylines, setPolylines] = useState([]);
 
@@ -24,6 +26,13 @@ const useTracker = (map: google.maps.Map | null = null) => {
     const [error, setError] = useState<string | null>(null);
 
 
+    useEffect(() => {
+        bussesRef.current = busses;
+    }, [busses]);
+    const refreshBusses = () => {
+        setBusses(new Map());
+        bussesRef.current = new Map();
+    }
     const createOneBus = useCallback((bus: BusInformation, position: LatLngLiteral) => {
         if (!map) return;
         setBusses((prev) => {
@@ -47,7 +56,6 @@ const useTracker = (map: google.maps.Map | null = null) => {
     }, [map]);
 
     const getAllBusses = useCallback(async () => {
-        setLoading(true);
         setError(null);
         const fetchBusses = await getAllBussesAndDriver()
         if (fetchBusses !== "Internal Server Error") {
@@ -108,27 +116,26 @@ const useTracker = (map: google.maps.Map | null = null) => {
             console.log('Connected to tracking sockets');
         });
 
-        socket.on('update-map', async (data: { user: string; location: BusInformation }) => {
+        socket.on('update-map', async (data: { bus: { _id: string }; user: string; location: BusInformation }) => {
             const busLoc: BusInformation = data.location;
+            const currentBusses = bussesRef.current;
 
             // if (!busses.has(data.user)) {
-            if (!pendingCreations.has(data.user)) {
-                pendingCreations.add(data.user);
-                const bus_id = Array.from(busses.entries()).find(
-                    ([, info]) => info.assignedDriverId === data.user
-                )?.[0];
+            if (!pendingCreations.has(data.bus._id)) {
+                pendingCreations.add(data.bus._id);
+                const bus_id = currentBusses.has(data.bus._id) ? data.bus._id : undefined;
                 if (bus_id) {
-                    // createOneBus(data.user, { lng: busLoc.longitude, lat: busLoc.latitude }, busLoc.speed);
-                    updateOneBus(data.user, { lng: busLoc.longitude, lat: busLoc.latitude }, busLoc.speed);
+                    // console.log("Updating Map", currentBusses);
+                    updateOneBus(data.bus._id, { lng: busLoc.longitude, lat: busLoc.latitude }, busLoc.speed);
                 }
-                pendingCreations.delete(data.user);
+                pendingCreations.delete(data.bus._id);
             }
             // } else {
             // }
         });
 
-        socket.on('track-my-vehicle-stop', async (data: { user: string }) => {
-            removeOneBus(data.user);
+        socket.on('track-my-vehicle-stop', async (data: { user: string; bus: { _id: string } }) => {
+            removeOneBus(data.bus._id);
         });
 
         socket.on('disconnect', () => {
@@ -147,12 +154,14 @@ const useTracker = (map: google.maps.Map | null = null) => {
 
     useEffect(() => {
         if (!map) return;
+        setLoading(true);
 
         getAllBusses();
         connectTrackingSocket();
+        setLoading(false);
     }, [map, getAllBusses, connectTrackingSocket]);
 
-    return { connectTrackingSocket, disconnectTrackingSocket, busses, setBusses, polylines, setPolylines, loading, setLoading, error, setError };
+    return { refreshBusses, connectTrackingSocket, disconnectTrackingSocket, busses, setBusses, polylines, setPolylines, loading, setLoading, error, setError };
 }
 
 export default useTracker

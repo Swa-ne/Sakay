@@ -25,17 +25,14 @@ class AdminChatPage extends StatefulWidget {
   State<AdminChatPage> createState() => _AdminChatPageState();
 }
 
-// TODO: Cache messages
 class _AdminChatPageState extends State<AdminChatPage> with Convertion {
   final TextEditingController messageController = TextEditingController();
-
   final ScrollController _scrollController = ScrollController();
   final TokenControllerImpl _tokenController = TokenControllerImpl();
   List<MessageModel> messages = [];
 
-  late String receiver_id;
-  late ChatBloc _chatBloc;
   late String user_id;
+  late ChatBloc _chatBloc;
 
   String cursor = "";
   bool isLoading = false;
@@ -71,6 +68,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       ));
+      messageController.clear();
     }
   }
 
@@ -85,12 +83,15 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back,
+              color: isDark ? Colors.white : Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -101,7 +102,9 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
             const SizedBox(width: 10),
             Text(
               "${widget.inbox.user_id.first_name} ${widget.inbox.user_id.last_name}",
-              style: const TextStyle(color: Colors.black),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+              ),
             ),
           ],
         ),
@@ -176,7 +179,10 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                             child: Text(
                               formatDate(messages[index].createdAt),
                               style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 12),
+                                color:
+                                    isDark ? Colors.white70 : Colors.grey[600],
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),
@@ -187,6 +193,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                           messages[index].message,
                           isMe,
                           formattedTime,
+                          isDark: isDark,
                         ),
                       ),
                     ],
@@ -202,10 +209,17 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                   Expanded(
                     child: TextField(
                       controller: messageController,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Type a message...",
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.grey,
+                        ),
                         filled: true,
-                        fillColor: Colors.grey[200],
+                        fillColor:
+                            isDark ? Color(0xFF2C2C2C) : Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -214,7 +228,7 @@ class _AdminChatPageState extends State<AdminChatPage> with Convertion {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.send, color: Colors.blue),
+                    icon: Icon(Icons.send, color: Colors.blue),
                     onPressed: sendMessage,
                   ),
                 ],

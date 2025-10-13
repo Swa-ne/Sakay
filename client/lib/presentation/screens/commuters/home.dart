@@ -233,15 +233,30 @@ class _HomeState extends State<Home> {
               bottomNavigationBar: BottomNavigationBar(
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
                 selectedItemColor: const Color(0xFF00A2FF),
-                unselectedItemColor: Colors.grey,
+                unselectedItemColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white70
+                        : Colors.grey,
                 showUnselectedLabels: true,
                 type: BottomNavigationBarType.fixed,
-                selectedLabelStyle: const TextStyle(
-                    fontSize: 10, fontWeight: FontWeight.normal),
-                unselectedLabelStyle: const TextStyle(
-                    fontSize: 10, fontWeight: FontWeight.normal),
+                selectedLabelStyle: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : null,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white70
+                      : null,
+                ),
                 items: const [
                   BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
                   BottomNavigationBarItem(

@@ -7,8 +7,8 @@ export interface fetchUser {
     last_name: string
     user_type: string
     email: string
-    assigned_bus_id: string
-    phone_number: string
+    assigned_bus_id?: string
+    phone_number?: string
     profile_picture_url: string
     createdAt?: string | null
 }

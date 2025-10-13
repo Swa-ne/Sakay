@@ -6,6 +6,7 @@ import 'package:sakay_app/bloc/bus/bus_bloc.dart';
 import 'package:sakay_app/bloc/chat/chat_bloc.dart';
 import 'package:sakay_app/bloc/announcement/announcement_bloc.dart';
 import 'package:sakay_app/bloc/report/report_bloc.dart';
+import 'package:sakay_app/core/configs/theme/theme_cubit.dart';
 import 'package:sakay_app/data/sources/realtime/chat_repo_impl.dart';
 import 'package:sakay_app/data/sources/realtime/announcement_repo_impl.dart';
 import 'package:sakay_app/data/sources/realtime/report_repo_impl.dart';
@@ -25,11 +26,15 @@ void main() async {
   String accessToken = "${dotenv.env['ACCESS_TOKEN']}";
   MapboxOptions.setAccessToken(accessToken);
 
-  runApp(const MyApp());
+  final themeCubit = ThemeCubit();
+  await themeCubit.loadTheme();
+
+  runApp(MyApp(themeCubit: themeCubit));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeCubit themeCubit;
+  const MyApp({super.key, required this.themeCubit});
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +68,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => BusBloc(BusRepoImpl()),
           ),
+          BlocProvider.value(value: themeCubit),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -71,11 +77,17 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            title: 'Sakay',
-            routerConfig: appRouter,
+          home: BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+                title: 'Sakay',
+                routerConfig: appRouter,
+              );
+            },
           ),
         ),
       ),

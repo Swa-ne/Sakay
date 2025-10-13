@@ -5,8 +5,10 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 0,
         elevation: 0,
@@ -24,14 +26,11 @@ class AboutPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF00A2FF)
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF00A2FF)),
             child: Row(
               children: [
                 Image.asset(
@@ -116,9 +115,9 @@ class AboutPage extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Row(
                           children: [
                             Icon(Icons.group, color: Color(0xFF00A2FF)),
@@ -136,11 +135,11 @@ class AboutPage extends StatelessWidget {
                         SizedBox(height: 20),
                         _TeamMember(
                           name: 'Lance Manaois',
-                          position: 'Project Manager & Lead Developer',
+                          position: 'Project Manager & Full-stack Developer',
                         ),
                         _TeamMember(
                           name: 'Stephen Bautista',
-                          position: 'Full-stack Developer & Team Manager',
+                          position: 'Lead Developer & Full-stack Developer',
                         ),
                         _TeamMember(
                           name: 'Jaspher Tania',
@@ -180,20 +179,25 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: isDark
+              ? Colors.grey.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -208,19 +212,19 @@ class _InfoCard extends StatelessWidget {
                   color: const Color(0xFF00A2FF).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  icon,
-                  color: const Color(0xFF00A2FF),
+                child: const Icon(
+                  Icons.star,
+                  color: Color(0xFF00A2FF),
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
+                  color: isDark ? Colors.white : const Color(0xFF2D3748),
                 ),
               ),
             ],
@@ -228,9 +232,9 @@ class _InfoCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF4A5568),
+              color: isDark ? Colors.white70 : const Color(0xFF4A5568),
               height: 1.5,
             ),
           ),
@@ -248,18 +252,21 @@ class _TeamMember extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Row(
@@ -288,18 +295,18 @@ class _TeamMember extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
+                    color: isDark ? Colors.white : const Color(0xFF2D3748),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   position,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF718096),
+                    color: isDark ? Colors.white70 : const Color(0xFF718096),
                   ),
                 ),
               ],

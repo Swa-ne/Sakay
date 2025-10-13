@@ -24,7 +24,7 @@ export const generateAccessToken = async (user: UserSchemaInterface): Promise<st
         },
         process.env.ACCESS_TOKEN_SECRET as string,
         {
-            expiresIn: "30m"
+            expiresIn: "30d"
         }
     )
 };

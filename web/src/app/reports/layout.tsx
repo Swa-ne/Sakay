@@ -9,13 +9,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import useReports from '@/hooks/useReports';
 import { TypesOfReport } from '@/types';
 import { timeAgo } from '@/utils/date.util';
-import LoadingPage from '@/components/pages/loading.page';
 import Link from 'next/link';
 import { reportActions } from '@/stores';
 import { getReportStats } from '@/service/report';
 
 export default function ReportsLayout({ children }: { children: ReactNode }) {
-    const { reports, loading, error } = useReports();
+    const { reports, error } = useReports();
 
     const tabs = [
         { name: 'All', value: 'all', icon: null },
@@ -36,8 +35,6 @@ export default function ReportsLayout({ children }: { children: ReactNode }) {
         };
         fetchReportStats();
     }, [reports]);
-
-    if (loading) return <LoadingPage />;
 
     if (error) {
         // TODO: show a something

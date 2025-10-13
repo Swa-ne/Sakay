@@ -40,7 +40,7 @@ const Map = ({ busses, polylines, setMap }: MapProps) => {
 
     const mapRef = useRef<google.maps.Map>(null);
 
-    if (!isLoaded) return <LoadingPage />;
+    if (!isLoaded) return <></>;
 
     return (
         <GoogleMap

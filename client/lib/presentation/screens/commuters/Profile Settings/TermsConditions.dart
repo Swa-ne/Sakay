@@ -5,37 +5,39 @@ class TermsConditions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Terms & Conditions",
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.black : Colors.white,
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 10),
@@ -44,7 +46,7 @@ class TermsConditions extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? Colors.grey[900] : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -61,20 +63,20 @@ class TermsConditions extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    const Text(
+                    Text(
                       'Legal Agreement',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 0, 0, 0),
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 3),
-                    const Text(
+                    Text(
                       'Please read these terms carefully before using Sakay',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color.fromARGB(179, 0, 0, 0),
+                        color: isDark ? Colors.white70 : Colors.black87,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -83,7 +85,8 @@ class TermsConditions extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -98,12 +101,12 @@ class TermsConditions extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'By agreeing to these Terms and Conditions, you acknowledge and accept the following:',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF2D3748),
+                        color: isDark ? Colors.white70 : const Color(0xFF2D3748),
                         height: 1.5,
                       ),
                     ),
@@ -162,14 +165,16 @@ class TermsConditions extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: isDark ? Colors.grey[900] : Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: Colors.grey.shade600,
+                          color: isDark
+                              ? Colors.white70
+                              : Colors.grey.shade600,
                           size: 24,
                         ),
                         const SizedBox(height: 12),
@@ -177,7 +182,9 @@ class TermsConditions extends StatelessWidget {
                           'Last updated: ${DateTime.now().year}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: isDark
+                                ? Colors.white70
+                                : Colors.grey.shade600,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -186,7 +193,9 @@ class TermsConditions extends StatelessWidget {
                           'These terms are effective immediately upon acceptance',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade500,
+                            color: isDark
+                                ? Colors.white54
+                                : Colors.grey.shade500,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -216,11 +225,13 @@ class _TermsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -230,7 +241,7 @@ class _TermsSection extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: isDark ? Colors.grey[700]! : Colors.grey.shade200,
           width: 1,
         ),
       ),
@@ -255,10 +266,10 @@ class _TermsSection extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
+                    color: isDark ? Colors.white : const Color(0xFF2D3748),
                   ),
                 ),
               ),
@@ -267,10 +278,10 @@ class _TermsSection extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               height: 1.6,
-              color: Color(0xFF4A5568),
+              color: isDark ? Colors.white70 : const Color(0xFF4A5568),
               letterSpacing: 0.2,
             ),
           ),

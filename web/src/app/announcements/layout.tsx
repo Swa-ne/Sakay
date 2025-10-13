@@ -50,18 +50,19 @@ const AnnouncementsLayouts = ({ children }: { children: ReactNode }) => {
                             <AddAnnouncementModal setOpen={setOpenAnnouncementModal} />
                         </Dialog>
                     </div>
-                    {announcements.map((ann) => (
-                        <Link href={`/announcements/${ann._id}`} key={ann._id} className='h-16 md:h-20 flex items-center justify-between border gap-2 rounded-md p-2 md:pl-3 md:pr-1.5 cursor-pointer mb-2'>
-                            <label className='w-2/3 flex flex-col justify-center hover:underline cursor-pointer'>
-                                <span className='truncate w-full block text-sm md:text-base'>
-                                    <b>{ann.headline}</b> - {ann.content.substring(0, 30)}
-                                    {ann.content.length > 30 ? '...' : ''}
-                                </span>
-                                <i className='text-xs md:text-sm'>{ann.audience}</i>
-                            </label>
-                            <span className='text-xs md:text-sm whitespace-nowrap'>{timeAgo(ann.updatedAt ?? '')}</span>
-                        </Link>
-                    ))}
+                    {announcements &&
+                        announcements.map((ann) => (
+                            <Link href={`/announcements/${ann._id}`} key={ann._id} className='h-16 md:h-20 flex items-center justify-between border gap-2 rounded-md p-2 md:pl-3 md:pr-1.5 cursor-pointer mb-2'>
+                                <label className='w-2/3 flex flex-col justify-center hover:underline cursor-pointer'>
+                                    <span className='truncate w-full block text-sm md:text-base'>
+                                        <b>{ann.headline}</b> - {ann.content.substring(0, 30)}
+                                        {ann.content.length > 30 ? '...' : ''}
+                                    </span>
+                                    <i className='text-xs md:text-sm'>{ann.audience}</i>
+                                </label>
+                                <span className='text-xs md:text-sm whitespace-nowrap'>{timeAgo(ann.updatedAt ?? '')}</span>
+                            </Link>
+                        ))}
                 </div>
 
                 <div className='w-full lg:w-1/2 bg-background rounded-xl md:rounded-2xl overflow-hidden relative h-full p-3 md:p-5'>{children}</div>

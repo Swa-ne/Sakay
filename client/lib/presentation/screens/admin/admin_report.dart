@@ -83,6 +83,24 @@ class _AdminReportsState extends State<AdminReports> {
     });
   }
 
+  Color getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[850]!
+        : Colors.white;
+  }
+
+  Color getTextColor(BuildContext context, {Color lightColor = Colors.black}) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : lightColor;
+  }
+
+  Color getIconColor(BuildContext context, {Color lightColor = Colors.black}) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : lightColor;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<ReportBloc, ReportState>(
@@ -136,6 +154,7 @@ class _AdminReportsState extends State<AdminReports> {
             PopupMenuButton<String>(
               icon: const Icon(Icons.filter_list, color: Colors.white),
               tooltip: 'Filter reports',
+              color: getCardColor(context),
               onSelected: (String value) {
                 setState(() {
                   if (value == 'All') {
@@ -157,11 +176,14 @@ class _AdminReportsState extends State<AdminReports> {
                 });
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
+                PopupMenuItem<String>(
                   value: 'All',
                   child: ListTile(
-                    leading: Icon(Icons.report, color: Colors.black, size: 25),
-                    title: Text('All Reports'),
+                    leading: Icon(Icons.report,
+                        color: getIconColor(context, lightColor: Colors.black),
+                        size: 25),
+                    title: Text('All Reports',
+                        style: TextStyle(color: getTextColor(context))),
                   ),
                 ),
                 const PopupMenuDivider(),
@@ -177,7 +199,7 @@ class _AdminReportsState extends State<AdminReports> {
                         style: TextStyle(
                             color: selectedFilter == 'INCIDENT'
                                 ? Colors.blue
-                                : Colors.black)),
+                                : getTextColor(context))),
                   ),
                 ),
                 PopupMenuItem<String>(
@@ -192,7 +214,7 @@ class _AdminReportsState extends State<AdminReports> {
                         style: TextStyle(
                             color: selectedFilter == 'PERFORMANCE'
                                 ? Colors.blue
-                                : Colors.black)),
+                                : getTextColor(context))),
                   ),
                 ),
                 const PopupMenuDivider(),
@@ -208,7 +230,7 @@ class _AdminReportsState extends State<AdminReports> {
                         style: TextStyle(
                             color: selectedStatusFilter == 'Open'
                                 ? Colors.blue
-                                : Colors.black)),
+                                : getTextColor(context))),
                   ),
                 ),
                 PopupMenuItem<String>(
@@ -223,11 +245,10 @@ class _AdminReportsState extends State<AdminReports> {
                         style: TextStyle(
                             color: selectedStatusFilter == 'Closed'
                                 ? Colors.blue
-                                : Colors.black)),
+                                : getTextColor(context))),
                   ),
                 ),
               ],
-              color: Colors.white,
             ),
           ],
         ),
@@ -241,47 +262,72 @@ class _AdminReportsState extends State<AdminReports> {
                   children: [
                     if (selectedFilter != null)
                       FilterChip(
-                        label: Text(selectedFilter!),
+                        label: Text(selectedFilter!,
+                            style: TextStyle(
+                                color: getTextColor(context,
+                                    lightColor: Colors.black))),
                         onSelected: (bool value) {
                           setState(() {
                             selectedFilter = null;
                           });
                         },
-                        backgroundColor: Colors.blue[100],
-                        deleteIcon: const Icon(Icons.close, size: 16),
+                        backgroundColor: Theme.of(context).brightness ==
+                                Brightness.dark
+                            ? Colors.grey[700]
+                            : Colors.blue[100],
+                        deleteIcon: Icon(Icons.close,
+                            size: 16, color: getIconColor(context)),
                       ),
                     if (selectedStatusFilter != null)
                       FilterChip(
-                        label: Text(selectedStatusFilter!),
+                        label: Text(selectedStatusFilter!,
+                            style: TextStyle(
+                                color: getTextColor(context,
+                                    lightColor: Colors.black))),
                         onSelected: (bool value) {
                           setState(() {
                             selectedStatusFilter = null;
                           });
                         },
-                        backgroundColor: Colors.green[100],
-                        deleteIcon: const Icon(Icons.close, size: 16),
+                        backgroundColor: Theme.of(context).brightness ==
+                                Brightness.dark
+                            ? Colors.grey[700]
+                            : Colors.green[100],
+                        deleteIcon: Icon(Icons.close,
+                            size: 16, color: getIconColor(context)),
                       ),
                     TextButton(
                       onPressed: _clearFilters,
-                      child: const Text('Clear All Filters',
-                          style: TextStyle(color: Colors.blue)),
+                      child: Text('Clear All Filters',
+                          style: TextStyle(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.blue)),
                     ),
                   ],
                 ),
               ),
             Expanded(
               child: filteredReports.isEmpty
-                  ? const Center(
-                      child: Text('No reports found'),
+                  ? Center(
+                      child: Text(
+                        'No reports found',
+                        style: TextStyle(color: getTextColor(context)),
+                      ),
                     )
                   : ListView.separated(
+                      controller: _scrollController,
                       itemCount: filteredReports.length,
                       separatorBuilder: (context, index) =>
-                          const Divider(height: 1),
+                          Divider(height: 1, color: getTextColor(context).withOpacity(0.2)),
                       itemBuilder: (context, index) {
                         final report = filteredReports[index];
                         return ReportTile(
                           report: report,
+                          backgroundColor: getCardColor(context),
+                          textColor: getTextColor(context),
+                          iconColor: getIconColor(context),
                           onTap: () {
                             if (report.type_of_report == 'INCIDENT') {
                               Navigator.push(
