@@ -79,6 +79,7 @@ export const allowedDestinations = [
         "lat": 16.038357,
         "lng": 120.333202,
     },
+    // repeats block (goes from top to bottom when from dagupan, goes from bottom to top when from lingayen)
     {
         "name": "Dagupan City National High School",
         "lat": 16.037269,
@@ -215,13 +216,139 @@ export const allowedDestinations = [
         "lng": 120.236803,
     },
     {
+        "name": "PNB - Lingayen",
+        "lat": 16.0223609,
+        "lng": 120.2359898,
+    },
+    // repeat end
+    {
+        "name": "Harvent School - Lingayen",
+        "lat": 16.0259072,
+        "lng": 120.2345061,
+    },
+    {
+        "name": "Kingdom Hall of Jehovah's Witnesses - Lingayen",
+        "lat": 16.0292683,
+        "lng": 120.23325,
+    },
+    {
+        "name": "Golden Mami House - Lingayen",
+        "lat": 16.0308944,
+        "lng": 120.2326433,
+    },
+    {
         "name": "Pangasinan State University",
         "lat": 16.030899,
         "lng": 120.230123,
+    },
+    {
+        "name": "Bo's Coffee - Lingayen",
+        "lat": 16.0303872,
+        "lng": 120.2285407,
+    },
+    {
+        "name": "7-Eleven - Lingayen",
+        "lat": 16.0303872,
+        "lng": 120.2285407,
+    },
+    {
+        "name": "YamiTeys Snack House",
+        "lat": 16.0285073,
+        "lng": 120.2279688,
+    },
+    {
+        "name": "P. Morgan",
+        "lat": 16.0270937,
+        "lng": 120.2282478,
+    },
+    {
+        "name": "Uson Pigar Pigar - Lingayen",
+        "lat": 16.0259742,
+        "lng": 120.2284627,
+    },
+    {
+        "name": "Total - Lingayen",
+        "lat": 16.0251403,
+        "lng": 120.2286114,
+    },
+    {
+        "name": "JK Raider Enterprises",
+        "lat": 16.0246013,
+        "lng": 120.2287145,
+    },
+    {
+        "name": "PCWORKS - Lingayen",
+        "lat": 16.0225447,
+        "lng": 120.2291036,
+    },
+    {
+        "name": "Jetti Artacho - Lingayen",
+        "lat": 16.0213224,
+        "lng": 120.2293242,
+    },
+    {
+        "name": "Amigo - Lingayen",
+        "lat": 16.020829,
+        "lng": 120.2281878,
+    },
+    {
+        "name": "Mesa de Amor",
+        "lat": 16.020694,
+        "lng": 120.2274517,
+    },
+    {
+        "name": "UPS Driving School - Lingayen",
+        "lat": 16.0202634,
+        "lng": 120.2267805,
+    },
+    {
+        "name": "Lingayen Tricycle Terminal",
+        "lat": 16.2267805,
+        "lng": 120.2276028,
+    },
+    {
+        "name": "Civil Service Commision Director II Office",
+        "lat": 16.0185148,
+        "lng": 120.2280105,
+    },
+    {
+        "name": "Lingayen Municipal Fish Port",
+        "lat": 16.0174397,
+        "lng": 120.228884,
+    },
+    {
+        "name": "Lingayen Common Bus Terminal",
+        "lat": 16.0178851,
+        "lng": 120.230678,
+    },
+    {
+        "name": "McDonald's - Lingayen",
+        "lat": 16.0188837,
+        "lng": 120.2314203,
     },
     {
         "name": "Lingayen Municipal Hall",
         "lat": 16.020103,
         "lng": 120.230726,
     },
+    {
+        "name": "The Co-Cathedral Parish of the Epiphany of our Lord",
+        "lat": 16.0211435,
+        "lng": 120.2322544,
+    },
+    {
+        "name": "BHF Bank - Lingayen",
+        "lat": 16.0217193,
+        "lng": 120.2333481,
+    },
+    {
+        "name": "Computer Bucket - Lingayen",
+        "lat": 16.0219766,
+        "lng": 120.23445,
+    },
+    {
+        "name": "LDTC Parking Terminal",
+        "lat": 16.004627,
+        "lng": 120.223597,
+    }
 ];
