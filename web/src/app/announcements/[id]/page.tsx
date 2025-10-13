@@ -2,7 +2,6 @@
 
 import EditAnnouncementModal from '@/components/editAnnouncementModal';
 import FilePreview from '@/components/filePreview';
-import LoadingPage from '@/components/pages/loading.page';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ import { useEffect, useState } from 'react';
 
 export default function AnnouncementDetails() {
     const { id } = useParams();
-    const { announcement, loading, error, fetchAnnouncement, handleDelete } = useAnnouncement();
+    const { announcement, error, fetchAnnouncement, handleDelete } = useAnnouncement();
     const [previewFile, setPreviewFile] = useState<File | string | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
