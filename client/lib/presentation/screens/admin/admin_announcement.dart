@@ -37,14 +37,15 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
   late UserModel _myUserModel;
   String _selectedAudience = "EVERYONE";
   final List<String> _audienceOptions = ["DRIVER", "COMMUTER", "EVERYONE"];
-  int currentPage = 1;
+
+  String cursor = "";
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _announcementBloc = BlocProvider.of<AnnouncementBloc>(context);
-    _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
+    _announcementBloc.add(GetAllAnnouncementsEvent(cursor));
     _scrollController.addListener(_onScroll);
     _initializeMyUserModel();
   }
@@ -71,9 +72,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
     if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
         isLoading = true;
-        currentPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentPage));
+      _announcementBloc.add(GetAllAnnouncementsEvent(cursor));
     }
   }
 
@@ -270,6 +270,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            cursor = state.cursor;
           });
         } else if (state is SaveAnnouncementError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -355,8 +356,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                 );
                               },
                               child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 4),
+                                margin: const EdgeInsets.symmetric(vertical: 4),
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: getCardColor(context),
@@ -382,8 +382,7 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                           Text(
                                             announcement.content,
                                             style: TextStyle(
-                                                color: getTextColor(
-                                                    context,
+                                                color: getTextColor(context,
                                                     lightColor:
                                                         Color(0xFF888888))),
                                             maxLines: 1,
@@ -427,8 +426,8 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
               height: MediaQuery.of(context).size.height,
               decoration: BoxDecoration(
                 color: getCardColor(context),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
               ),
               child: Column(
                 children: [
@@ -483,13 +482,13 @@ class _AdminAnnouncementState extends State<AdminAnnouncement>
                                       color: getTextColor(context)),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade400),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade400),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),

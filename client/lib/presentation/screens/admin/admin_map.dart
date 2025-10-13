@@ -347,30 +347,11 @@ class _AdminMapState extends State<AdminMap> {
     return Scaffold(
       body: Stack(
         children: [
+          // Updated to pass mapType and showTraffic parameters
           Positioned.fill(
-            child: GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-                _mapController!.setMapStyle(_getMapStyle());
-                setState(() {
-                  _mapInitialized = true;
-                });
-                if (_showTraffic) {
-                  _mapController!.setMapStyle('');
-                }
-              },
-              initialCameraPosition: _defaultCameraPosition,
+            child: MyMapWidget(
               mapType: _currentMapType,
-              trafficEnabled: _showTraffic,
-              onCameraMove: (CameraPosition position) {
-                if (!_hasRestricted) {
-                  _restrictToPangasinan();
-                  _hasRestricted = true;
-                }
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
+              showTraffic: _showTraffic,
             ),
           ),
 
@@ -401,8 +382,7 @@ class _AdminMapState extends State<AdminMap> {
                 child: Icon(
                   Icons.menu,
                   color: isDark ? Colors.white : Colors.black,
-                  size: MediaQuery.of(context).size.width *
-                      0.06,
+                  size: MediaQuery.of(context).size.width * 0.06,
                 ),
               ),
             ),
@@ -492,7 +472,7 @@ class _AdminMapState extends State<AdminMap> {
             ),
           ),
 
-          // Live Traffic Button
+          // Live Traffic Button - Updated to only change state
           Positioned(
             top: MediaQuery.of(context).size.height * 0.08,
             left: MediaQuery.of(context).size.width * 0.18,
@@ -530,8 +510,7 @@ class _AdminMapState extends State<AdminMap> {
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.03,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isDark ? Colors.white : Colors.grey,
+                        color: isDark ? Colors.white : Colors.grey,
                       ),
                     ),
                   ],

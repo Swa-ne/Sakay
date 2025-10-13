@@ -23,7 +23,7 @@ class _AdminReportsState extends State<AdminReports> {
 
   String? selectedFilter;
   String? selectedStatusFilter;
-  int currentPage = 1;
+  String cursor = "";
   bool isLoading = false;
 
   final List<ReportModel> reports = [];
@@ -32,7 +32,7 @@ class _AdminReportsState extends State<AdminReports> {
   void initState() {
     super.initState();
     _reportBloc = BlocProvider.of<ReportBloc>(context);
-    _reportBloc.add(GetAllReportsEvent(currentPage));
+    _reportBloc.add(GetAllReportsEvent(cursor));
     _reportBloc.add(ConnectReportRealtimeEvent());
     _scrollController.addListener(_onScroll);
   }
@@ -41,9 +41,8 @@ class _AdminReportsState extends State<AdminReports> {
     if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
         isLoading = true;
-        currentPage++;
       });
-      _reportBloc.add(GetAllReportsEvent(currentPage));
+      _reportBloc.add(GetAllReportsEvent(cursor));
     }
   }
 
@@ -111,6 +110,7 @@ class _AdminReportsState extends State<AdminReports> {
         } else if (state is GetAllReportsSuccess) {
           setState(() {
             reports.addAll(state.reports);
+            cursor = state.cursor;
           });
         } else if (state is GetAllReportsError) {
           ScaffoldMessenger.of(context).showSnackBar(

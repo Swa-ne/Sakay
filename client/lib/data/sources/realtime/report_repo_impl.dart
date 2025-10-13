@@ -70,23 +70,36 @@ class ReportRepoImpl extends ReportRepo {
   }
 
   @override
-  Future<List<ReportModel>> getAllReports(int page) async {
+  Future<Map<String, dynamic>> getAllReports(String? cursor) async {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
-      var response =
-          await http.get(Uri.parse("$_apiUrl/get-all-report/$page"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      });
+      final uri = Uri.parse("$_apiUrl/get-all-report").replace(
+        queryParameters: {
+          if (cursor != null && cursor.isNotEmpty) 'cursor': cursor,
+        },
+      );
+
+      var response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': access_token,
+          'Cookie': 'refresh_token=$refresh_token',
+        },
+      );
       final response_body = json.decode(response.body);
       if (response.statusCode == 200) {
-        List<ReportModel> reportList = (response_body['message'] as List)
-            .map((json) => ReportModel.fromJson(json))
-            .toList();
-        return reportList;
+        List<ReportModel> reportList =
+            (response_body['message']["reports"] as List)
+                .map((json) => ReportModel.fromJson(json))
+                .toList();
+        return {
+          "reports": reportList,
+          "nextCursor": response_body['message']["nextCursor"],
+        };
+        ;
       } else {
         throw Exception(response_body['error']);
       }

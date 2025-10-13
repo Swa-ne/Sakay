@@ -23,12 +23,12 @@ class SaveAnnouncementEvent extends AnnouncementEvent {
 }
 
 class GetAllAnnouncementsEvent extends AnnouncementEvent {
-  final int page;
+  final String cursor;
 
-  const GetAllAnnouncementsEvent(this.page);
+  const GetAllAnnouncementsEvent(this.cursor);
 
   @override
-  List<Object> get props => [page];
+  List<Object> get props => [cursor];
 }
 
 class GetAnnouncementEvent extends AnnouncementEvent {

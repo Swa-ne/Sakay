@@ -35,13 +35,13 @@ class _HomeState extends State<Home> {
 
   // Announcements
   final List<AnnouncementsModel> announcements = [];
-  int currentAnnouncementPage = 1;
+  String currentAnnouncementCursor = "";
   final ScrollController _scrollAnnouncementController = ScrollController();
   bool isLoadingAnnouncement = false;
 
   // Messages
   final List<MessageModel> messages = [];
-  int currentMessagePage = 1;
+  String currentMessageCursor = "";
   final ScrollController _scrollMessageController = ScrollController();
   bool isLoadingMessage = false;
 
@@ -55,9 +55,9 @@ class _HomeState extends State<Home> {
         !isLoadingAnnouncement) {
       setState(() {
         isLoadingAnnouncement = true;
-        currentAnnouncementPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     }
   }
 
@@ -67,9 +67,8 @@ class _HomeState extends State<Home> {
         chat_id != null) {
       setState(() {
         isLoadingMessage = true;
-        currentMessagePage++;
       });
-      _chatBloc.add(GetMessageEvent(chat_id!, currentMessagePage));
+      _chatBloc.add(GetMessageEvent(chat_id!, currentMessageCursor));
     }
   }
 
@@ -100,7 +99,8 @@ class _HomeState extends State<Home> {
     _announcementBloc.stream
         .firstWhere((state) => state is ConnectedAnnouncementRealtimeSocket)
         .then((_) {
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     });
 
     _chatBloc.stream
@@ -109,7 +109,7 @@ class _HomeState extends State<Home> {
       setState(() {
         chat_id = (state as CreateInboxSuccess).chat_id;
       });
-      _chatBloc.add(GetMessageEvent(chat_id!, currentMessagePage));
+      _chatBloc.add(GetMessageEvent(chat_id!, currentMessageCursor));
     });
 
     _chatBloc.add(CreateInboxEvent());
@@ -163,6 +163,7 @@ class _HomeState extends State<Home> {
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            currentAnnouncementCursor = state.cursor;
             isLoadingAnnouncement = false;
           });
         } else if (state is OnReceiveAnnouncementSuccess) {
@@ -194,6 +195,7 @@ class _HomeState extends State<Home> {
             } else if (state is GetMessageSuccess) {
               setState(() {
                 messages.addAll(state.messages);
+                currentMessageCursor = state.cursor;
                 isLoadingMessage = false;
               });
             } else if (state is OnReceiveMessageSuccess) {
@@ -227,45 +229,44 @@ class _HomeState extends State<Home> {
             }
           },
           child: Scaffold(
-            body: pages[_selectedIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              backgroundColor: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[900]
-                  : Colors.white,
-              selectedItemColor: const Color(0xFF00A2FF),
-              unselectedItemColor:
-                  Theme.of(context).brightness == Brightness.dark
+              body: pages[_selectedIndex],
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                selectedItemColor: const Color(0xFF00A2FF),
+                unselectedItemColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white70
+                        : Colors.grey,
+                showUnselectedLabels: true,
+                type: BottomNavigationBarType.fixed,
+                selectedLabelStyle: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : null,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white70
-                      : Colors.grey,
-              showUnselectedLabels: true,
-              type: BottomNavigationBarType.fixed,
-              selectedLabelStyle: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : null,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white70
-                    : null,
-              ),
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.inbox), label: 'Inbox'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.campaign), label: 'Announcement'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person), label: 'Profile'),
-              ],
-            ),
-          )),
+                      : null,
+                ),
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.inbox), label: 'Inbox'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.campaign), label: 'Announcement'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.person), label: 'Profile'),
+                ],
+              ))),
     );
   }
 }

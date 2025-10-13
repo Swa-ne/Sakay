@@ -24,7 +24,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
   final List<InboxModel> inboxes = [];
   late ChatBloc _chatBloc;
   final ScrollController _scrollController = ScrollController();
-  int currentPage = 1;
+  String cursor = "";
   bool isLoading = false;
 
   late String user_id;
@@ -33,7 +33,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
   void initState() {
     super.initState();
     _chatBloc = BlocProvider.of<ChatBloc>(context);
-    _chatBloc.add(GetInboxesEvent(currentPage));
+    _chatBloc.add(GetInboxesEvent(cursor));
     _scrollController.addListener(_onScroll);
     _initializeMyUserModel();
   }
@@ -55,9 +55,8 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
     if (_scrollController.position.pixels <= 100 && !isLoading) {
       setState(() {
         isLoading = true;
-        currentPage++;
       });
-      _chatBloc.add(GetInboxesEvent(currentPage));
+      _chatBloc.add(GetInboxesEvent(cursor));
     }
   }
 
@@ -211,6 +210,7 @@ class _AdminInboxState extends State<AdminInbox> with Convertion {
         } else if (state is GetInboxesSuccess) {
           setState(() {
             isLoading = false;
+            cursor = state.cursor;
             inboxes.addAll(state.inboxes);
           });
         } else if (state is IsReadInboxError) {

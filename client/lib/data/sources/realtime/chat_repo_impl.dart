@@ -90,23 +90,36 @@ class ChatRepoImpl extends ChatRepo {
   }
 
   @override
-  Future<List<MessageModel>> getMessage(String chat_id, int page) async {
+  Future<Map<String, dynamic>> getMessage(
+      String chat_id, String? cursor) async {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
-      var response = await http
-          .get(Uri.parse("$_apiUrl/get-messages/$chat_id/$page"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      });
+      final uri = Uri.parse("$_apiUrl/get-messages/$chat_id").replace(
+        queryParameters: {
+          if (cursor != null && cursor.isNotEmpty) 'cursor': cursor,
+        },
+      );
+
+      var response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': access_token,
+          'Cookie': 'refresh_token=$refresh_token',
+        },
+      );
       final response_body = json.decode(response.body);
       if (response.statusCode == 200) {
-        List<MessageModel> messageList = (response_body['message'] as List)
-            .map((json) => MessageModel.fromJson(json))
-            .toList();
-        return messageList;
+        List<MessageModel> messageList =
+            (response_body['message']["result"] as List)
+                .map((json) => MessageModel.fromJson(json))
+                .toList();
+        return {
+          "messages": messageList,
+          "nextCursor": response_body['message']["nextCursor"],
+        };
       } else {
         throw Exception(response_body['message']);
       }
@@ -138,27 +151,43 @@ class ChatRepoImpl extends ChatRepo {
   }
 
   @override
-  Future<List<InboxModel>> getAllInboxes(int page) async {
+  Future<Map<String, dynamic>> getAllInboxes(String? cursor) async {
     final access_token = await _tokenController.getAccessToken();
     final refresh_token = await _tokenController.getRefreshToken();
-    var response = await http.get(
-      Uri.parse("$_apiUrl/get-all-inbox/$page"),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': access_token,
-        'Cookie': 'refresh_token=$refresh_token',
-      },
-    );
-    final response_body = json.decode(response.body);
-    if (response.statusCode == 200) {
-      List<InboxModel> inboxList = (response_body['message'] as List)
-          .map((json) => InboxModel.fromJson(json))
-          .toList();
+    try {
+      final uri = Uri.parse("$_apiUrl/get-all-inbox").replace(
+        queryParameters: {
+          if (cursor != null && cursor.isNotEmpty) 'cursor': cursor,
+        },
+      );
 
-      return inboxList;
-    } else {
-      throw Exception(response_body['message']);
+      var response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': access_token,
+          'Cookie': 'refresh_token=$refresh_token',
+        },
+      );
+      final response_body = json.decode(response.body);
+      print("irrorrfjsalfjsadjfd $response_body");
+      if (response.statusCode == 200) {
+        List<InboxModel> inboxList =
+            (response_body['message']["inboxes"] as List)
+                .map((json) => InboxModel.fromJson(json))
+                .toList();
+
+        return {
+          "inboxes": inboxList,
+          "nextCursor": response_body['message']["nextCursor"],
+        };
+      } else {
+        throw Exception(response_body['message']);
+      }
+    } catch (e) {
+      print("irrorrfjsalfjsadjfd $e");
+      throw Exception(e);
     }
   }
 

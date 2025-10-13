@@ -24,7 +24,7 @@ export const getAllInboxesController = async (req: Request, res: Response) => {
                     new Date(a.last_message.createdAt).getTime()
                 );
 
-                res.status(200).json({ message: { inboxes, nextCrusor: result.message.nextCursor } });
+                res.status(200).json({ message: { inboxes, nextCursor: result.message.nextCursor } });
                 return;
             }
             res.status(200).json({ message: result.message });

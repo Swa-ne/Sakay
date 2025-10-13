@@ -89,8 +89,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         try {
           emit(ChatLoading());
           final messages =
-              await _chatRepo.getMessage(event.chat_id, event.page);
-          emit(GetMessageSuccess(messages));
+              await _chatRepo.getMessage(event.chat_id, event.cursor);
+          emit(GetMessageSuccess(messages["messages"], messages["nextCursor"]));
         } catch (e) {
           emit(const GetMessageError("Internet Connection Error"));
         }
@@ -120,8 +120,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       (event, emit) async {
         try {
           emit(ChatLoading());
-          final inboxes = await _chatRepo.getAllInboxes(event.page);
-          emit(GetInboxesSuccess(inboxes));
+          final inboxes = await _chatRepo.getAllInboxes(event.cursor);
+          emit(GetInboxesSuccess(inboxes["inboxes"], inboxes["nextCursor"]));
         } catch (e) {
           emit(const GetInboxesError("Internet Connection Error"));
         }

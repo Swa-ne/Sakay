@@ -51,8 +51,9 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
         try {
           emit(AnnouncementLoading());
           final announcements =
-              await _announcementRepo.getAllAnnouncements(event.page);
-          emit(GetAllAnnouncementsSuccess(announcements));
+              await _announcementRepo.getAllAnnouncements(event.cursor);
+          emit(GetAllAnnouncementsSuccess(
+              announcements["announcements"], announcements["nextCursor"]));
         } catch (e) {
           emit(const GetAllAnnouncementsError("Internet Connection Error"));
         }

@@ -1,14 +1,24 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_bloc.dart';
 import 'package:sakay_app/bloc/tracker/tracker_event.dart';
 import 'package:sakay_app/common/mixins/tracker.dart';
+import 'package:sakay_app/common/widgets/map.dart';
+import 'package:sakay_app/common/widgets/tracker_required.dart';
+import 'package:sakay_app/common/widgets/near_destination.dart';
+import 'package:sakay_app/common/widgets/at_destination.dart';
+import 'package:sakay_app/data/models/bus.dart';
+import 'package:sakay_app/data/models/location.dart';
 import 'package:sakay_app/data/sources/authentication/token_controller_impl.dart';
+import 'package:sakay_app/presentation/screens/commuters/alarm_system.dart';
 import 'package:sakay_app/presentation/screens/commuters/incident_report.dart';
 import 'package:sakay_app/presentation/screens/commuters/performance_report.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sakay_app/presentation/screens/commuters/sos_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final TokenControllerImpl _tokenController = TokenControllerImpl();
   final Tracker tracker = Tracker();
+  final FocusNode _searchFocusNode = FocusNode();
 
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
@@ -72,13 +83,82 @@ class _HomePageState extends State<HomePage> {
   bool _mapInitialized = false;
   GoogleMapController? _mapController;
   bool _showTraffic = false;
+  LatLng? _currentLocation;
+  String _nearestDestination = "Turn on location";
+  late Timer _locationUpdateTimer;
+
+  bool _showAlreadyAtDestination = false;
+  String _currentDestinationName = "";
+
+  List<BusModel> _availableBuses = [];
+  late ValueListenableBuilder<Map<String, BusModel>> _busListBuilder;
 
   @override
   void initState() {
     super.initState();
     _initPreferences(); // FOR MAP STYLE PREFERENCE
     _trackerBloc = BlocProvider.of<TrackerBloc>(context);
+    _tokenController.getTrackerOn().then((trackerOn) {
+      isTrackerOn = trackerOn == "1";
+    });
     _checkFirstTime();
+    _setupLocationListener();
+    tracker.setDestinationApproachingCallback(_showDestinationApproachingPopup);
+    tracker.setAlreadyAtDestinationCallback(showAlreadyAtDestination);
+    tracker.bussesDataNotifier.addListener(_updateBusList);
+
+    _loadVibrationLevel();
+  }
+
+  @override
+  void dispose() {
+    tracker.bussesDataNotifier.removeListener(_updateBusList);
+    _locationUpdateTimer.cancel();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _updateBusList() {
+    setState(() {
+      _availableBuses = tracker.bussesDataNotifier.value.values.toList();
+    });
+  }
+
+  Future<void> _loadVibrationLevel() async {
+    try {
+      String vibrateLevel = await _tokenController.getVibrate();
+      if (vibrateLevel.isNotEmpty) {
+        int level = int.tryParse(vibrateLevel) ?? 3;
+        tracker.setVibrationLevel(level);
+      }
+    } catch (e) {
+      print('Error loading vibration level: $e');
+      tracker.setVibrationLevel(3);
+    }
+  }
+
+  void _setupLocationListener() {
+    // Set up a periodic timer to update the nearest destination
+    _locationUpdateTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      if (isTrackerOn) {
+        try {
+          Location position = await tracker.getLocationandSpeed();
+          setState(() {
+            _currentLocation = LatLng(position.latitude, position.longitude);
+            _nearestDestination = tracker.getNearestDestination(
+                position.latitude, position.longitude);
+          });
+
+          if (_mapController != null && isTrackerOn) {
+            _mapController!.animateCamera(
+              CameraUpdate.newLatLng(_currentLocation!),
+            );
+          }
+        } catch (e) {
+          print("Error getting location: $e");
+        }
+      }
+    });
   }
 
   // PARA SA SHARED PREFERENCES NG MAP STYLE AND LIVE TRAFFIC
@@ -738,10 +818,182 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  void dispose() {
-    _mapController?.dispose();
-    super.dispose();
+  Widget _buildCompactVolumeControl(
+      String title, double value, Function(double) onChanged, double s) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13 * s,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        SizedBox(height: 6 * s),
+        SliderTheme(
+          data: SliderThemeData(
+            trackHeight: 4 * s,
+            thumbShape: RoundSliderThumbShape(
+              enabledThumbRadius: 8 * s,
+            ),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 12 * s),
+            activeTrackColor: Color(0xFF00A2FF),
+            inactiveTrackColor: Colors.grey.shade300,
+            thumbColor: Color(0xFF00A2FF),
+          ),
+          child: Slider(
+            value: value,
+            onChanged: onChanged,
+            min: 0,
+            max: 1,
+            divisions: 10,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showTrackerRequiredPopup(double s) {
+    showDialog(
+      context: context,
+      builder: (context) => TrackerRequiredPopup(s: s),
+    );
+  }
+
+  void _showDestinationApproachingPopup(String destinationName) {
+    final s = MediaQuery.of(context).size.width / 375;
+    showDialog(
+      context: context,
+      builder: (context) => DestinationApproachingPopup(
+        s: s,
+        destinationName: destinationName,
+      ),
+    );
+  }
+
+  void showAlreadyAtDestination(String destinationName) {
+    setState(() {
+      _showAlreadyAtDestination = true;
+      _currentDestinationName = destinationName;
+    });
+
+    Future.delayed(Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _showAlreadyAtDestination = false;
+        });
+      }
+    });
+  }
+
+  Map<String, String> _calculateBusDistanceAndTime(
+      BusModel bus, LatLng? userLocation) {
+    if (userLocation == null || bus.lat == null || bus.lng == null) {
+      return {'distance': 'N/A', 'time': 'N/A'};
+    }
+
+    double distance = geolocator.Geolocator.distanceBetween(
+      userLocation.latitude,
+      userLocation.longitude,
+      bus.lat!,
+      bus.lng!,
+    );
+
+    double distanceKm = distance / 1000;
+
+    String time;
+    if (bus.speed != null && bus.speed! > 0) {
+      int effectiveSpeed = bus.speed! < 1 ? 1 : bus.speed!.round();
+      double timeHours = distanceKm / effectiveSpeed;
+      double timeMinutes = timeHours * 60;
+
+      if (timeMinutes < 1) {
+        time = "<1 min";
+      } else {
+        time = "${timeMinutes.ceil()} mins";
+      }
+    } else {
+      double timeHours = distanceKm / 30;
+      double timeMinutes = timeHours * 60;
+
+      if (timeMinutes < 1) {
+        time = "<1 min";
+      } else {
+        time = "${timeMinutes.ceil()} mins";
+      }
+    }
+
+    String formattedDistance;
+    if (distance < 1000) {
+      formattedDistance = "${distance.round()} m";
+    } else {
+      formattedDistance = "${distanceKm.toStringAsFixed(1)} km";
+    }
+
+    return {'distance': formattedDistance, 'time': time};
+  }
+
+  Widget _buildBusListContent(double s) {
+    if (_availableBuses.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.directions_bus_outlined,
+              size: 40 * s,
+              color: Colors.grey.shade400,
+            ),
+            SizedBox(height: 12 * s),
+            Text(
+              'No buses available',
+              style: TextStyle(
+                fontSize: 16 * s,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 8 * s),
+            Text(
+              'Buses will appear here when they\nare active on your route',
+              style: TextStyle(
+                fontSize: 12 * s,
+                color: Colors.grey.shade500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: _availableBuses.map((bus) {
+          final routeInfo =
+              tracker.getNearestDestination(bus.lat ?? 0.0, bus.lng ?? 0.0);
+          final distanceTime =
+              _calculateBusDistanceAndTime(bus, _currentLocation);
+
+          return _buildBusMenuItem(
+            context,
+            "${bus.bus_number} - ${bus.plate_number}",
+            routeInfo,
+            "assets/bus.png",
+            distance: distanceTime['distance'],
+            estimatedTime: distanceTime['time'],
+            onClose: () {
+              setState(() {
+                _showBusList = false;
+              });
+            },
+          );
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -764,157 +1016,21 @@ class _HomePageState extends State<HomePage> {
       },
       child: Stack(
         children: [
-          // FOR MAP AND MAP STYLES - FIXED VERSION
-          Positioned.fill(
-            child: GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-                _mapController!.setMapStyle(_getMapStyle());
+          if (_showAlreadyAtDestination)
+            AlreadyAtDestinationWidget(
+              s: s,
+              destinationName: _currentDestinationName,
+              onClose: () {
                 setState(() {
-                  _mapInitialized = true;
+                  _showAlreadyAtDestination = false;
                 });
-                if (_showTraffic) {
-                  _mapController!.setMapStyle('');
-                }
               },
-              initialCameraPosition: _defaultCameraPosition,
-              mapType: _currentMapType,
-              trafficEnabled: _showTraffic,
-              onCameraMove: (CameraPosition position) {
-                if (!_hasRestricted) {
-                  _restrictToPangasinan();
-                  _hasRestricted = true;
-                }
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
             ),
-          ),
-
-          // Top search + suggestions area (responsive)
-          Positioned(
-            top: 20 * s,
-            left: 16 * s,
-            right: 70 * s,
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12 * s),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[850]
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(8 * s),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 5 * s,
-                        offset: Offset(0, 2 * s),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.grey,
-                          size: 20 * s),
-                      SizedBox(width: 8 * s),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          style: TextStyle(
-                            fontSize: 13 * s,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Search for a location...',
-                            hintStyle: TextStyle(
-                              fontSize: 13 * s,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white54
-                                  : Colors.grey,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (query) async {
-                            if (query.isNotEmpty) {
-                              var result = await tracker.searchLocations(query);
-                              setState(() {
-                                _searchResults = result;
-                                _isSearching = true;
-                              });
-                            } else {
-                              setState(() {
-                                _searchResults = [];
-                                _isSearching = false;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.send,
-                            color: Colors.transparent, size: 20 * s),
-                        onPressed: () {
-                          final query = _searchController.text;
-                          if (query.isNotEmpty) {
-                            tracker.handleSearchAndRoute(query);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isSearching && _searchResults.isNotEmpty)
-                  Container(
-                    margin: EdgeInsets.only(top: 8 * s),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[850]
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(8 * s),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5 * s,
-                          offset: Offset(0, 2 * s),
-                        ),
-                      ],
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final location = _searchResults[index];
-                        return ListTile(
-                          title: Text(
-                            location['name'],
-                            style: TextStyle(
-                              fontSize: 13 * s,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                          onTap: () {
-                            _searchController.text = location['name'];
-                            setState(() {
-                              _isSearching = false;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-              ],
+          // FOR MAP AND MAP STYLES - Pass mapType and showTraffic
+          Positioned.fill(
+            child: MyMapWidget(
+              mapType: _currentMapType,
+              showTraffic: _showTraffic,
             ),
           ),
 
@@ -1081,45 +1197,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildBusMenuItem(
-                          context,
-                          "001 - ABC - 1234",
-                          "Boundary Marker Lingayen",
-                          "assets/bus_image.png",
-                          distance: "2 km",
-                          estimatedTime: "5 mins",
-                          onClose: () => setState(() => _showBusList = false),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
-                        _buildBusMenuItem(
-                          context,
-                          "002 - XYZ - 5678",
-                          "Dagupan Terminal",
-                          "assets/bus_image.png",
-                          distance: "3.5 km",
-                          estimatedTime: "8 mins",
-                          onClose: () => setState(() => _showBusList = false),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
-                        _buildBusMenuItem(
-                          context,
-                          "003 - LMN - 9101",
-                          "San Carlos City",
-                          "assets/bus_image.png",
-                          distance: "5 km",
-                          estimatedTime: "12 mins",
-                          onClose: () => setState(() => _showBusList = false),
-                        ),
-                      ],
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height *
+                          .32, // half the screen
+                      child: _buildBusListContent(s),
                     ),
                   ),
                 ),
-              ),
+              )
             ],
           ),
 
@@ -1177,7 +1262,7 @@ class _HomePageState extends State<HomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            bottom: _showBusList ? 280 * s : 10 * s, // animates smoothly
+            bottom: _showBusList ? 293 * s : 10 * s,
             left: 16 * s,
             right: 16 * s,
             child: Container(
@@ -1220,7 +1305,9 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Phinma University of Pangasinan',
+                          isTrackerOn
+                              ? _nearestDestination
+                              : "Turn on location",
                           style: TextStyle(
                             fontSize: 12 * s,
                             fontWeight: FontWeight.w600,
@@ -1233,7 +1320,9 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          '28WV+R2R, Arellano St, Downtown District',
+                          isTrackerOn
+                              ? '' // TODO: real
+                              : "Turn on your tracker to let drivers know your location",
                           style: TextStyle(
                             fontSize: 10 * s,
                             color:
@@ -1248,6 +1337,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(width: 12 * s),
+                  AlarmSystem(
+                    isTrackerOn: isTrackerOn,
+                    s: s,
+                  ),
                   InkWell(
                     onTap: () async {
                       _trackerBloc.add(
@@ -1256,6 +1349,23 @@ class _HomePageState extends State<HomePage> {
                       setState(() {
                         isTrackerOn = !isTrackerOn;
                       });
+                      _tokenController.updateTrackerOn(isTrackerOn ? "1" : "0");
+                      if (!isTrackerOn) {
+                        try {
+                          Location position =
+                              await tracker.getLocationandSpeed();
+                          setState(() {
+                            _currentLocation =
+                                LatLng(position.latitude, position.longitude);
+                            _nearestDestination = tracker.getNearestDestination(
+                              position.latitude,
+                              position.longitude,
+                            );
+                          });
+                        } catch (e) {
+                          print("Error getting location: $e");
+                        }
+                      }
                     },
                     borderRadius: BorderRadius.circular(8 * s),
                     child: Container(
@@ -1283,7 +1393,160 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-          )
+          ),
+
+          // Top search + suggestions area (responsive)
+          Stack(
+            children: [
+              Positioned(
+                top: 20 * s,
+                left: 16 * s,
+                right: 70 * s,
+                child: Container(
+                  padding: EdgeInsets.only(left: 1 * s),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8 * s),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5 * s,
+                        offset: Offset(0, 2 * s),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _isSearching ? Icons.arrow_back : Icons.search,
+                          color: Colors.grey,
+                          size: 20 * s,
+                        ),
+                        onPressed: () {
+                          if (_isSearching) {
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              _isSearching = false;
+                              _searchController.clear();
+                              _searchResults = [];
+                            });
+                          }
+                        },
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          cursorColor: const Color(0xFF00A2FF),
+                          style: TextStyle(fontSize: 13 * s),
+                          decoration: InputDecoration(
+                            hintText: 'Search for a location...',
+                            hintStyle: TextStyle(fontSize: 13 * s),
+                            border: InputBorder.none,
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _isSearching = true;
+                            });
+                          },
+                          onChanged: (query) async {
+                            if (query.isNotEmpty) {
+                              var result = await tracker.searchLocations(query);
+                              setState(() {
+                                _searchResults = result;
+                                _isSearching = true;
+                              });
+                            } else {
+                              setState(() {
+                                _searchResults = [];
+                                _isSearching = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      if (_isSearching)
+                        IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.black,
+                            size: 20 * s,
+                          ),
+                          onPressed: () {
+                            final query = _searchController.text;
+                            if (query.isNotEmpty) {
+                              if (isTrackerOn) {
+                                tracker.handleSearchAndRoute(query);
+                              } else {
+                                _showTrackerRequiredPopup(s);
+                              }
+                            }
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              if (_isSearching && _searchResults.isNotEmpty) ...[
+                Positioned(
+                  top: (25 * s) + (50 * s),
+                  left: 16 * s,
+                  right: 16 * s,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5 * s),
+                    constraints: BoxConstraints(maxHeight: 530 * s),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8 * s),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 3 * s,
+                          offset: Offset(0, 1 * s),
+                        ),
+                      ],
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final location = _searchResults[index];
+                        return ListTile(
+                          leading: Icon(
+                            Icons.location_on,
+                            color: const Color(0xFF00A2FF),
+                            size: 18 * s,
+                          ),
+                          title: Text(
+                            location['name'],
+                            style: TextStyle(fontSize: 13 * s),
+                          ),
+                          onTap: () {
+                            _searchController.text = location['name'];
+
+                            FocusScope.of(context).unfocus();
+
+                            setState(() {
+                              _isSearching = false;
+                            });
+                            final query = location['name'];
+                            if (query.isNotEmpty) {
+                              if (isTrackerOn) {
+                                tracker.handleSearchAndRoute(query);
+                              } else {
+                                _showTrackerRequiredPopup(s);
+                              }
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     ));

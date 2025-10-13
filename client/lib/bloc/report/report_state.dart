@@ -38,11 +38,12 @@ class SaveReportError extends ReportState {
 
 class GetAllReportsSuccess extends ReportState {
   final List<ReportModel> reports;
+  final String cursor;
 
-  const GetAllReportsSuccess(this.reports);
+  const GetAllReportsSuccess(this.reports, this.cursor);
 
   @override
-  List<Object> get props => [reports];
+  List<Object> get props => [reports, cursor];
 }
 
 class GetAllReportsError extends ReportState {

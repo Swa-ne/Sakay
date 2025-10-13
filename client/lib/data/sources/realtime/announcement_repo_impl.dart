@@ -58,25 +58,36 @@ class AnnouncementRepoImpl extends AnnouncementRepo {
   }
 
   @override
-  Future<List<AnnouncementsModel>> getAllAnnouncements(int page) async {
+  Future<Map<String, dynamic>> getAllAnnouncements(String? cursor) async {
     try {
       final access_token = await _tokenController.getAccessToken();
       final refresh_token = await _tokenController.getRefreshToken();
       try {
-        var response = await http
-            .get(Uri.parse("$_apiUrl/get-all-announcements/$page"), headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': access_token,
-          'Cookie': 'refresh_token=$refresh_token',
-        });
+        final uri = Uri.parse("$_apiUrl/get-all-announcements").replace(
+          queryParameters: {
+            if (cursor != null && cursor.isNotEmpty) 'cursor': cursor,
+          },
+        );
+
+        var response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': access_token,
+            'Cookie': 'refresh_token=$refresh_token',
+          },
+        );
         final response_body = json.decode(response.body);
         if (response.statusCode == 200) {
           List<AnnouncementsModel> announcementList =
-              (response_body['message'] as List)
+              (response_body['message']["announcements"] as List)
                   .map((json) => AnnouncementsModel.fromJson(json))
                   .toList();
-          return announcementList;
+          return {
+            "announcements": announcementList,
+            "nextCursor": response_body['message']["nextCursor"],
+          };
         } else {
           throw Exception(response_body['error']);
         }

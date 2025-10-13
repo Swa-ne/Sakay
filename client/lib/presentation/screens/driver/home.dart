@@ -36,13 +36,13 @@ class _HomeState extends State<Home> {
 
   // Announcements
   final List<AnnouncementsModel> announcements = [];
-  int currentAnnouncementPage = 1;
+  String currentAnnouncementCursor = "";
   final ScrollController _scrollAnnouncementController = ScrollController();
   bool isLoadingAnnouncement = false;
 
   // Messages
   final List<MessageModel> messages = [];
-  int currentMessagePage = 1;
+  String currentMessageCursor = "";
   final ScrollController _scrollMessageController = ScrollController();
   bool isLoadingMessage = false;
 
@@ -62,9 +62,9 @@ class _HomeState extends State<Home> {
         !isLoadingAnnouncement) {
       setState(() {
         isLoadingAnnouncement = true;
-        currentAnnouncementPage++;
       });
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     }
   }
 
@@ -74,9 +74,8 @@ class _HomeState extends State<Home> {
         chat_id != null) {
       setState(() {
         isLoadingMessage = true;
-        currentMessagePage++;
       });
-      _chatBloc.add(GetMessageEvent(chat_id!, currentMessagePage));
+      _chatBloc.add(GetMessageEvent(chat_id!, currentMessageCursor));
     }
   }
 
@@ -105,7 +104,8 @@ class _HomeState extends State<Home> {
     _announcementBloc.stream
         .firstWhere((state) => state is ConnectedAnnouncementRealtimeSocket)
         .then((_) {
-      _announcementBloc.add(GetAllAnnouncementsEvent(currentAnnouncementPage));
+      _announcementBloc
+          .add(GetAllAnnouncementsEvent(currentAnnouncementCursor));
     });
 
     _chatBloc.stream
@@ -114,7 +114,7 @@ class _HomeState extends State<Home> {
       setState(() {
         chat_id = (state as CreateInboxSuccess).chat_id;
       });
-      _chatBloc.add(GetMessageEvent(chat_id!, currentMessagePage));
+      _chatBloc.add(GetMessageEvent(chat_id!, currentMessageCursor));
     });
 
     _chatBloc.add(CreateInboxEvent());
@@ -168,6 +168,7 @@ class _HomeState extends State<Home> {
         } else if (state is GetAllAnnouncementsSuccess) {
           setState(() {
             announcements.addAll(state.announcements);
+            currentAnnouncementCursor = state.cursor;
             isLoadingAnnouncement = false;
           });
         } else if (state is OnReceiveAnnouncementSuccess) {
@@ -199,6 +200,7 @@ class _HomeState extends State<Home> {
             } else if (state is GetMessageSuccess) {
               setState(() {
                 messages.addAll(state.messages);
+                currentMessageCursor = state.cursor;
                 isLoadingMessage = false;
               });
             } else if (state is OnReceiveMessageSuccess) {
