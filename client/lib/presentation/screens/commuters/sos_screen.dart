@@ -1,7 +1,6 @@
-// SOS File
-
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:sakay_app/core/sos_notifier.dart';
 
 class SosOverlayDialog extends StatefulWidget {
   const SosOverlayDialog({super.key});
@@ -12,18 +11,16 @@ class SosOverlayDialog extends StatefulWidget {
 
 class _SosOverlayDialogState extends State<SosOverlayDialog>
     with SingleTickerProviderStateMixin {
-  // Hold-to-trigger
+
   bool _isHolding = false;
   int _holdSeconds = 10;
   Timer? _holdTimer;
 
-  // Confirmation (after accidental release)
   bool _isConfirming = false;
   int _confirmSeconds = 10;
   Timer? _confirmTimer;
-  double _cancelProgress = 0.0; // slider progress 0..1
+  double _cancelProgress = 0.0;
 
-  // Slide-up animation
   late final AnimationController _controller;
   late final Animation<Offset> _slideAnimation;
 
@@ -31,15 +28,15 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-        .animate(
-            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _controller.forward();
   }
 
   void _startHold() {
-    // cancel any confirm timer if restarting a hold
     _confirmTimer?.cancel();
     setState(() {
       _isConfirming = false;
@@ -51,9 +48,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     _holdTimer?.cancel();
     _holdTimer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() => _holdSeconds--);
-
       if (_holdSeconds <= 0) {
-        // Full 10s hold completed -> send immediately
         _holdTimer?.cancel();
         _sendSOS();
       }
@@ -64,14 +59,13 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     if (!_isHolding) return;
     _holdTimer?.cancel();
 
-    // If user released early (still > 0), enter confirmation phase
     if (_holdSeconds > 0) {
       _startConfirmCountdown();
     }
 
     setState(() {
       _isHolding = false;
-      _holdSeconds = 10; // reset for next time
+      _holdSeconds = 10;
     });
   }
 
@@ -108,14 +102,16 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
   void _sendSOS() {
     _holdTimer?.cancel();
     _confirmTimer?.cancel();
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("🚨 SOS has been sent to the authorities (placeholder)"),
+        content: Text("🚨 SOS has been sent to the authorities"),
       ),
     );
-    // TODO: Replace with your actual SOS trigger function
-    // e.g., await sosService.sendAlert();
-    debugPrint("SOS Triggered!");
+
+    SosNotifier().triggerSOS("Commuter A");
+
+    debugPrint("SOS Triggered and sent to admins!");
     Navigator.pop(context);
   }
 
@@ -123,9 +119,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     _holdTimer?.cancel();
     _confirmTimer?.cancel();
     _controller.reverse().then((_) {
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      if (mounted) Navigator.pop(context);
     });
   }
 
@@ -139,7 +133,6 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
 
   @override
   Widget build(BuildContext context) {
-    // Fade background slightly red while holding
     final bgColor = _isHolding ? Colors.red.shade100 : Colors.white;
 
     return Dialog(
@@ -158,15 +151,12 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
           ),
           child: Column(
             children: [
-              // Top bar with Close button (left) + Title (center)
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.close,
-                          color: Colors.black, size: 28),
+                      icon: const Icon(Icons.close, color: Colors.black, size: 28),
                       onPressed: _closeDialog,
                     ),
                     const Expanded(
@@ -181,14 +171,13 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 48), // balance right side
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
 
               const Spacer(),
 
-              // Explanation when in confirmation mode
               if (_isConfirming)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -199,7 +188,6 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                   ),
                 ),
 
-              // Center button (hold or confirmation text)
               if (!_isConfirming)
                 GestureDetector(
                   onLongPressStart: (_) => _startHold(),
@@ -242,21 +230,17 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
 
               const Spacer(),
 
-              // Slide-to-cancel (only during confirmation)
               if (_isConfirming)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border:
-                              Border.all(color: Colors.red.withOpacity(0.2)),
+                          border: Border.all(color: Colors.red.withOpacity(0.2)),
                         ),
                         child: const Row(
                           children: [
@@ -279,10 +263,8 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                           inactiveTrackColor:
                               const Color(0xFF00A2FF).withOpacity(0.2),
                           thumbColor: const Color(0xFF00A2FF),
-                          overlayColor:
-                              const Color(0xFF00A2FF).withOpacity(0.1),
-                          thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 12),
+                          overlayColor: const Color(0xFF00A2FF).withOpacity(0.1),
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
                         ),
                         child: Slider(
                           min: 0,

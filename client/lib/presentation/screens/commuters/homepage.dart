@@ -1259,7 +1259,7 @@ class _HomePageState extends State<HomePage> {
           // Show the traffic legend if live traffic is enabled
           if (_showTraffic) _buildTrafficLegend(s, sw),
 
-// SOS Button - Positioned top-left of Turn on location container
+          // SOS Button
           Positioned(
             bottom: MediaQuery.of(context).size.height * 0.11,
             left: MediaQuery.of(context).size.width * 0.04,
