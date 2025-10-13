@@ -11,7 +11,6 @@ class SosOverlayDialog extends StatefulWidget {
 
 class _SosOverlayDialogState extends State<SosOverlayDialog>
     with SingleTickerProviderStateMixin {
-
   bool _isHolding = false;
   int _holdSeconds = 10;
   Timer? _holdTimer;
@@ -32,25 +31,58 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
       duration: const Duration(milliseconds: 400),
     );
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+        .animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _controller.forward();
   }
 
-  void _startHold() {
+  Future<void> _sendSOS() async {
+    _holdTimer?.cancel();
     _confirmTimer?.cancel();
+
     setState(() {
-      _isConfirming = false;
-      _cancelProgress = 0.0;
+      _isConfirming = true;
+      _confirmSeconds = 0;
+    });
+
+    try {
+      SosNotifier().triggerSOS("Commuter A");
+
+      setState(() {});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("🚨 SOS has been sent to the authorities"),
+        ),
+      );
+
+      debugPrint("SOS Triggered and sent to admins!");
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ Failed to send SOS: $e")),
+      );
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) Navigator.pop(context);
+  }
+
+  void _startHold() {
+    if (_isHolding) return;
+
+    setState(() {
       _isHolding = true;
       _holdSeconds = 10;
     });
 
-    _holdTimer?.cancel();
-    _holdTimer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() => _holdSeconds--);
+    _holdTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _holdSeconds--;
+      });
+
       if (_holdSeconds <= 0) {
-        _holdTimer?.cancel();
-        _sendSOS();
+        timer.cancel();
+        _sendSOSImmediately();
       }
     });
   }
@@ -78,9 +110,16 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     });
 
     _confirmTimer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() => _confirmSeconds--);
+      setState(() {
+        _confirmSeconds--;
+      });
+
       if (_confirmSeconds <= 0) {
-        _sendSOS();
+        t.cancel();
+        setState(() {
+          _confirmSeconds = 0;
+        });
+        Future.delayed(const Duration(seconds: 1), _sendSOS);
       }
     });
   }
@@ -99,7 +138,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     }
   }
 
-  void _sendSOS() {
+  void _sendSOSImmediately() {
     _holdTimer?.cancel();
     _confirmTimer?.cancel();
 
@@ -152,11 +191,13 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black, size: 28),
+                      icon: const Icon(Icons.close,
+                          color: Colors.black, size: 28),
                       onPressed: _closeDialog,
                     ),
                     const Expanded(
@@ -175,9 +216,7 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                   ],
                 ),
               ),
-
               const Spacer(),
-
               if (_isConfirming)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -187,7 +226,6 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                     style: TextStyle(fontSize: 16, color: Colors.black54),
                   ),
                 ),
-
               if (!_isConfirming)
                 GestureDetector(
                   onLongPressStart: (_) => _startHold(),
@@ -214,12 +252,13 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                     ),
                   ),
                 ),
-
               if (_isConfirming)
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0, bottom: 12),
                   child: Text(
-                    "Sending SOS in $_confirmSeconds…",
+                    _confirmSeconds > 0
+                        ? "Sending SOS in $_confirmSeconds…"
+                        : "🚨 SOS Sent",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -227,20 +266,21 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                     ),
                   ),
                 ),
-
               const Spacer(),
-
               if (_isConfirming)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.2)),
+                          border:
+                              Border.all(color: Colors.red.withOpacity(0.2)),
                         ),
                         child: const Row(
                           children: [
@@ -263,8 +303,10 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
                           inactiveTrackColor:
                               const Color(0xFF00A2FF).withOpacity(0.2),
                           thumbColor: const Color(0xFF00A2FF),
-                          overlayColor: const Color(0xFF00A2FF).withOpacity(0.1),
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                          overlayColor:
+                              const Color(0xFF00A2FF).withOpacity(0.1),
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 12),
                         ),
                         child: Slider(
                           min: 0,
