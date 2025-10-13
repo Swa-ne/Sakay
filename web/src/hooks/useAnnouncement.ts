@@ -133,9 +133,11 @@ const useAnnouncement = () => {
                 files.forEach((file) => formData.append('file', file));
             }
 
-            const announcement = await postAnnouncement(formData);
-            if (typeof announcement !== "string" && announcement.status === 200) {
-                setAnnouncements((prevState) => [announcement.data, ...prevState,])
+            const ann_id = await postAnnouncement(formData);
+            const announcement = typeof ann_id === 'string' ? await getAnnouncement(ann_id) : null;
+            if (typeof announcement !== "string" && announcement) {
+
+                setAnnouncements((prevState) => [announcement, ...prevState])
                 setOpen(false);
                 setAnnouncementForm({
                     headline: "",

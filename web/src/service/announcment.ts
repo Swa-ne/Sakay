@@ -57,7 +57,7 @@ export const postAnnouncement = async (formData: FormData) => {
             }
         );
 
-        return response;
+        return response.data.message;
     } catch (error: unknown) {
         const axiosError = error as AxiosError<{ error: string }>;
         const errMsg = axiosError.response?.data?.error || 'Unknown error';
