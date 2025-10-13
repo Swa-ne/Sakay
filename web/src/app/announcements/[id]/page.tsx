@@ -105,7 +105,7 @@ export default function AnnouncementDetails() {
         }
     }, [id, fetchAnnouncement]);
 
-    if (loading) return <LoadingPage />;
+    // if (loading) return <LoadingPage />;
     if (error) return <div>Error: {error}</div>;
     if (!announcement) return <div>Report not found</div>;
 

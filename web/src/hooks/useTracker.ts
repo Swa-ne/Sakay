@@ -47,7 +47,6 @@ const useTracker = (map: google.maps.Map | null = null) => {
     }, [map]);
 
     const getAllBusses = useCallback(async () => {
-        setLoading(true);
         setError(null);
         const fetchBusses = await getAllBussesAndDriver()
         if (fetchBusses !== "Internal Server Error") {
@@ -147,9 +146,11 @@ const useTracker = (map: google.maps.Map | null = null) => {
 
     useEffect(() => {
         if (!map) return;
+        setLoading(true);
 
         getAllBusses();
         connectTrackingSocket();
+        setLoading(false);
     }, [map, getAllBusses, connectTrackingSocket]);
 
     return { connectTrackingSocket, disconnectTrackingSocket, busses, setBusses, polylines, setPolylines, loading, setLoading, error, setError };

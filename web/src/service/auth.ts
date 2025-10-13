@@ -85,7 +85,7 @@ export const logout = async () => {
         });
 
         const data = response.data;
-        if (data === "User logged Out") {
+        if (data.message === "User logged Out") {
             useAuthStore.getState().reset();
             return "Success";
         }

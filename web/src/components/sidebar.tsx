@@ -11,7 +11,6 @@ import LogoutIcon from './icons/logoutIcon';
 import Link from 'next/link';
 import { Megaphone } from 'lucide-react';
 import { useAuthenticated } from '@/hooks/useAuthenticated';
-import LoadingPage from './pages/loading.page';
 import { redirect } from 'next/navigation';
 import NotSupportedPage from './pages/not.supported.page';
 import { logout } from '@/service/auth';
@@ -21,7 +20,7 @@ export default function Sidebar() {
     const [isLogoutHovered, setIsLogoutHovered] = useState(false);
 
     const { isAuthenticated, userType } = useAuthenticated();
-    if (isAuthenticated === null) return <LoadingPage />;
+    if (isAuthenticated === null) return <></>;
     if (!isAuthenticated) {
         redirect('/');
     }

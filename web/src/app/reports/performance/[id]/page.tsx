@@ -28,7 +28,7 @@ const PerformancePage = () => {
         }
     }, [id, setReportID]);
 
-    if (loading) return <LoadingPage />;
+    // if (loading) return <LoadingPage />;
 
     if (error) return <div>Error: {error}</div>;
 

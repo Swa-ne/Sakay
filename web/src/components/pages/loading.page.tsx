@@ -6,13 +6,7 @@ import busLoading from '@/assets/animations/bus-loading.json';
 
 const LoadingPage: React.FC = () => {
     return (
-        <div
-            className='fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white bg-opacity-95 text-center'
-            style={{
-                minHeight: '100vh',
-                minWidth: '100vw',
-            }}
-        >
+        <div className='relative h-screen w-full inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-95 text-center'>
             <div className='w-40 max-w-xs h-32 mb-6 flex items-center justify-center mx-auto'>
                 <Lottie animationData={busLoading} loop autoplay style={{ width: '100%', height: '100%' }} />
             </div>

@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react'
 import { authenticateToken } from '@/service/auth'
 import { connectAdminSocketEvents, connectSocket } from '@/service/websocket/realtime'
