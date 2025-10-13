@@ -30,10 +30,11 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+        .animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _controller.forward();
   }
 
@@ -118,16 +119,15 @@ class _SosOverlayDialogState extends State<SosOverlayDialog>
     Navigator.pop(context);
   }
 
-void _closeDialog() {
-  _holdTimer?.cancel();
-  _confirmTimer?.cancel();
-  _controller.reverse().then((_) {
-    if (mounted) {
-      Navigator.pop(context);
-    }
-  });
-}
-
+  void _closeDialog() {
+    _holdTimer?.cancel();
+    _confirmTimer?.cancel();
+    _controller.reverse().then((_) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -160,11 +160,13 @@ void _closeDialog() {
             children: [
               // Top bar with Close button (left) + Title (center)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black, size: 28),
+                      icon: const Icon(Icons.close,
+                          color: Colors.black, size: 28),
                       onPressed: _closeDialog,
                     ),
                     const Expanded(
@@ -212,7 +214,9 @@ void _closeDialog() {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      _isHolding ? "$_holdSeconds" : "Press and hold\nto send SOS",
+                      _isHolding
+                          ? "$_holdSeconds"
+                          : "Press and hold\nto send SOS",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16,
@@ -241,18 +245,21 @@ void _closeDialog() {
               // Slide-to-cancel (only during confirmation)
               if (_isConfirming)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.2)),
+                          border:
+                              Border.all(color: Colors.red.withOpacity(0.2)),
                         ),
-                        child: Row(
-                          children: const [
+                        child: const Row(
+                          children: [
                             Icon(Icons.swipe_right, color: Colors.red),
                             SizedBox(width: 8),
                             Expanded(
@@ -268,7 +275,14 @@ void _closeDialog() {
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           trackHeight: 8,
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                          activeTrackColor: const Color(0xFF00A2FF),
+                          inactiveTrackColor:
+                              const Color(0xFF00A2FF).withOpacity(0.2),
+                          thumbColor: const Color(0xFF00A2FF),
+                          overlayColor:
+                              const Color(0xFF00A2FF).withOpacity(0.1),
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 12),
                         ),
                         child: Slider(
                           min: 0,
