@@ -147,9 +147,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                         child: Container(
                           padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1A1A1A)
-                                : Colors.white,
+                            color:
+                                isDark ? const Color(0xFF1A1A1A) : Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
                             boxShadow: [
                               BoxShadow(
@@ -309,7 +308,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: const Text(
-              'Forgot Password?',
+              '',
               style: TextStyle(color: Colors.red, fontSize: 12),
             ),
           ),
