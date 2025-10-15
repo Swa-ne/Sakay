@@ -1,0 +1,22 @@
+services:
+    flask:
+        build:
+            context: .
+            dockerfile: Dockerfile.flask
+        container_name: flask-api
+        expose:
+            - '5000'
+        env_file:
+            - .env
+        restart: always
+
+    nginx:
+        build:
+            context: .
+            dockerfile: Dockerfile.nginx
+        container_name: flask-nginx
+        ports:
+            - '80:8080'
+        depends_on:
+            - flask
+        restart: always

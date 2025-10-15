@@ -1,0 +1,50 @@
+# Ignore environment and secret files
+.env
+*.env
+.env.*
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Byte-compiled / package artifacts
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Logs and coverage files
+*.log
+*.out
+*.err
+coverage/
+htmlcov/
+*.cover
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+
+# Git files
+.git/
+.gitignore
+
+# macOS and Windows specific
+.DS_Store
+Thumbs.db
+
+# Docker and compose artifacts (if any)
+docker-compose.override.yml
+
+# Temporary files
+*.tmp
+*.bak
+*.old
