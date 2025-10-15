@@ -1,11 +1,8 @@
 from flask import Flask, request, send_file, jsonify
-from dotenv import load_dotenv
 from email.message import EmailMessage
 import os
 import ssl
 import smtplib
-
-load_dotenv()
 
 app = Flask(__name__)
 
