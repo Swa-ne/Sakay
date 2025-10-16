@@ -1,20 +1,20 @@
-version: '3.4'
-
 services:
     api:
         build:
             context: .
-            target: production
-
+            dockerfile: Dockerfile.express
+        container_name: sakay-javascript-api
         ports:
-            - 3000:3000
-
-        environment:
-            - MONGODB_CONNECTION=${MONGODB_CONNECTION}
-            - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-            - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
-            - API_PORT=${API_PORT}
-            - REDIS_USERNAME=${REDIS_USERNAME}
-            - REDIS_PASSWORD=${REDIS_PASSWORD}
-            - REDIS_HOST=${REDIS_HOST}
-            - REDIS_PORT=${REDIS_PORT}
+            - '3000'
+        env_file: .env
+        restart: always
+    nginx:
+        build:
+            context: .
+            dockerfile: Dockerfile.nginx
+        container_name: sakay-javascript-nginx
+        ports:
+            - '80:8080'
+        depends_on:
+            - api
+        restart: always
