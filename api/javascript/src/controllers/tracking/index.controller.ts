@@ -1,5 +1,5 @@
 import { UserType } from "../../middlewares/token.authentication"
-import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime, getAdminsFromRedisTracking, checkBusIDFromRedisRealtime, addBusIDToRedisRealtime, removeBusIDFromRedisRealtime, getBusIDFromRedisRealtime } from "../../services/tracking/index.services";
+import { addUserToRedisTracking, removeUserFromRedisTracking, addUserToRedisRealtime, removeUserFromRedisRealtime, getUserFromRedisRealtime, checkUserFromRedisRealtime, getAdminsFromRedisTracking, checkBusIDFromRedisRealtime, addBusIDToRedisRealtime, removeBusIDFromRedisRealtime, getBusIDFromRedisRealtime, removeBusLocDataFromRedisRealtime, addBusLocDataToRedisRealtime, LOCATION } from "../../services/tracking/index.services";
 
 export const addUserToRedisTrackingController = async (socket_id: string, user?: UserType) => {
     try {
@@ -105,5 +105,25 @@ export const getBusIDFromRedisRealtimeController = async (bus_id: string) => {
         return result
     } catch (error) {
         return null
+    }
+}
+export const addBusLocDataToRedisRealtimeController = async (bus_id: string, location: LOCATION) => {
+    try {
+        if (!bus_id) return { error: "User not found" }
+        const result = await addBusLocDataToRedisRealtime(bus_id, location)
+        if (result.httpCode === 500) return { error: result.error }
+        return { message: result.message }
+    } catch (error) {
+        return { error: "Internal Server Error" }
+    }
+}
+export const removeBusLocDataFromRedisRealtimeController = async (bus_id: string) => {
+    try {
+        if (!bus_id) return { error: "User not found" }
+        const result = await removeBusLocDataFromRedisRealtime(bus_id)
+        if (result.httpCode === 500) return { error: result.error }
+        return { message: result.message }
+    } catch (error) {
+        return { error: "Internal Server Error" }
     }
 }

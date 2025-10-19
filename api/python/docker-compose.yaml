@@ -20,3 +20,27 @@ services:
         depends_on:
             - flask
         restart: always
+
+    celery_worker:
+        build:
+            context: .
+            dockerfile: Dockerfile.celery
+        container_name: celery-worker
+        env_file:
+            - .env
+        depends_on:
+            - flask
+        command: celery -A celery_worker.celery worker --loglevel=info
+        restart: always
+
+    celery_beat:
+        build:
+            context: .
+            dockerfile: Dockerfile.celery
+        container_name: celery-beat
+        env_file:
+            - .env
+        depends_on:
+            - flask
+        command: celery -A celery_worker.celery beat --loglevel=info
+        restart: always

@@ -1,5 +1,12 @@
 import { redis } from "../..";
 
+export interface LOCATION {
+    'latitude': string,
+    'longitude': string,
+    'speed': string,
+    'timestamp': string,
+}
+
 export const addUserToRedisTracking = async (type: string, socket_id: string) => {
     try {
         const redisKey = `user_sockets_tracking:${type}`;
@@ -94,5 +101,29 @@ export const getBusIDFromRedisRealtime = async (bus_id: string) => {
         return socket_id;
     } catch (err) {
         return null;
+    }
+}
+export const addBusLocDataToRedisRealtime = async (bus_id: string, locData: LOCATION) => {
+    try {
+        const key = `driver:${bus_id}:location`;
+
+        const pipeline = redis.multi();
+
+        pipeline.hSet(key, { ...locData });
+        pipeline.expire(key, 120);
+
+        await pipeline.exec();
+        return { message: 'Success', httpCode: 200 };
+    } catch (err) {
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const removeBusLocDataFromRedisRealtime = async (bus_id: string) => {
+    try {
+        const key = `driver:${bus_id}:location`;
+        await redis.del(key);
+        return { message: 'Success', httpCode: 200 };
+    } catch (err) {
+        return { error: "Internal Server Error", httpCode: 500 };
     }
 }

@@ -3,6 +3,9 @@ import { Report } from "../models/report.model";
 import { User } from "../models/authentication/user.model";
 import { Bus } from "../models/bus.model";
 import { startOfWeek, subWeeks } from "date-fns";
+import { redis } from "..";
+import { getNearestDestination } from "../utils/latlng.util";
+import { emitReportToAdmin } from "../socket";
 
 export const postIncidentReport = async (bus_id: string, user_id: string, description: string, place_of_incident: string, time_of_incident: string, date_of_incident: string) => {
     const session = await startSession();
@@ -217,6 +220,83 @@ export const getReportStats = async () => {
             httpCode: 200,
         };
     } catch (error) {
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+};
+export const updateAdminReport = async () => {
+    const session = await startSession();
+    session.startTransaction();
+
+    const now = new Date();
+    const time_of_incident = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
+    const date_of_incident = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    });
+
+    try {
+        const overspeedKeys = await redis.keys("overspeed:*");
+        const offrouteKeys = await redis.keys("offroute:*");
+        const alerts = [];
+
+        const allKeys = [...overspeedKeys, ...offrouteKeys];
+
+        for (const key of allKeys) {
+            const busId = key.split(":")[1];
+            const type = key.startsWith("overspeed:") ? "overspeed" : "offroute";
+
+            const locationKey = `driver:${busId}:location`;
+            const locData = await redis.hGetAll(locationKey);
+
+            const lat = parseFloat(locData.lat);
+            const lng = parseFloat(locData.lng);
+
+            if (isNaN(lat) || isNaN(lng)) {
+                console.warn(`No location data found for bus ${busId}`);
+                continue;
+            }
+
+            const place_of_incident = getNearestDestination(lat, lng);
+
+            const description =
+                type === "overspeed"
+                    ? "Driver oversped"
+                    : "Driver went off route";
+
+            alerts.push({
+                bus_id: busId,
+                type,
+                lat,
+                lng,
+                message:
+                    type === "overspeed"
+                        ? `Bus ${busId} exceeded the speed limit.`
+                        : `Bus ${busId} went off its assigned route.`,
+            });
+
+            const report = await new Report({
+                bus: busId,
+                reporter: "Automation",
+                type_of_report: "INCIDENT",
+                description,
+                place_of_incident,
+                time_of_incident,
+                date_of_incident,
+            }).save({ session });
+            emitReportToAdmin(report)
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+        return { message: "Success", httpCode: 200, alerts };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         return { error: "Internal Server Error", httpCode: 500 };
     }
 };

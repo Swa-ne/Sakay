@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 import http from "http";
 import { socketAuthenticate } from "./middlewares/socket.token.authentication";
 import { UserType } from "./middlewares/token.authentication";
-import { addBusIDToRedisRealtimeControllerController, addUserToRedisRealtimeController, addUserToRedisTrackingController, checkBusIDFromRedisRealtimeController, checkUserFromRedisRealtimeController, getBusIDFromRedisRealtimeController, getUserFromRedisRealtimeController, removeBusIDFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
+import { addBusIDToRedisRealtimeControllerController, addBusLocDataToRedisRealtimeController, addUserToRedisRealtimeController, addUserToRedisTrackingController, checkBusIDFromRedisRealtimeController, checkUserFromRedisRealtimeController, getBusIDFromRedisRealtimeController, getUserFromRedisRealtimeController, removeBusIDFromRedisRealtimeController, removeBusLocDataFromRedisRealtimeController, removeUserFromRedisRealtimeController, removeUserFromRedisTrackingController } from "./controllers/tracking/index.controller";
 import { getCurrentUserById } from './services/index.services';
 import { getFilesFromAnnouncement } from './services/announcement.services';
 import { getReport } from './services/report.services';
@@ -56,6 +56,7 @@ trackingSocket.on("connection", async (socket) => {
                 const occupiedBy = await getBusIDFromRedisRealtimeController(bus_id.toString());
                 if (!occupiedBy || occupiedBy === socket.user.user_id) {
                     await addBusIDToRedisRealtimeControllerController(bus_id.toString(), socket.user.user_id);
+                    await addBusLocDataToRedisRealtimeController(bus_id.toString(), location);
                     const bus = await getBus(bus_id.toString());
                     socket.broadcast.emit("update-map", {
                         location, user: socket.user?.user_id, bus: bus.message
@@ -89,6 +90,7 @@ trackingSocket.on("connection", async (socket) => {
         if (socket.user?.user_id) {
             const bus_id = (await getBusWithUserID(socket.user.user_id)).message;
             if (bus_id) {
+                removeBusLocDataFromRedisRealtimeController(bus_id.toString());
                 removeBusIDFromRedisRealtimeController(bus_id.toString())
             }
         }
@@ -176,6 +178,12 @@ export const emitDriverAssigned = (userId: string, busId: string) => {
 export const emitDriverUnassigned = (userId: string) => {
     io.of("/realtime").emit("driver-unassigned-receive", {
         userId,
+    });
+};
+
+export const emitReportToAdmin = (updated_report: any) => {
+    io.of("/realtime").emit("report-receive-admin", {
+        report: updated_report.message
     });
 };
 
