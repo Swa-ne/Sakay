@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { authenticateToken } from "../middlewares/token.authentication"
-import { getAllReportsController, getReportController, getReportStatsController, postIncidentReportController, postPerformanceReportController, toggleReportController, updateAdminReportController } from "../controllers/report.controller";
+import { getAllReportsController, getDriverPerformanceSummaryByIdController, getDriversSummaryController, getReportController, getReportStatsController, postIncidentReportController, postPerformanceReportController, toggleReportController, updateAdminReportController } from "../controllers/report.controller";
 
 
 const router = Router()
@@ -15,5 +15,7 @@ router.put("/toggle-report/:report_id", toggleReportController);
 router.get("/get-stats-report", getReportStatsController);
 
 router.get("/udpate-admin", updateAdminReportController);
+router.get("/summary-drivers", getDriversSummaryController);
+router.get("/summary-driver/:report_id", getDriverPerformanceSummaryByIdController);
 
 export default router

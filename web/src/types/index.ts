@@ -47,7 +47,10 @@ export interface Unit {
     plate_number: string;
     assignedDriverId?: string | null;
 }
-
+interface violationDetails {
+    _id: string;
+    description: string;
+}
 export interface Report {
     _id: string,
     bus: fetchBus,
@@ -63,11 +66,20 @@ export interface Report {
     service_rate?: number | null,
     reliability_rate?: number | null,
     is_open: boolean,
+    total_reports?: number | null,
+    overall_average?: number | null,
+    avg_driving_rate?: number | null,
+    avg_service_rate?: number | null,
+    avg_reliability_rate?: number | null,
+    driver_name?: string | null,
+    driver_id?: string | null,
+    driver_profile_picture_url?: string | null,
+    reports: violationDetails[],
     createdAt?: string | null,
     updatedAt?: string | null,
 }
 
-export type TypesOfReport = "PERFORMANCE" | "INCIDENT" | "MAINTENANCE";
+export type TypesOfReport = "PERFORMANCE" | "INCIDENT" | "DRIVER";
 
 export interface ReportStatItem {
     count: number;

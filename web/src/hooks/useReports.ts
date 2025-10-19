@@ -14,7 +14,9 @@ const useReports = () => {
     const [report, setReport] = useState<Report | null>()
 
     const reports = useReportStore((state) => state.reports);
+    const drivers = useReportStore((state) => state.drivers);
     const setReports = useReportStore((state) => state.setReports);
+    const setDrivers = useReportStore((state) => state.setDrivers);
     const reportStats = useReportStore((state) => state.reportStats);
     const setReportStats = useReportStore((state) => state.setReportStats);
     const onToggleReport = useReportStore((state) => state.onToggleReport);
@@ -130,7 +132,7 @@ const useReports = () => {
         if (reportID) fetchReport(reportID)
     }, [reportID, fetchReport])
 
-    return { loadMoreReports, report, reports, reportStats, reportID, setReport, setReports, setReportStats, setReportID, reportCursor, setReportCursor, loading, error, setLoading, toggleReportOnClick };
+    return { loadMoreReports, report, drivers, reports, reportStats, reportID, setReport, setDrivers, setReports, setReportStats, setReportID, reportCursor, setReportCursor, loading, error, setLoading, toggleReportOnClick };
 }
 
 export default useReports

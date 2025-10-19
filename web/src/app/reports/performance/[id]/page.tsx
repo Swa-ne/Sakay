@@ -10,7 +10,6 @@ import { StarRating } from '@/components/ui/star-rating';
 
 import useReports from '@/hooks/useReports';
 import { reportDate } from '@/utils/date.util';
-import LoadingPage from '@/components/pages/loading.page';
 // import useManageAccounts from '@/hooks/useManageAccounts';
 
 const PerformancePage = () => {
