@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserType } from '../middlewares/token.authentication';
 import { validateContentLength } from '../utils/input.validators';
-import { getAllReports, getReport, getReportStats, postIncidentReport, postPerformanceReport, toggleReport, updateAdminReport } from '../services/report.services';
+import { getAllReports, getDriverPerformanceSummary, getDriverPerformanceSummaryById, getReport, getReportStats, postIncidentReport, postPerformanceReport, toggleReport, updateAdminReport } from '../services/report.services';
 
 export const postIncidentReportController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
@@ -194,5 +194,29 @@ export const updateAdminReportController = async (req: Request, res: Response) =
         res.status(reports.httpCode).json({ error: reports.error });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const getDriversSummaryController = async (req: Request, res: Response) => {
+    try {
+        const result = await getDriverPerformanceSummary();
+        res.status(200).json({ success: true, data: result });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+export const getDriverPerformanceSummaryByIdController = async (req: Request, res: Response) => {
+    try {
+        const { report_id } = req.params;
+
+        if (!report_id) {
+            res.status(404).json({ error: 'Report not found' });
+            return;
+        }
+        const result = await getDriverPerformanceSummaryById(report_id);
+        res.status(200).json({ success: true, data: result });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };

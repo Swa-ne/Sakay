@@ -1,4 +1,4 @@
-import { ObjectId, Schema, startSession } from "mongoose";
+import mongoose, { ObjectId, Schema, startSession, Types } from "mongoose";
 import { Report } from "../models/report.model";
 import { User } from "../models/authentication/user.model";
 import { Bus } from "../models/bus.model";
@@ -299,4 +299,274 @@ export const updateAdminReport = async () => {
         session.endSession();
         return { error: "Internal Server Error", httpCode: 500 };
     }
+};
+export const getDriverPerformanceSummary = async () => {
+    const summary = await Report.aggregate([
+        { $match: { type_of_report: "PERFORMANCE" } },
+        {
+            $group: {
+                _id: "$driver",
+                total_reports: { $sum: 1 },
+                avg_driving_rate: { $avg: "$driving_rate" },
+                avg_service_rate: { $avg: "$service_rate" },
+                avg_reliability_rate: { $avg: "$reliability_rate" },
+            },
+        },
+        {
+            $addFields: {
+                overall_average: {
+                    $avg: [
+                        "$avg_driving_rate",
+                        "$avg_service_rate",
+                        "$avg_reliability_rate",
+                    ],
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "driver",
+            },
+        },
+        { $unwind: { path: "$driver", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "reports",
+                localField: "_id",
+                foreignField: "driver",
+                as: "reports",
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "reports.reporter",
+                foreignField: "_id",
+                as: "reporters",
+            },
+        },
+        {
+            $lookup: {
+                from: "buses",
+                localField: "reports.bus",
+                foreignField: "_id",
+                as: "buses",
+            },
+        },
+        {
+            $addFields: {
+                reports: {
+                    $map: {
+                        input: "$reports",
+                        as: "r",
+                        in: {
+                            _id: "$$r._id",
+                            description: "$$r.description",
+                            driving_rate: "$$r.driving_rate",
+                            service_rate: "$$r.service_rate",
+                            reliability_rate: "$$r.reliability_rate",
+                            createdAt: "$$r.createdAt",
+                            reporter: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: "$reporters",
+                                            as: "u",
+                                            cond: { $eq: ["$$u._id", "$$r.reporter"] },
+                                        },
+                                    },
+                                    0,
+                                ],
+                            },
+                            bus: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: "$buses",
+                                            as: "b",
+                                            cond: { $eq: ["$$b._id", "$$r.bus"] },
+                                        },
+                                    },
+                                    0,
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                driver_id: "$driver._id",
+                driver_name: {
+                    $concat: ["$driver.first_name", " ", "$driver.last_name"]
+                },
+                driver_email: "$driver.email_address",
+                driver_createdAt: "$driver.createdAt",
+                driver_profile_picture_url: "$driver.profile_picture_url",
+                total_reports: 1,
+                avg_driving_rate: { $round: ["$avg_driving_rate", 2] },
+                avg_service_rate: { $round: ["$avg_service_rate", 2] },
+                avg_reliability_rate: { $round: ["$avg_reliability_rate", 2] },
+                overall_average: { $round: ["$overall_average", 2] },
+                reports: {
+                    _id: 1,
+                    description: 1,
+                    driving_rate: 1,
+                    service_rate: 1,
+                    reliability_rate: 1,
+                    createdAt: 1,
+                    "reporter._id": 1,
+                    "reporter.name": 1,
+                    "bus._id": 1,
+                    "bus.plate_number": 1,
+                },
+            },
+        },
+    ]);
+    return summary;
+};
+export const getDriverPerformanceSummaryById = async (driverId: string) => {
+    const driverObjectId = new mongoose.Types.ObjectId(driverId);
+    const summary = await Report.aggregate([
+        {
+            $match: {
+                type_of_report: "PERFORMANCE",
+                driver: driverObjectId,
+            },
+        },
+        {
+            $group: {
+                _id: "$driver",
+                total_reports: { $sum: 1 },
+                avg_driving_rate: { $avg: "$driving_rate" },
+                avg_service_rate: { $avg: "$service_rate" },
+                avg_reliability_rate: { $avg: "$reliability_rate" },
+            },
+        },
+        {
+            $addFields: {
+                overall_average: {
+                    $avg: [
+                        "$avg_driving_rate",
+                        "$avg_service_rate",
+                        "$avg_reliability_rate",
+                    ],
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "driver",
+            },
+        },
+        { $unwind: { path: "$driver", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "reports",
+                localField: "_id",
+                foreignField: "driver",
+                as: "reports",
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "reports.reporter",
+                foreignField: "_id",
+                as: "reporters",
+            },
+        },
+        {
+            $lookup: {
+                from: "buses",
+                localField: "reports.bus",
+                foreignField: "_id",
+                as: "buses",
+            },
+        },
+        {
+            $addFields: {
+                reports: {
+                    $map: {
+                        input: "$reports",
+                        as: "r",
+                        in: {
+                            _id: "$$r._id",
+                            description: "$$r.description",
+                            driving_rate: "$$r.driving_rate",
+                            service_rate: "$$r.service_rate",
+                            reliability_rate: "$$r.reliability_rate",
+                            createdAt: "$$r.createdAt",
+                            reporter: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: "$reporters",
+                                            as: "u",
+                                            cond: { $eq: ["$$u._id", "$$r.reporter"] },
+                                        },
+                                    },
+                                    0,
+                                ],
+                            },
+                            bus: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: "$buses",
+                                            as: "b",
+                                            cond: { $eq: ["$$b._id", "$$r.bus"] },
+                                        },
+                                    },
+                                    0,
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                driver_id: "$driver._id",
+                driver_name: {
+                    $concat: ["$driver.first_name", " ", "$driver.last_name"],
+                },
+                driver_email: "$driver.email_address",
+                driver_createdAt: "$driver.createdAt",
+                driver_profile_picture_url: "$driver.profile_picture_url",
+                total_reports: 1,
+                avg_driving_rate: { $round: ["$avg_driving_rate", 2] },
+                avg_service_rate: { $round: ["$avg_service_rate", 2] },
+                avg_reliability_rate: { $round: ["$avg_reliability_rate", 2] },
+                overall_average: { $round: ["$overall_average", 2] },
+                reports: {
+                    _id: 1,
+                    description: 1,
+                    driving_rate: 1,
+                    service_rate: 1,
+                    reliability_rate: 1,
+                    createdAt: 1,
+                    "reporter._id": 1,
+                    "reporter.first_name": 1,
+                    "reporter.last_name": 1,
+                    "bus._id": 1,
+                    "bus.plate_number": 1,
+                },
+            },
+        },
+        { $limit: 1 },
+    ]);
+
+    console.log(summary);
+    return summary[0] || null;
 };
