@@ -83,3 +83,41 @@ export const toggleReport = async (report_id: string) => {
         return errMsg;
     }
 }
+export const getDriversSummary = async () => {
+    const { access_token } = useAuthStore.getState();
+    try {
+        const response = await api.get(
+            `${ROUTE}/summary-drivers`,
+            {
+                headers: {
+                    "Authorization": access_token
+                }
+            }
+        );
+        const data = response.data;
+        return data.data;
+    } catch (error: unknown) {
+        const axiosError = error as AxiosError<{ error: string }>;
+        const errMsg = axiosError.response?.data?.error || 'Unknown error';
+        return errMsg;
+    }
+}
+export const getDriversSummaryByID = async (driver_id: string) => {
+    const { access_token } = useAuthStore.getState();
+    try {
+        const response = await api.get(
+            `${ROUTE}/summary-driver/${driver_id}`,
+            {
+                headers: {
+                    "Authorization": access_token
+                }
+            }
+        );
+        const data = response.data;
+        return data.data;
+    } catch (error: unknown) {
+        const axiosError = error as AxiosError<{ error: string }>;
+        const errMsg = axiosError.response?.data?.error || 'Unknown error';
+        return errMsg;
+    }
+}

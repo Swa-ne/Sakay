@@ -3,9 +3,11 @@ import { create } from 'zustand';
 
 interface ReportStore {
     reports: Report[]
+    drivers: []
     reportStats: FetchReportStats | null;
 
     setReports: (update: Report[] | ((prev: Report[]) => Report[])) => void
+    setDrivers: (update: [] | ((prev: []) => [])) => void
     setReportStats: (update: (FetchReportStats | null) | ((prev: (FetchReportStats | null)) => (FetchReportStats | null))) => void
 
     onToggleReport: (report: Report) => void
@@ -15,6 +17,7 @@ interface ReportStore {
 
 const useReportStore = create<ReportStore>((set) => ({
     reports: [],
+    drivers: [],
     reportStats: {
         open: {
             count: 0,
@@ -38,6 +41,10 @@ const useReportStore = create<ReportStore>((set) => ({
     setReports: (update) =>
         set((state) => ({
             reports: typeof update === 'function' ? update(state.reports) : update,
+        })),
+    setDrivers: (update) =>
+        set((state) => ({
+            drivers: typeof update === 'function' ? update(state.drivers) : update,
         })),
     setReportStats: (update) =>
         set((state) => ({
@@ -70,6 +77,7 @@ export default useReportStore;
 
 export const reportActions = {
     setReportStats: useReportStore.getState().setReportStats,
+    setDrivers: useReportStore.getState().setDrivers,
     onToggleReport: useReportStore.getState().onToggleReport,
     onAdminReport: useReportStore.getState().onAdminReport,
     onAdminToggleReport: useReportStore.getState().onAdminToggleReport,
