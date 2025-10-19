@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserType } from '../middlewares/token.authentication';
 import { validateContentLength } from '../utils/input.validators';
-import { getAllReports, getReport, getReportStats, postIncidentReport, postPerformanceReport, toggleReport } from '../services/report.services';
+import { getAllReports, getReport, getReportStats, postIncidentReport, postPerformanceReport, toggleReport, updateAdminReport } from '../services/report.services';
 
 export const postIncidentReportController = async (req: Request & { user?: UserType }, res: Response) => {
     try {
@@ -171,6 +171,20 @@ export const toggleReportController = async (req: Request & { user?: UserType },
 export const getReportStatsController = async (req: Request, res: Response) => {
     try {
         const reports = await getReportStats();
+
+        if (reports.httpCode === 200) {
+            res.status(reports.httpCode).json({ message: reports.message });
+            return;
+        }
+
+        res.status(reports.httpCode).json({ error: reports.error });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const updateAdminReportController = async (req: Request, res: Response) => {
+    try {
+        const reports = await updateAdminReport();
 
         if (reports.httpCode === 200) {
             res.status(reports.httpCode).json({ message: reports.message });
