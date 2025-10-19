@@ -58,6 +58,12 @@ class _SplashScreenState extends State<SplashScreen> {
             return;
           }
           context.go('/commuter/home');
+        } else if (state is EmailNotVerified) {
+          // _authBloc.add(ResendEmailCodeEvent(state.token));
+          // context.go("/email_verification", extra: {
+          //   "email_address": obfuscateEmail(_emailController.text),
+          //   "token": state.token,
+          // });
         } else {
           context.go('/onboarding');
         }
