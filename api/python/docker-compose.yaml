@@ -9,8 +9,6 @@ services:
         env_file:
             - .env
         restart: always
-        networks:
-            - shared_network
 
     nginx:
         build:
@@ -22,8 +20,6 @@ services:
         depends_on:
             - flask
         restart: always
-        networks:
-            - shared_network
 
     celery_worker:
         build:
@@ -36,8 +32,6 @@ services:
             - flask
         command: celery -A celery_worker.celery worker --loglevel=info
         restart: always
-        networks:
-            - shared_network
 
     celery_beat:
         build:
@@ -50,5 +44,3 @@ services:
             - flask
         command: celery -A celery_worker.celery beat --loglevel=info
         restart: always
-        networks:
-            - shared_network
