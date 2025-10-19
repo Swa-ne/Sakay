@@ -67,7 +67,7 @@ export interface Report {
     updatedAt?: string | null,
 }
 
-export type TypesOfReport = "PERFORMANCE" | "INCIDENT" | "MAINTENANCE";
+export type TypesOfReport = "PERFORMANCE" | "INCIDENT" | "DRIVER";
 
 export interface ReportStatItem {
     count: number;
