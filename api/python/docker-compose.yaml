@@ -27,8 +27,8 @@ services:
 
     celery_worker:
         build:
-        context: .
-        dockerfile: Dockerfile.celery
+            context: .
+            dockerfile: Dockerfile.celery
         container_name: celery-worker
         env_file:
             - .env
@@ -41,8 +41,8 @@ services:
 
     celery_beat:
         build:
-        context: .
-        dockerfile: Dockerfile.celery
+            context: .
+            dockerfile: Dockerfile.celery
         container_name: celery-beat
         env_file:
             - .env
@@ -53,6 +53,6 @@ services:
         networks:
             - shared_network
 
-    networks:
+networks:
     shared_network:
         external: true
