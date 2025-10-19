@@ -53,6 +53,6 @@ services:
         networks:
             - shared_network
 
-    networks:
+networks:
     shared_network:
         external: true
