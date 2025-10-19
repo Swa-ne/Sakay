@@ -52,7 +52,3 @@ services:
         restart: always
         networks:
             - shared_network
-
-networks:
-    shared_network:
-        external: true
