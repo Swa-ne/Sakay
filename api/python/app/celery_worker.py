@@ -5,6 +5,7 @@ import redis
 from celery import Celery
 
 JS_IP_ADDRESS = os.getenv("JS_IP_ADDRESS", "redis")
+JAVASCRIPT_IP = os.getenv("JAVASCRIPT_IP", "")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 REDIS_USERNAME = os.getenv("REDIS_USERNAME", "")
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
@@ -522,7 +523,7 @@ def check_all_drivers():
                     
         if call_js:
             try:
-                js_api_url = f"http://{JS_IP_ADDRESS}/update-admin"
+                js_api_url = f"http://{JAVASCRIPT_IP}/udpate-admin"
                 response = requests.post(js_api_url, timeout=5)
                 print(f"Triggered JS API: {response.status_code} {response.text}")
             except Exception as e:
