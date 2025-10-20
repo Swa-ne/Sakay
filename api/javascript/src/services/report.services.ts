@@ -6,6 +6,7 @@ import { startOfWeek, subWeeks } from "date-fns";
 import { redis } from "..";
 import { getNearestDestination } from "../utils/latlng.util";
 import { emitReportToAdmin } from "../socket";
+import { getBus } from "./bus.services";
 
 export const postIncidentReport = async (bus_id: string, user_id: string, description: string, place_of_incident: string, time_of_incident: string, date_of_incident: string) => {
     const session = await startSession();
@@ -240,7 +241,6 @@ export const updateAdminReport = async () => {
     try {
         const overspeedKeys = await redis.keys("overspeed:*");
         const offrouteKeys = await redis.keys("offroute:*");
-        const alerts = [];
 
         const allKeys = [...overspeedKeys, ...offrouteKeys];
 
@@ -251,8 +251,8 @@ export const updateAdminReport = async () => {
             const locationKey = `driver:${busId}:location`;
             const locData = await redis.hGetAll(locationKey);
 
-            const lat = parseFloat(locData.lat);
-            const lng = parseFloat(locData.lng);
+            const lat = parseFloat(locData.latitude);
+            const lng = parseFloat(locData.longitude);
 
             if (isNaN(lat) || isNaN(lng)) {
                 console.warn(`No location data found for bus ${busId}`);
@@ -261,21 +261,12 @@ export const updateAdminReport = async () => {
 
             const place_of_incident = getNearestDestination(lat, lng);
 
+            const bus = await getBus(busId);
             const description =
                 type === "overspeed"
-                    ? "Driver oversped"
-                    : "Driver went off route";
+                    ? `Bus ${bus.message?.bus_number} - ${bus.message?.plate_number} exceeded the speed limit.`
+                    : `Bus ${bus.message?.bus_number} - ${bus.message?.plate_number} went off its assigned route.`;
 
-            alerts.push({
-                bus_id: busId,
-                type,
-                lat,
-                lng,
-                message:
-                    type === "overspeed"
-                        ? `Bus ${busId} exceeded the speed limit.`
-                        : `Bus ${busId} went off its assigned route.`,
-            });
 
             const report = await new Report({
                 bus: busId,
@@ -289,7 +280,7 @@ export const updateAdminReport = async () => {
             emitReportToAdmin(report)
         }
 
-        return { message: "Success", httpCode: 200, alerts };
+        return { message: "Success", httpCode: 200 };
     } catch (error) {
         return { error: "Internal Server Error", httpCode: 500 };
     }

@@ -493,8 +493,8 @@ def check_all_drivers():
 
             bus_id = key.split(":")[1]
             speed = float(loc_data.get("speed", 0))
-            lat = float(loc_data.get("lat", 0))
-            lng = float(loc_data.get("lng", 0))
+            lat = float(loc_data.get("latitude", 0))
+            lng = float(loc_data.get("longitude", 0))
 
             overspeed_key = f"overspeed:{bus_id}"
             offroute_key = f"offroute:{bus_id}"
