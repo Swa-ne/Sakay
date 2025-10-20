@@ -63,7 +63,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-app.get("/udpate-admin", updateAdminReportController);
+app.post("/udpate-admin", updateAdminReportController);
 app.use("/authentication", entryRoutes)
 app.use("/chat", chatRoutes)
 app.use("/announcement", announcementRoutes)
