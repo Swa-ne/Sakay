@@ -224,8 +224,6 @@ export const getReportStats = async () => {
     }
 };
 export const updateAdminReport = async () => {
-    const session = await startSession();
-    session.startTransaction();
 
     const now = new Date();
     const time_of_incident = now.toLocaleTimeString('en-US', {
@@ -287,16 +285,12 @@ export const updateAdminReport = async () => {
                 place_of_incident,
                 time_of_incident,
                 date_of_incident,
-            }).save({ session });
+            }).save();
             emitReportToAdmin(report)
         }
 
-        await session.commitTransaction();
-        session.endSession();
         return { message: "Success", httpCode: 200, alerts };
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         return { error: "Internal Server Error", httpCode: 500 };
     }
 };
