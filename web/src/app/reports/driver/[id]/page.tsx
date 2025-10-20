@@ -33,7 +33,7 @@ const DriverReportPage = () => {
                     <h3 className='text-lg font-semibold mb-3'>Driver Information</h3>
                     <div className='flex items-center space-x-3'>
                         <div className='relative w-16 h-16 rounded-md overflow-hidden border-2 border-gray-300'>
-                            <Image src={report.driver_profile_picture_url ?? '/profile.jpg'} fill alt='Driver profile' className='object-cover' />
+                            <Image src={'/profile.jpg'} fill alt='Driver profile' className='object-cover' />
                         </div>
                         <div>
                             <h3 className='text-base font-semibold'>{report.driver_name}</h3>

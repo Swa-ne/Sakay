@@ -41,7 +41,7 @@ const IncidentPage = () => {
                     <h3 className='text-lg font-semibold'>Reported by:</h3>
                     <div className='flex items-center m-5 space-x-1'>
                         <div className='relative w-15 rounded-md overflow-hidden aspect-square border-2 border-black'>
-                            <Image src={report.driver?.profile_picture_url || '/profile.jpg'} fill className='object-fill scale-110' alt='Sakay user profile picture' />
+                            <Image src={'/profile.jpg'} fill className='object-fill scale-110' alt='Sakay user profile picture' />
                         </div>
                         <div className='ml-3'>
                             <h3 className='text-lg font-semibold'>{`${report.reporter?.first_name} ${report.reporter?.last_name}`}</h3>

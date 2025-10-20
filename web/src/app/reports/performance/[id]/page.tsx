@@ -78,7 +78,7 @@ const PerformancePage = () => {
                 <div className='w-full h-36 flex items-center space-x-1.5 rounded-2xl overflow-hidden shadow-[0px_4px_10px_rgba(0,0,0,0.15)]'>
                     <div className='w-1/5 h-full flex justify-center items-center bg-primary'>
                         <div className='relative h-30 rounded-full overflow-hidden aspect-square'>
-                            <Image src={report.driver?.profile_picture_url || '/profile.jpg'} fill className='object-fill scale-110' alt='Profile' />
+                            <Image src={'/profile.jpg'} fill className='object-fill scale-110' alt='Profile' />
                         </div>
                     </div>
                     <div className='flex-1 h-full p-5'>
