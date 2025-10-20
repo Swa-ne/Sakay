@@ -184,7 +184,7 @@ export const emitDriverUnassigned = (userId: string) => {
 export const emitReportToAdmin = (updated_report: any) => {
     console.log("running")
     io.of("/realtime").emit("report-receive-admin", {
-        report: updated_report.message
+        report: updated_report
     });
 };
 
