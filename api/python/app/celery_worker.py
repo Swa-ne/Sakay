@@ -25,7 +25,7 @@ redis_client = redis.Redis(
 
 celery.conf.beat_schedule = {
     "check_driver_locations_every_second": {
-        "task": "tasks.check_all_drivers",
+        "task": "check_all_drivers",
         "schedule": 1.0,
     },
 }
@@ -522,7 +522,7 @@ def check_all_drivers():
                     
         if call_js:
             try:
-                js_api_url = f"http://{JS_IP_ADDRESS}:80/report/update-admin"
+                js_api_url = f"http://{JS_IP_ADDRESS}/report/update-admin"
                 response = requests.post(js_api_url, timeout=5)
                 print(f"Triggered JS API: {response.status_code} {response.text}")
             except Exception as e:
