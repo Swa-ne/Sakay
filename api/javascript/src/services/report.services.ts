@@ -260,27 +260,23 @@ export const updateAdminReport = async () => {
             }
 
             const place_of_incident = getNearestDestination(lat, lng);
-            console.log("place_of_incident", place_of_incident);
-            console.log("busid", busId);
+            const user = await User.findById("68f5cfd080bf86ba9cc3aeee");
             const bus = await getBus(busId);
-            console.log("bus", bus);
             const description =
                 type === "overspeed"
                     ? `Bus ${bus.message?.bus_number} - ${bus.message?.plate_number} exceeded the speed limit.`
                     : `Bus ${bus.message?.bus_number} - ${bus.message?.plate_number} went off its assigned route.`;
 
 
-            console.log("saving report");
             const report = await new Report({
                 bus: busId,
-                reporter: "Automation",
+                reporter: user,
                 type_of_report: "INCIDENT",
                 description,
                 place_of_incident,
                 time_of_incident,
                 date_of_incident,
             }).save();
-            console.log("report saved", report._id);
             emitReportToAdmin(report)
         }
 
