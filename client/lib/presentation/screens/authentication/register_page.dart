@@ -68,7 +68,7 @@ class _RegisterPageState extends State<RegisterPage> with InputValidationMixin {
           ),
       firstDate: DateTime(1900),
       lastDate: DateTime(
-        now.year,
+        now.year - 12,
         now.month,
         now.day,
       ),
