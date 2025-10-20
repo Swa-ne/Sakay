@@ -14,7 +14,6 @@ router.get("/get-report/:report_id", getReportController);
 router.put("/toggle-report/:report_id", toggleReportController);
 router.get("/get-stats-report", getReportStatsController);
 
-router.get("/udpate-admin", updateAdminReportController);
 router.get("/summary-drivers", getDriversSummaryController);
 router.get("/summary-driver/:report_id", getDriverPerformanceSummaryByIdController);
 

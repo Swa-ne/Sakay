@@ -522,7 +522,7 @@ def check_all_drivers():
                     
         if call_js:
             try:
-                js_api_url = f"http://{JS_IP_ADDRESS}/report/update-admin"
+                js_api_url = f"http://{JS_IP_ADDRESS}/update-admin"
                 response = requests.post(js_api_url, timeout=5)
                 print(f"Triggered JS API: {response.status_code} {response.text}")
             except Exception as e:

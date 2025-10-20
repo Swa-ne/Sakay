@@ -15,6 +15,7 @@ import busRoutes from "./routes/bus.routes";
 import usersRoutes from "./routes/user.routes";
 
 import { app, server } from './socket';
+import { updateAdminReportController } from './controllers/report.controller';
 
 
 
@@ -62,6 +63,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+app.get("/udpate-admin", updateAdminReportController);
 app.use("/authentication", entryRoutes)
 app.use("/chat", chatRoutes)
 app.use("/announcement", announcementRoutes)
